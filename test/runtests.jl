@@ -1,4 +1,4 @@
-using ElasticFDA
+using FDAsrsf
 using Base.Test
 
 # write your own tests here
