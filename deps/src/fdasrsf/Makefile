@@ -1,6 +1,12 @@
 .PHONY : clean
 
-CC = icc  # C commpiler
+ERR = $(shell which icc >/dev/null; echo $$?)
+ifeq "$(ERR)" "0"
+    CC = icc
+else
+    CC = gcc
+endif
+
 CFLAGS= -fPIC -Wall -Wextra -O3 -g # C flags
 LDFLAGS= -shared   # linking flags
 
