@@ -158,7 +158,6 @@ end
 
 function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
                        q2::Array{Float64,2}, lam::Float64=0.0)
-    mq = mq./norm(mq);
     M, N = size(q1);
     n1 = 1;
     sizei = Cdouble[0];
@@ -168,7 +167,6 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
         q2i = q2[:, ii] ./ norm(q2[:, ii]);
         G = zeros(M);
         T = zeros(M);
-        qi = q[:, ii];
         ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
               (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32,
               Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32,
