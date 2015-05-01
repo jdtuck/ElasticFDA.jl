@@ -6,12 +6,14 @@ using Dierckx
 using NLopt
 using ProgressMeter
 using Distributions
+using Cpp
 using Winston
 
 export
     smooth_data!,
     smooth_data,
     f_to_srsf,
+    srsf_to_f,
     optimum_reparam,
     warp_q_gamma,
     qtocurve,
