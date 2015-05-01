@@ -84,71 +84,186 @@ end
 
 
 function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
-                       q2::Array{Float64,1}, lam::Float64=0.0)
+                         q2::Array{Float64,1}, lam::Float64=0.0,
+                         method::ASCIIString="DP")
     q1 = q1./norm(q1);
+    q2 = q2./norm(q2);
     M = length(q2);
     n1 = 1;
-    G = zeros(M);
-    T = zeros(M);
-    sizei = Cdouble[0];
-    ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32,
-           Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32, Ptr{Float64},
-           Ptr{Float64}, Ptr{Float64}, Float64), q1, timet, q2, timet,
-           n1, M, M, timet, timet, M, M, G, T, sizei, lam)
-    G = G[1:int(sizei[1])];
-    T = T[1:int(sizei[1])];
-    yi = InterpIrregular(T, G, BCnil, InterpLinear);
-    gam = yi[timet];
+    if (method == "DP")
+        G = zeros(M);
+        T = zeros(M);
+        sizei = Cdouble[0];
+        ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
+            (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32,
+            Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32, Ptr{Float64},
+            Ptr{Float64}, Ptr{Float64}, Float64), q1, timet, q2, timet,
+            n1, M, M, timet, timet, M, M, G, T, sizei, lam)
+        G = G[1:int(sizei[1])];
+        T = T[1:int(sizei[1])];
+        yi = InterpIrregular(T, G, BCnil, InterpLinear);
+        gam = yi[timet];
+    elseif (method == "DP2")
+        opt = zeros(M+n1*n1+1);
+        swap = false;
+        fopts = zeros(5);
+        comtime = zeros(5);
+        @cpp ccall((:optimum_reparam, libgropt), Void,
+                   (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
+                   Ptr{Uint8}, Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
+                   q1, q2, M, n1, 0.0, true, "", opt, swap, fopts, comtime)
+
+        gam = opt[1:end-2];
+
+        if swap
+            gam = invertGamma(gam);
+        end
+
+    else
+        w = 0.01;
+        opt = zeros(M+n1*n1+1);
+        swap = false;
+        fopts = zeros(5);
+        comtime = zeros(5);
+        @cpp ccall((:optimum_reparam, libgropt), Void,
+                   (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
+                   Ptr{Uint8}, Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
+                   q1, q2, M, n1, w, false, method, opt, swap, fopts, comtime)
+
+        gam = opt[1:end-2];
+
+        if swap
+            gam = invertGamma(gam);
+        end
+    end
+
     gam = (gam-gam[1]) ./ (gam[end] - gam[1]);
+
     return gam
 end
 
 
 function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
                          q2::Array{Float64,1}, time2::Array{Float64,1},
-                         lam::Float64=0.0)
+                         lam::Float64=0.0, method::ASCIIString="DP")
     q1 = q1./norm(q1);
+    q2 = q2./norm(q2);
     M1 = length(q1);
     M2 = length(q2);
     n1 = 1;
-    G = zeros(M1);
-    T = zeros(M1);
-    sizei = Cdouble[0];
-    ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
-          (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32,
-           Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32, Ptr{Float64},
-           Ptr{Float64}, Ptr{Float64}, Float64), q1, time1, q2, time2,
-           n1, M1, M2, time1, time2, M1, M2, G, T, sizei, lam)
-    G = G[1:int(sizei[1])];
-    T = T[1:int(sizei[1])];
-    yi = InterpIrregular(T, G, BCnil, InterpLinear);
-    gam = yi[time1];
+    if (M1 != M2)
+        method = "DP";
+    end
+    if (method == "DP")
+        G = zeros(M1);
+        T = zeros(M1);
+        sizei = Cdouble[0];
+        ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
+            (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32,
+            Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32, Ptr{Float64},
+            Ptr{Float64}, Ptr{Float64}, Float64), q1, time1, q2, time2,
+            n1, M1, M2, time1, time2, M1, M2, G, T, sizei, lam)
+        G = G[1:int(sizei[1])];
+        T = T[1:int(sizei[1])];
+        yi = InterpIrregular(T, G, BCnil, InterpLinear);
+        gam = yi[time1];
+    elseif (method == "DP2")
+        opt = zeros(M1+n1*n1+1);
+        swap = false;
+        fopts = zeros(5);
+        comtime = zeros(5);
+        @cpp ccall((:optimum_reparam, libgropt), Void,
+                   (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
+                   Ptr{Uint8}, Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
+                   q1, q2, M1, n1, 0.0, true, "", opt, swap, fopts, comtime)
+
+        gam = opt[1:end-2];
+
+        if swap
+            gam = invertGamma(gam);
+        end
+
+    else
+        w = 0.01;
+        opt = zeros(M1+n1*n1+1);
+        swap = false;
+        fopts = zeros(5);
+        comtime = zeros(5);
+        @cpp ccall((:optimum_reparam, libgropt), Void,
+                   (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
+                   Ptr{Uint8}, Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
+                   q1, q2, M1, n1, w, false, method, opt, swap, fopts, comtime)
+
+        gam = opt[1:end-2];
+
+        if swap
+            gam = invertGamma(gam);
+        end
+    end
+
     gam = (gam-gam[1]) ./ (gam[end] - gam[1]);
+
     return gam
 end
 
 
 function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
-                       q2::Array{Float64,2}, lam::Float64=0.0)
+                         q2::Array{Float64,2}, lam::Float64=0.0,
+                         method::ASCIIString="DP")
     q1 = q1./norm(q1);
     M, N = size(q2);
     n1 = 1;
-    sizei = Cdouble[0];
     gam = zeros(M, N);
     for ii in 1:N
-        G = zeros(M);
-        T = zeros(M);
         qi = q2[:, ii];
-        ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
+        qi = qi./norm(qi);
+        if (method == "DP")
+            G = zeros(M);
+            T = zeros(M);
+            sizei = Cdouble[0];
+            ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
               (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32,
               Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32,
               Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Float64), q1, timet,
               qi, timet, n1, M, M, timet, timet, M, M, G, T, sizei, lam)
-        G = G[1:int(sizei[1])];
-        T = T[1:int(sizei[1])];
-        yi = InterpIrregular(T, G, BCnil, InterpLinear);
-        gam0 = yi[timet];
+            G = G[1:int(sizei[1])];
+            T = T[1:int(sizei[1])];
+            yi = InterpIrregular(T, G, BCnil, InterpLinear);
+            gam0 = yi[timet];
+        elseif (method == "DP2")
+            opt = zeros(M+n1*n1+1);
+            swap = false;
+            fopts = zeros(5);
+            comtime = zeros(5);
+            @cpp ccall((:optimum_reparam, libgropt), Void,
+                    (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
+                    Ptr{Uint8}, Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
+                    q1, qi, M, n1, 0.0, true, "", opt, swap, fopts, comtime)
+
+            gam0 = opt[1:end-2];
+
+            if swap
+                gam0 = invertGamma(gam0);
+            end
+
+        else
+            w = 0.01;
+            opt = zeros(M+n1*n1+1);
+            swap = false;
+            fopts = zeros(5);
+            comtime = zeros(5);
+            @cpp ccall((:optimum_reparam, libgropt), Void,
+                    (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
+                    Ptr{Uint8}, Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
+                    q1, qi, M, n1, w, false, method, opt, swap, fopts, comtime)
+
+            gam0 = opt[1:end-2];
+
+            if swap
+                gam0 = invertGamma(gam0);
+            end
+        end
+
         gam[:, ii] = (gam0-gam0[1]) ./ (gam0[end] - gam0[1]);
     end
 
@@ -157,25 +272,62 @@ end
 
 
 function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
-                       q2::Array{Float64,2}, lam::Float64=0.0)
+                         q2::Array{Float64,2}, lam::Float64=0.0,
+                         method::ASCIIString="DP")
     M, N = size(q1);
     n1 = 1;
-    sizei = Cdouble[0];
     gam = zeros(M, N);
     for ii in 1:N
         q1i = q1[:, ii] ./ norm(q1[:, ii]);
         q2i = q2[:, ii] ./ norm(q2[:, ii]);
-        G = zeros(M);
-        T = zeros(M);
-        ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
+        if (method == "DP")
+            G = zeros(M);
+            T = zeros(M);
+            sizei = Cdouble[0];
+            ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
               (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32,
               Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32,
               Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Float64), q1i, timet,
               q2i, timet, n1, M, M, timet, timet, M, M, G, T, sizei, lam)
-        G = G[1:int(sizei[1])];
-        T = T[1:int(sizei[1])];
-        yi = InterpIrregular(T, G, BCnil, InterpLinear);
-        gam0 = yi[timet];
+            G = G[1:int(sizei[1])];
+            T = T[1:int(sizei[1])];
+            yi = InterpIrregular(T, G, BCnil, InterpLinear);
+            gam0 = yi[timet];
+            sizei = Cdouble[0];
+        elseif (method == "DP2")
+            opt = zeros(M+n1*n1+1);
+            swap = false;
+            fopts = zeros(5);
+            comtime = zeros(5);
+            @cpp ccall((:optimum_reparam, libgropt), Void,
+                    (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
+                    Ptr{Uint8}, Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
+                    q11, q2i, M, n1, 0.0, true, "", opt, swap, fopts, comtime)
+
+            gam0 = opt[1:end-2];
+
+            if swap
+                gam0 = invertGamma(gam0);
+            end
+
+        else
+            w = 0.01;
+            opt = zeros(M+n1*n1+1);
+            swap = false;
+            fopts = zeros(5);
+            comtime = zeros(5);
+            @cpp ccall((:optimum_reparam, libgropt), Void,
+                    (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
+                    Ptr{Uint8}, Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
+                    q1i, q2i, M, n1, w, false, method, opt, swap, fopts, comtime)
+
+            gam0 = opt[1:end-2];
+
+            if swap
+                gam0 = invertGamma(gam0);
+            end
+        end
+
         gam[:, ii] = (gam0-gam0[1]) ./ (gam0[end] - gam0[1]);
     end
 
