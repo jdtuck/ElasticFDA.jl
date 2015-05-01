@@ -18,14 +18,15 @@
 
 //#define TESTSIMPLEEXAMPLE
 //#define TESTPRODUCTEXAMPLE
-
+#include <stdio.h>
+#include <stdlib.h>
 // blas and lapack related
 #include <cstddef>
 #ifdef __cplusplus
     extern "C" {
 #endif
 
-extern void dgemm(
+extern void dgemm_(
     const char   *transa,
     const char   *transb,
     const ptrdiff_t *m,
@@ -41,7 +42,7 @@ extern void dgemm(
     const ptrdiff_t *ldc
 );
 
-extern void dgetrf(
+extern void dgetrf_(
     const ptrdiff_t *m,
     const ptrdiff_t *n,
     double *a,
@@ -50,7 +51,7 @@ extern void dgetrf(
     ptrdiff_t *info
 );
 
-extern void dgetrs(
+extern void dgetrs_(
     const char   *trans,
     const ptrdiff_t *n,
     const ptrdiff_t *nrhs,
@@ -62,7 +63,7 @@ extern void dgetrs(
     ptrdiff_t *info
 );
 
-extern void dgemv(
+extern void dgemv_(
     const char   *trans,
     const ptrdiff_t *m,
     const ptrdiff_t *n,
@@ -76,7 +77,7 @@ extern void dgemv(
     const ptrdiff_t *incy
 );
 
-extern void dcopy(
+extern void dcopy_(
     const ptrdiff_t *n,
     const double *dx,
     const ptrdiff_t *incx,
@@ -84,7 +85,7 @@ extern void dcopy(
     const ptrdiff_t *incy
 );
 
-extern double ddot(
+extern double ddot_(
     const ptrdiff_t *n,
     const double *dx,
     const ptrdiff_t *incx,
@@ -92,14 +93,14 @@ extern double ddot(
     const ptrdiff_t *incy
 );
 
-extern void dscal(
+extern void dscal_(
     const ptrdiff_t *n,
     const double *da,
     double *dx,
     const ptrdiff_t *incx
 );
 
-extern void daxpy(
+extern void daxpy_(
     const ptrdiff_t *n,
     const double *da,
     const double *dx,
@@ -108,7 +109,7 @@ extern void daxpy(
     const ptrdiff_t *incy
 );
 
-extern void dger(
+extern void dger_(
     const ptrdiff_t *m,
     const ptrdiff_t *n,
     const double *alpha,
@@ -120,7 +121,7 @@ extern void dger(
     const ptrdiff_t *lda
 );
 
-extern void dgeqp3(
+extern void dgeqp3_(
     const ptrdiff_t *m,
     const ptrdiff_t *n,
     double *a,
@@ -132,7 +133,7 @@ extern void dgeqp3(
     ptrdiff_t *info
 );
 
-extern void dorgqr(
+extern void dorgqr_(
     const ptrdiff_t *m,
     const ptrdiff_t *n,
     const ptrdiff_t *k,
@@ -144,7 +145,7 @@ extern void dorgqr(
     ptrdiff_t *info
 );
 
-extern void dormqr(
+extern void dormqr_(
     const char   *side,
     const char   *trans,
     const ptrdiff_t *m,
@@ -160,7 +161,7 @@ extern void dormqr(
     ptrdiff_t *info
 );
 
-extern void dtrsm(
+extern void dtrsm_(
     const char   *side,
     const char   *uplo,
     const char   *transa,
@@ -174,7 +175,7 @@ extern void dtrsm(
     const ptrdiff_t *ldb
 );
 
-extern void dlarfx(
+extern void dlarfx_(
     const char   *side,
     const ptrdiff_t *m,
     const ptrdiff_t *n,
@@ -185,7 +186,7 @@ extern void dlarfx(
     double *work
 );
 
-extern void dgesdd(
+extern void dgesdd_(
     const char   *jobz,
     const ptrdiff_t *m,
     const ptrdiff_t *n,
@@ -202,7 +203,7 @@ extern void dgesdd(
     ptrdiff_t *info
 );
 
-extern void dgesvd(
+extern void dgesvd_(
     const char   *jobu,
     const char   *jobvt,
     const ptrdiff_t *m,
@@ -219,7 +220,7 @@ extern void dgesvd(
     ptrdiff_t *info
 );
 
-extern void dsymv(
+extern void dsymv_(
     const char   *uplo,
     const ptrdiff_t *n,
     const double *alpha,
@@ -232,7 +233,7 @@ extern void dsymv(
     const ptrdiff_t *incy
 );
 
-extern void dgetri(
+extern void dgetri_(
     const ptrdiff_t *n,
     double *a,
     const ptrdiff_t *lda,
@@ -242,7 +243,7 @@ extern void dgetri(
     ptrdiff_t *info
 );
 
-extern void dlapmt(
+extern void dlapmt_(
     const ptrdiff_t *forwrd,
     const ptrdiff_t *m,
     const ptrdiff_t *n,
@@ -251,7 +252,7 @@ extern void dlapmt(
     ptrdiff_t *k
 );
 
-extern void dgees(
+extern void dgees_(
     const char   *jobvs,
     const char   *sort,
     ptrdiff_t (*select)(),
@@ -272,26 +273,6 @@ extern void dgees(
 #ifdef __cplusplus
     }   /* extern "C" */
 #endif
-
-#define dgemm_ dgemm
-#define dgetrf_ dgetrf
-#define dgetrs_ dgetrs
-#define dgemv_ dgemv
-#define dcopy_ dcopy
-#define ddot_ ddot
-#define dscal_ dscal
-#define daxpy_ daxpy
-#define dger_ dger
-#define dgeqp3_ dgeqp3
-#define dorgqr_ dorgqr
-#define dormqr_ dormqr
-#define dtrsm_ dtrsm
-#define dlarfx_ dlarfx
-#define dgesdd_ dgesdd
-#define dgesvd_ dgesvd
-#define dsymv_ dsymv
-#define dgetri_ dgetri
-#define dgees_ dgees
 
 #endif // end of ifndef MATLAB_MEX_FILE
 
@@ -366,7 +347,7 @@ extern void dgees(
 #include "Timer.h"
 
 #ifdef __INTEL_COMPILER
-/*const class {
+const class {
 public:
 	template<class T> // convertible to any type
 	operator T*(void) const // of null non-member
@@ -380,7 +361,7 @@ public:
 	}
 private:
 	void operator&(void) const; // whose address can't be taken
-} nullptr = {};*/
+} nullptr = {};
 #endif // end of __GNUC__
 
 #include <map>

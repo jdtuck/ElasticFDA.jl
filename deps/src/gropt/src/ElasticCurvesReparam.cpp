@@ -4,8 +4,8 @@
 std::map<integer *, integer> *CheckMemoryDeleted;
 
 void optimum_reparam(double *C1, double *C2, int n, int d, double w,
-                          bool onlyDP, char *methodname, double *opt, bool swap,
-                          double *fopts, double *comtime)
+                     bool onlyDP, double *opt, bool swap,
+                     double *fopts, double *comtime)
 {
 	/* dimensions of input matrices */
     /* opt size is n + d*d +1 */
@@ -16,6 +16,10 @@ void optimum_reparam(double *C1, double *C2, int n, int d, double w,
     bool rotated = false;
     bool isclosed = false;
     bool swapi;
+
+    std::string methodname = "";
+    if (!onlyDP)
+        methodname = "LRBFGS";
 
 	init_genrand(0);
 
