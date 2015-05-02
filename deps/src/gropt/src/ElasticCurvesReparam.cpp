@@ -37,7 +37,7 @@ void optimum_reparam(double *C1, double *C2, int n, int d, double w,
 	integer ns, lms;
 
 	DriverElasticCurvesRO(C1, C2, d1, n1, w, rotated, isclosed, onlyDP, 0, methodname,
-		                  1, Xopt, swapi, fopts, comtime, ns, lms);
+		                  0, Xopt, swapi, fopts, comtime, ns, lms);
 
     swap = swapi;
 
