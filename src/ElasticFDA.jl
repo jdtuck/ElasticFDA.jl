@@ -16,6 +16,7 @@ export
     srsf_to_f,
     optimum_reparam,
     warp_q_gamma,
+    warp_f_gamma,
     qtocurve,
     vert_fPCA,
     horiz_fPCA,

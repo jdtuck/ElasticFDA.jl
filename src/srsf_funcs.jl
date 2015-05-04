@@ -378,6 +378,16 @@ function warp_q_gamma(time::Vector, q::Vector, gam::Vector)
 end
 
 
+function warp_f_gamma(time::Vector, f::Vector, gam::Vector)
+    M = length(gam);
+    tmp = InterpIrregular(time, f, BCnil, InterpLinear);
+    xout = (time[end] - time[1]) .* gam + time[1];
+    f_temp = tmp[xout];
+
+    return f_temp
+end
+
+
 function rgam(N, sigma, num)
     gam = zeros(N, num);
 

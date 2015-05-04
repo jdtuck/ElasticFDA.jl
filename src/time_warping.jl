@@ -1,4 +1,5 @@
-function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0)
+function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0,
+                    optim="DP")
     ####################################################################
     # This function aligns a collection of functions using the elastic
     # square-root slope (srsf) framework.
@@ -10,6 +11,10 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0)
     # :param showplot: Shows plots of results using matplotlib (default = T)
     # :param smoothdata: Smooth the data using a box filter (default = F)
     # :param lam: controls the elasticity (default = 0)
+    # :param optim: optimization method to find warping, default is
+    #               Dynamic Programming ("DP"). Other options are
+    #               Coordiante Descent ("DP2") and Riemanain BFGS
+    #               ("LRBFGS")
 
     # :return fn: aligned functions - array of shape (M,N) of M
     # functions with N samples
@@ -58,6 +63,7 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0)
     for ii in 1:N
         q[:, ii] = f_to_srsf(f[:, ii], timet);
     end
+    fo = vec(f[1,:]);
     println("Initializing...")
     mnq = mean(q,2);
     d1 = repmat(mnq,1,N);
@@ -69,10 +75,12 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0)
 
     if parallel
         gam = @parallel (hcat) for i=1:N
-            optimum_reparam(mq, timet, q[:, i], lam);
+            optimum_reparam(mq, timet, q[:, i], lam, method=optim,
+                            f1o=mf[1], f2o=fo[i]);
         end
     else
-        gam = optimum_reparam(mq, timet, q, lam);
+        gam = optimum_reparam(mq, timet, q, lam, method=optim,
+                              f1o=mf[1], f2o=fo);
     end
 
     gamI = sqrt_mean_inverse(gam);
@@ -94,6 +102,9 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0)
     tmp = zeros(M, MaxItr+2);
     tmp[:, 1] = mq;
     mq = copy(tmp);
+    tmp = zeros(M, MaxItr+2);
+    tmp[:, 1] = mf;
+    mf = copy(tmp);
     tmp = zeros(M, N, MaxItr+2);
     tmp[:, :, 1] = f;
     f = copy(tmp);
@@ -111,15 +122,17 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0)
         # Matching Step
         if parallel
             gam = @parallel (hcat) for i=1:N
-                optimum_reparam(mq[:,r], timet, q[:, i, 1], lam);
+                optimum_reparam(mq[:,r], timet, q[:, i, 1], lam, method=optim,
+                                f1o=mf[1,r], f2o=fo[i]);
             end
         else
-            gam = optimum_reparam(mq[:,r], timet, q[:,:,1], lam);
+            gam = optimum_reparam(mq[:,r], timet, q[:,:,1], lam, method=optim,
+                                  f1o=mf[1,r], f2o=fo);
         end
 
         gam_dev = zeros(M,N);
         for k in 1:N
-            xout = (timet[end] -timet[1]) .* gam[:, k] + timet[1];
+            xout = (timet[end]-timet[1]) .* gam[:, k] + timet[1];
             f[:, k, r+1] = approx(timet, f[:, k, 1], xout);
             q[:, k, r+1] = f_to_srsf(f[:, k, r+1], timet);
             gam_dev = gradient(gam[:, k], 1/(M-1));
@@ -138,6 +151,7 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0)
             # compute the mean of the matched function
             qtemp = q[:, :, r+1];
             mq[:, r+1] = mean(qtemp, 2);
+            mf[:, r+1] = mean(f[:, :, r+1], 2);
 
             qun[r] = norm(mq[:,r+1] - mq[:,r])/norm(mq[:,r]);
         end
@@ -153,6 +167,7 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0)
             dist_iinv = ds[r+1].^(-1);
             qtemp = q[:, :, r+1]/ds[r+1];
             mq[:, r+1] = sum(qtemp,2) .* dist_iinv;
+            mf[:, r+1] = sum(f[:,:,r+1]/ds[r+1],2) .* dist_iinv;
 
             qun[r] = norm(mq[:, r+1] - mq[:,r])/ norm(mq[:,r]);
         end
@@ -167,10 +182,12 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0)
     r = r1 + 1;
     if parallel
         gam = @parallel (hcat) for i=1:N
-            optimum_reparam(mq[:,r], timet, q[:, i, 1], lam);
+            optimum_reparam(mq[:,r], timet, q[:, i, 1], lam, method=optim,
+                            f1o=mf[1,r], f2o=fo[i]);
         end
     else
-        gam = optimum_reparam(mq[:,r], timet, q[:,:,1], lam);
+        gam = optimum_reparam(mq[:,r], timet, q[:,:,1], lam, method=optim,
+                              f1o=mf[1,r], f2o=fo);
     end
 
     gam_dev = zeros(M,N);
@@ -180,7 +197,7 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0)
 
     gamI = sqrt_mean_inverse(gam);
     gamI_dev = gradient(gamI, 1/(M-1));
-    timet0 = (timet[end] -timet[1]) .* gamI  + timet[1];
+    timet0 = (timet[end]-timet[1]) .* gamI  + timet[1];
     mq[:, r+1] = approx(timet, mq[:, r], timet0) .* sqrt(gamI_dev);
 
     for k in 1:N
