@@ -190,7 +190,7 @@ void DriverElasticCurvesRO(double *C1, double *C2, integer d, integer n, double 
 		GetCurveSmall(C1, C1s, d, n, ns, isclosed);
 		CurveToQ(C1s, d, ns, q1s, isclosed);
 	}
-	std::cout << "lms:" << lms << ", ns:" << ns << std::endl;//----
+	//std::cout << "lms:" << lms << ", ns:" << ns << std::endl;//----
 	//for (integer i = 0; i < lms; i++) //---
 	//{
 	//	std::cout << ms[i] << std::endl;
@@ -204,10 +204,10 @@ void DriverElasticCurvesRO(double *C1, double *C2, integer d, integer n, double 
         fopts[i] = 1000;
         comtime[i] = static_cast<double>(getTickCount() - starttime) / CLK_PS;
     }
-    
+
 	for (integer i = 0; i < lms; i++) //lms
 	{
-		std::cout << ms[i] << ", ";
+		//std::cout << ms[i] << ", ";
         starttime = getTickCount();
 		// obtain initial reparameterization
 		ShiftC(C2, d, n, C2shift, ms[i]);
@@ -266,7 +266,7 @@ void DriverElasticCurvesRO(double *C1, double *C2, integer d, integer n, double 
 					}
 					ECRO = new ElasticCurvesRO(q1, Rotq2shift, d, n, w, rotated, isclosed);
 					ECRO->SetDomain(Domain);
-					std::cout << "CD1 func:" << ECRO->f(InitialX) << std::endl;
+					//std::cout << "CD1 func:" << ECRO->f(InitialX) << std::endl;
 				}
 
 				if (isclosed)
@@ -307,14 +307,13 @@ void DriverElasticCurvesRO(double *C1, double *C2, integer d, integer n, double 
 			Gradient(DPgam, n, 1.0 / (n - 1), Xptr);
 //         ForDebug::Print("DPgam:", DPgam, 1, n);//----
 //         ForDebug::Print("Xptr:", Xptr, 1, n);//----
-        
+
 		for (integer j = 0; j < n; j++)
 		{
 			Xptr[j] = sqrt(Xptr[j]);
 		}
 
 //         ForDebug::Print("Xptr:", Xptr, 1, n);//----
-        
 		//ForDebug::Print("q1:", q1, n, d);//---
 		//ForDebug::Print("Rotq2shift:", Rotq2shift, n, d);//---
 
@@ -327,7 +326,7 @@ void DriverElasticCurvesRO(double *C1, double *C2, integer d, integer n, double 
 		{
 			ECRO->w = 0;
 			msV[i] = ECRO->f(InitialX);
-			std::cout << "CD1H func:" << msV[i] << std::endl;
+			//std::cout << "CD1H func:" << msV[i] << std::endl;
 		}
 		if (!onlyDP)
 		{
@@ -411,7 +410,7 @@ void DriverElasticCurvesRO(double *C1, double *C2, integer d, integer n, double 
 			ECRO->w = 0;
 			//--Xopt->RemoveAllFromTempData();
 			msV[i] = ECRO->f(const_cast<Element *> (solver->GetXopt()));
-			std::cout << solverstr << "func:" << msV[i] << ", num of iter:" << solver->GetIter() << std::endl;//---
+			//std::cout << solverstr << "func:" << msV[i] << ", num of iter:" << solver->GetIter() << std::endl;//---
 		}
 		//ECRO->CheckGradHessian(solver->GetXopt());//--
 		delete ECRO;
@@ -450,7 +449,7 @@ void DriverElasticCurvesRO(double *C1, double *C2, integer d, integer n, double 
 				dgemm_(transn, transt, &d, &d, &d, &one, O, &d, Xoptptr + n, &d, &zero, O2, &d);\
 				dcopy_(&dd, O2, &inc, Xoptptr + n, &inc);
 				//ForDebug::Print("XoptO2:", Xoptptr + n, d, d);//----
-                
+
 //                 std::cout << "ms[i]:" << ms[i] << ",:" << static_cast<double> (ms[i]) / (n - 1) << std::endl;//---
 //                 std::cout << "Xoptptr[n + d * d]:" << Xoptptr[n + d * d] << std::endl;//---
 				Xoptptr[n + d * d] = Xoptptr[n + d * d] + static_cast<double> (ms[i]) / (n - 1);
@@ -458,7 +457,7 @@ void DriverElasticCurvesRO(double *C1, double *C2, integer d, integer n, double 
 		}
 		if (!onlyDP)
 			delete solver;
-        
+
         comtime[0] += (double) (getTickCount() - starttime) / CLK_PS;
         if(msV[i] < fopts[0])
             fopts[0] = msV[i];
@@ -488,8 +487,8 @@ void DriverElasticCurvesRO(double *C1, double *C2, integer d, integer n, double 
         }
 	}
 
-	std::cout << "min f:" << minmsV << std::endl;
-	std::cout << "time:" << comtime[0] << std::endl;
+	//std::cout << "min f:" << minmsV << std::endl;
+	//std::cout << "time:" << comtime[0] << std::endl;
 	delete[] C2shift;
 	if (C2_coefs != nullptr)
 	{
