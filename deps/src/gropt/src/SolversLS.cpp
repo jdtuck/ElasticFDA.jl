@@ -61,7 +61,7 @@ void SolversLS::Run(void)
 		(this->*Linesearch)();
 		if (LSstatus < SUCCESS) // Obtain x2, f2, gf2, stepsize, eta2=stepsize*eta1
 		{
-			std::cout << "Linesearch fails! LSstatus:" << LSstatusSetnames[LSstatus] << std::endl;
+//			std::cout << "Linesearch fails! LSstatus:" << LSstatusSetnames[LSstatus] << std::endl;
 		}
 
 		iter++;
@@ -115,7 +115,7 @@ void SolversLS::LinesearchArmijo(void)
 			stepsize *= LS_ratio;
 			if (stepsize < Minstepsize)
 			{
-				std::cout << "Warning: step size reaches the minimum:" << Minstepsize << "!" << std::endl;
+//				std::cout << "Warning: step size reaches the minimum:" << Minstepsize << "!" << std::endl;
 				LSstatus = MINSTEPSIZE;
 				break;
 			}
@@ -155,7 +155,7 @@ void SolversLS::LinesearchArmijo(void)
 		stepsize = (stepsize > LS_ratio1 * prestepsize) ? stepsize : LS_ratio1 * prestepsize;
 		if (stepsize < Minstepsize)
 		{
-			std::cout << "Warning: step size reaches the minimum:" << Minstepsize << "!" << std::endl;
+//			std::cout << "Warning: step size reaches the minimum:" << Minstepsize << "!" << std::endl;
 			LSstatus = MINSTEPSIZE;
 			break;
 		}
