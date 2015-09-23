@@ -111,6 +111,10 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
     c1 = srsf_to_f(q1,timet,f1o);
     c2 = srsf_to_f(q2,timet,f2o);
     M = length(q2);
+    rotated = false;
+    isclosed = false;
+    skipm = 0;
+    auto = 0;
     n1 = 1;
     if (method == "DP")
         G = zeros(M);
@@ -132,8 +136,9 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
         comtime = zeros(5);
         @cpp ccall((:optimum_reparam, libgropt), Void,
                    (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                    Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                    c1, c2, M, n1, 0.0, true, opt, swap, fopts, comtime)
+                    Ptr{Float64}, Bool, Bool, Bool, Int32, Int32, Ptr{Float64},
+                    Ptr{Float64}), c1, c2, M, n1, 0.0, true, rotated, isclosed,
+                    skipm, auto, opt, swap, fopts, comtime)
 
         gam = opt[1:end-2];
 
@@ -148,14 +153,17 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
         comtime = zeros(5);
         @cpp ccall((:optimum_reparam, libgropt), Void,
                    (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                    Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                   c1, c2, M, n1, w, false, opt, swap, fopts, comtime)
+                    Ptr{Float64}, Bool, Bool, Bool, Int32, Int32, Ptr{Float64},
+                    Ptr{Float64}), c1, c2, M, n1, w, false, rotated, isclosed,
+                    skipm, auto, opt, swap, fopts, comtime)
 
         if fopts[1] == 1000
             @cpp ccall((:optimum_reparam, libgropt), Void,
                        (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                        Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                       c1, c2, M, n1, 0.0, true, opt, swap, fopts, comtime)
+                        Ptr{Float64}, Bool, Bool, Bool, Int32, Int32,
+                        Ptr{Float64}, Ptr{Float64}), c1, c2, M, n1, 0.0, true,
+                        rotated, isclosed, skipm, auto, opt, swap, fopts,
+                        comtime)
         end
 
         gam = opt[1:end-2];
@@ -182,6 +190,10 @@ function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
     M1 = length(q1);
     M2 = length(q2);
     n1 = 1;
+    rotated = false;
+    isclosed = false;
+    skipm = 0;
+    auto = 0;
     if (M1 != M2)
         method = "DP";
     end
@@ -205,8 +217,9 @@ function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
         comtime = zeros(5);
         @cpp ccall((:optimum_reparam, libgropt), Void,
                    (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                    Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                   c1, c2, M1, n1, 0.0, true, opt, swap, fopts, comtime)
+                    Ptr{Float64}, Bool, Bool, Bool, Int32, Int32, Ptr{Float64},
+                    Ptr{Float64}), c1, c2, M1, n1, 0.0, true, rotated, isclosed,
+                    skipm, auto, opt, swap, fopts, comtime)
 
         gam = opt[1:end-2];
 
@@ -221,14 +234,17 @@ function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
         comtime = zeros(5);
         @cpp ccall((:optimum_reparam, libgropt), Void,
                    (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                    Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                   c1, c2, M1, n1, w, false, opt, swap, fopts, comtime)
+                    Ptr{Float64}, Bool, Bool, Bool, Int32, Int32, Ptr{Float64},
+                    Ptr{Float64}), c1, c2, M1, n1, w, false, rotated, isclosed,
+                    skipm, auto, opt, swap, fopts, comtime)
 
         if fopts[1] == 1000
             @cpp ccall((:optimum_reparam, libgropt), Void,
                        (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                        Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                       c1, c2, M1, n1, 0.0, true, opt, swap, fopts, comtime)
+                        Ptr{Float64}, Bool, Bool, Bool, Int32, Int32,
+                        Ptr{Float64}, Ptr{Float64}), c1, c2, M1, n1, 0.0, true,
+                        rotated, isclosed, skipm, auto, opt, swap, fopts,
+                        comtime)
         end
 
         gam = opt[1:end-2];
@@ -253,6 +269,10 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
     M, N = size(q2);
     n1 = 1;
     gam = zeros(M, N);
+    rotated = false;
+    isclosed = false;
+    skipm = 0;
+    auto = 0;
     for ii in 1:N
         qi = q2[:, ii];
         qi = qi./norm(qi);
@@ -277,8 +297,9 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
             comtime = zeros(5);
             @cpp ccall((:optimum_reparam, libgropt), Void,
                     (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                     Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                    c1, ci, M, n1, 0.0, true, opt, swap, fopts, comtime)
+                     Ptr{Float64}, Bool, Bool, Bool, Int32, Int32, Ptr{Float64},
+                     Ptr{Float64}), c1, ci, M, n1, 0.0, true, rotated, isclosed,
+                     skipm, auto, opt, swap, fopts, comtime)
 
             gam0 = opt[1:end-2];
 
@@ -293,14 +314,17 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
             comtime = zeros(5);
             @cpp ccall((:optimum_reparam, libgropt), Void,
                     (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                     Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                    c1, ci, M, n1, w, false, opt, swap, fopts, comtime)
+                     Ptr{Float64}, Bool, Bool, Bool, Int32, Int32, Ptr{Float64},
+                     Ptr{Float64}), c1, ci, M, n1, w, false, rotated, isclosed,
+                     skipm, auto, opt, swap, fopts, comtime)
 
             if fopts[1] == 1000
                 @cpp ccall((:optimum_reparam, libgropt), Void,
                         (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                         Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                        c1, ci, M, n1, 0.0, true, opt, swap, fopts, comtime)
+                         Ptr{Float64}, Bool, Bool, Bool, Int32, Int32,
+                         Ptr{Float64}, Ptr{Float64}), c1, ci, M, n1, 0.0, true,
+                         rotated, isclosed, skipm, auto, opt, swap, fopts,
+                         comtime)
             end
 
             gam0 = opt[1:end-2];
@@ -325,6 +349,10 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
     M, N = size(q1);
     n1 = 1;
     gam = zeros(M, N);
+    rotated = false;
+    isclosed = false;
+    skipm = 0;
+    auto = 0;
     for ii in 1:N
         q1i = q1[:, ii] ./ norm(q1[:, ii]);
         q2i = q2[:, ii] ./ norm(q2[:, ii]);
@@ -351,8 +379,9 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
             comtime = zeros(5);
             @cpp ccall((:optimum_reparam, libgropt), Void,
                     (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                     Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                    c1i, c2i, M, n1, 0.0, true, opt, swap, fopts, comtime)
+                     Ptr{Float64}, Bool, Bool, Bool, Int32, Int32, Ptr{Float64},
+                     Ptr{Float64}), c1i, c2i, M, n1, 0.0, true, rotated,
+                     isclosed, skipm, auto, opt, swap, fopts, comtime)
 
             gam0 = opt[1:end-2];
 
@@ -367,14 +396,17 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
             comtime = zeros(5);
             @cpp ccall((:optimum_reparam, libgropt), Void,
                     (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                     Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                    c1i, c2i, M, n1, w, false, opt, swap, fopts, comtime)
+                     Ptr{Float64}, Bool, Bool, Bool, Int32, Int32, Ptr{Float64},
+                     Ptr{Float64}), c1i, c2i, M, n1, w, false, rotated,
+                     isclosed, skipm, auto, opt, swap, fopts, comtime)
 
             if fopts[1] == 1000
                 @cpp ccall((:optimum_reparam, libgropt), Void,
                         (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                         Ptr{Float64}, Bool, Ptr{Float64}, Ptr{Float64}),
-                        c11, c2i, M, n1, 0.0, true, opt, swap, fopts, comtime)
+                         Ptr{Float64}, Bool, Bool, Bool, Int32, Int32,
+                         Ptr{Float64}, Ptr{Float64}), c11, c2i, M, n1, 0.0,
+                         true, rotated, isclosed, skipm, auto, opt, swap, fopts,
+                         comtime)
             end
 
             gam0 = opt[1:end-2];
