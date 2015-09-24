@@ -545,7 +545,7 @@ end
 
 
 function parallel_translate(w, q1, q2, basis, mode='O')
-    wtilde = w - 2 innerprod_q2(w,q2) / innerprod_q2(q1+q2, q1+q2) * (q1+q2);
+    wtilde = w - 2*innerprod_q2(w,q2) / innerprod_q2(q1+q2, q1+q2) * (q1+q2);
     l = sqrt(innerprod_q2(wtilde, wtilde));
 
     if mode == 'C'
@@ -614,7 +614,7 @@ end
 
 
 function rot_mat(theta)
-    O = [cos(theta), -1*sin(theta); sin(theta), cos(theta)];
+    O = [cos(theta) -1*sin(theta); sin(theta) cos(theta)];
 
     return O
 end
@@ -622,7 +622,7 @@ end
 
 function innerprod_q2(q1, q2)
     T = size(q1,2);
-    val = sum(sum(q1.*q2))/T
+    val = sum(sum(q1.*q2))/T;
 
     return val
 end

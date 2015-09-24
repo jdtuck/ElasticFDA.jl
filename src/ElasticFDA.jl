@@ -30,7 +30,14 @@ export
     srsf_align,
     align_fPCA,
     trapz,
-    warp_q_gamma
+    warp_q_gamma,
+    curve_karcher_mean,
+    curve_srvf_align,
+    curve_principal_directions,
+    curve_karcher_cov,
+    sample_shapes,
+    curve_to_q,
+    q_to_curve
 
 # load fdasrsf library
 unixpath = "../deps/src/fdasrsf/fdasrsf"
@@ -53,6 +60,8 @@ if (dlopen_e(libgropt) == C_NULL)
 end
 
 ### source files
+include("curve_funcs.jl")
+include("curve_stats.jl")
 include("srsf_funcs.jl")
 include("misc_funcs.jl")
 include("fPCA.jl")

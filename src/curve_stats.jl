@@ -109,7 +109,7 @@ function curve_karcher_cov(betamean::Array{Float64,2}, beta::Array{Float64,3},
     # Compute Karcher covariance of uniformly sampled mean
     betamean = resamplecurve(betamean, T);
     mu = curve_to_q(betamean);
-    if mode = 'C'
+    if mode == 'C'
         mu = project_curve(mu);
         basis = find_basis_normal(mu);
     end
@@ -235,7 +235,7 @@ function curve_principal_directions(betamean::Array{Float64, 2}, mu, K,
 end
 
 
-function sample_shapes(mu:Array(Float64,2), K, mode='O', no=3, numSamp=10)
+function sample_shapes(mu::Array{Float64,2}, K, mode='O', no=3, numSamp=10)
     n, T = size(mu);
 
     U,s,V = svd(K);
