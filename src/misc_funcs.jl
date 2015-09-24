@@ -25,26 +25,45 @@ function approx(xd, yd, xi)
 end
 
 
-function trapz(x, y)
-    N = size(y,2);
-    if N == 1
-        M = length(y);
-        out = sum(diff(x).*(y[1:M-1] + y[2:M])/2);
+function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
+    perm = [dim:max(ndims(y),dim), 1:dim-1];
+    y = permutedims(y, perm);
+    if ndims(y) == 1
+        m = 1;
     else
-        M = size(y,1);
-        out = zeros(N);
-        for i in 1:N
-            out[i] = sum(diff(x).*(y[1:M-1,i]+y[2:M,i])/2);
-        end
+        m = size(y,1);
     end
+
+    if m == 1
+        M = length(y);
+        out = sum(diff(x).*(y[1:M-1] + y[2:M])/2.);
+    else
+        out = diff(x).' * (y[1:m-1,:] + y[2:m,:])/2.;
+        out = ipermutedims(out, perm);
+    end
+
     return out
 end
 
 
-function cumtrapz(x, y)
-    m = length(y);
-    dt = diff(x)/2.0;
-    z = [0, cumsum(dt.*(y[1:(m-1)] + y[2:m]))];
+function cumtrapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
+    perm = [dim:max(length(size(y)),dim), 1:dim-1];
+    y = permutedims(y, perm);
+    if ndims(y) == 1
+        n = 1;
+        m = length(y);
+    else
+        m, n = size(y);
+    end
+
+    if n == 1
+        dt = diff(x)/2.0;
+        z = [0, cumsum(dt.*(y[1:(m-1)] + y[2:m]))];
+    else
+        dt = repmat(diff(x)/2.0,1,n);
+        z = [zeros(1,n); cumsum(dt.*(y[1:(m-1), :] + y[2:m, :]),1)];
+        z = ipermutedims(z, perm);
+    end
 
     return z
 end

@@ -17,7 +17,7 @@ function resamplecurve(x, N=100)
     end
 
     return xn
-end
+end
 
 
 function calculatecentroid(beta)
@@ -33,10 +33,7 @@ function calculatecentroid(beta)
         integrand[:,i] = beta[:,i]*normbetadot[i];
     end
     scale = trapz(linspace(0,1,T), normbetadot);
-    centroid = zeros(n);
-    for i = 1:n
-        centroid[n] = trapz(linspace(0,1,T), integrand[n,:]);
-    end
+    centroid = trapz(linspace(0,1,T), integrand, 2)./scale;
 
     return centroid
 end
@@ -77,10 +74,7 @@ function q_to_curve(q)
     integrand = zeros(2,T);
     integrand[1,:] = q[1,:].*qnorm;
     integrand[2,:] = q[2,:].*qnorm;
-    beta = zeros(2,T);
-    for i = 1:2
-        beta[i,:] = cumtrapz([1:T], integrand[i,:]) / T;
-    end
+    beta = cumtrapz([1:T], integrand, 2)./T;
 
     return beta
 end
@@ -203,12 +197,7 @@ function calculate_variance(beta)
         integrand[:, :, i] = a1 * a1' * normbetadot[i];
     end
     l = trapz(t, normbetadot);
-    variance = zeors(n, n);
-    for i = 1:n
-        for j = 1:n
-            variance(i,j) = trapz(t, integrand(i,j,:));
-        end
-    end
+    variance = trapz(t, integrand, 3);
     variance /= l;
 
     return variance
