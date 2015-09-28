@@ -43,7 +43,7 @@ function curve_to_q(beta)
     n, T = size(beta);
     v = zeros(n,T);
     for i = 1:n
-        v[n,:] = gradient(beta[n,:], 1.0/(T-1));
+        v[i,:] = gradient(vec(beta[i,:]), 1.0/(T-1));
     end
 
     len = sum(sqrt(sum(v.*v)))/T;
