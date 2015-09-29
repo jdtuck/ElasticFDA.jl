@@ -1,6 +1,6 @@
 function resamplecurve(x, N=100)
     n, T = size(x);
-    xn = zeros(n, T);
+    xn = zeros(n, N);
 
     delta = zeros(T);
 
@@ -12,7 +12,7 @@ function resamplecurve(x, N=100)
     newdel = linspace(0,1,N);
 
     for r in 1:n
-        s = Spline1D(cumdel,x[r,:]);
+        s = Spline1D(cumdel,vec(x[r,:]));
         xn[r,:] = evaluate(s,newdel);
     end
 
@@ -24,7 +24,7 @@ function calculatecentroid(beta)
     n, T = size(beta);
     betadot = zeros(n,T);
     for i = 1:n
-        betadot[n,:] = gradient(beta[n,:], 1.0/(T-1));
+        betadot[i,:] = gradient(vec(beta[i,:]), 1.0/(T-1));
     end
     normbetadot = zeros(T);
     integrand = zeros(n,T);
@@ -72,9 +72,9 @@ function q_to_curve(q)
     end
 
     integrand = zeros(2,T);
-    integrand[1,:] = q[1,:].*qnorm;
-    integrand[2,:] = q[2,:].*qnorm;
-    beta = cumtrapz([1:T], integrand, 2)./T;
+    integrand[1,:] = vec(q[1,:]).*qnorm;
+    integrand[2,:] = vec(q[2,:]).*qnorm;
+    beta = cumtrapz([1.:T], integrand, 2)./T;
 
     return beta
 end
@@ -175,7 +175,7 @@ function find_best_rotation(q1, q2)
     n, T = size(q1);
     A = q1*q2';
     U, S, V = svd(A);
-    if (abs(det(U) * det(V) - 1) < 10 * eps)
+    if (abs(det(U) * det(V) - 1) < 10 * epsilon)
         S = eye(n)
     else
         S = eye(n)
@@ -192,7 +192,7 @@ function calculate_variance(beta)
     n, T = size(beta);
     betadot = zeros(n, T);
     for i = 1:n
-        betadot[i,:] = gradient(beta[i,:], 1.0/(T-1));
+        betadot[i,:] = gradient(vec(beta[i,:]), 1.0/(T-1));
     end
     normbetadot = zeros(T);
     centroid = calculatecentroid(beta);
@@ -237,13 +237,13 @@ function find_basis_normal(q)
     integrandb3 = zeros(T);
     integrandb4 = zeros(T);
     for i = 1:T
-        integrandb3[i] = q[:,i]'*h3[:,i];
-        integrandb4[i] = q[:,i]'*h4[:,i];
+        integrandb3[i] = (q[:,i]'*h3[:,i])[1];
+        integrandb4[i] = (q[:,i]'*h4[:,i])[1];
     end
     b3 = h3 - q*trapz(linspace(0,1,T),integrandb3);
     b4 = h4 - q*trapz(linspace(0,1,T),integrandb4);
 
-    basis = Array(any,2);
+    basis = Array(Any,2);
     basis[1] = b3;
     basis[2] = b4;
 
@@ -261,9 +261,9 @@ function calc_j(basis)
     integrand22 = zeros(T);
 
     for i = 1:T
-        integrand11[i] = b1[:,i]'*b1[:,i];
-        integrand12[i] = b1[:,i]'*b2[:,i];
-        integrand22[i] = b2[:,i]'*b2[:,i];
+        integrand11[i] = (b1[:,i]'*b1[:,i])[1];
+        integrand12[i] = (b1[:,i]'*b2[:,i])[1];
+        integrand22[i] = (b2[:,i]'*b2[:,i])[1];
     end
 
     j = zeros(2,2);
@@ -278,7 +278,8 @@ end
 
 function shift_f(f, tau)
     n, T = size(f);
-    fn = circshift(f[:,1:T-1],[0 tau]);
+    fn = zeros(n,T);
+    fn[:,1:T-1] = circshift(f[:,1:T-1],[0 tau]);
     fn[:,T] = fn[:,1];
 
     return fn

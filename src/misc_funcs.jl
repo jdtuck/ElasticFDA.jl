@@ -39,7 +39,10 @@ function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
         out = sum(diff(x).*(y[1:M-1] + y[2:M])/2.);
     else
         out = diff(x).' * (y[1:m-1,:] + y[2:m,:])/2.;
+        siz = size(y); siz = collect(siz); siz[1] = 1;
+        out = reshape(out, tuple(siz...));
         out = ipermutedims(out, perm);
+        out = squeeze(out,length(perm));
     end
 
     return out
