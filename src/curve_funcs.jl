@@ -97,33 +97,34 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
         q2 = curve_to_q(beta2);
 
         # Optimzie over Gamma
-        q1i = reshape(q1, M*n1, 1);
-        q2i = reshape(q2, M*n1, 1);
+        q1i = vec(reshape(q1, M*n1, 1));
+        q2i = vec(reshape(q2, M*n1, 1));
         G = zeros(M);
         T = zeros(M);
         sizei = Cdouble[0];
         ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
             (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32,
-            Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32, Ptr{Float64},
-            Ptr{Float64}, Ptr{Float64}, Float64), q1i, timet, q2i, timet,
-            n1, M, M, timet, timet, M, M, G, T, sizei, lam)
+            Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32,
+            Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Float64), q2i, timet,
+            q1i, timet, n1, M, M, timet, timet, M, M, G, T, sizei, lam)
         G = G[1:int(sizei[1])];
         T = T[1:int(sizei[1])];
         yi = InterpIrregular(T, G, BCnil, InterpLinear);
         gam = yi[timet];
 
     elseif (method == "DP2")
-        c1 = reshape(beta1', M*n1, 1);
-        c2 = reshape(beta2', M*n1, 1);
+        c1 = vec(reshape(beta1', M*n1, 1));
+        c2 = vec(reshape(beta2', M*n1, 1));
         opt = zeros(M+n1*n1+1);
         swap = false;
         fopts = zeros(5);
         comtime = zeros(5);
         @cpp ccall((:optimum_reparam, libgropt), Void,
                    (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                    Ptr{Float64}, Bool, Bool, Bool, Int32, Int32, Ptr{Float64},
-                    Ptr{Float64}), c1, c2, M, n1, 0.0, true, rotated, isclosed,
-                    skipm, auto, opt, swap, fopts, comtime)
+                    Bool, Bool, Int32, Int32, Ptr{Float64}, Bool,
+                    Ptr{Float64}, Ptr{Float64}), c1, c2, M, n1, 0.0, true,
+                    rotated, isclosed, skipm, auto, opt, swap, fopts,
+                    comtime)
 
         gam = opt[1:end-5];
         R = reshape(opt[end-4:end-1],2,2);
@@ -134,8 +135,8 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
         end
 
     else
-        c1 = reshape(beta1', M*n1, 1);
-        c2 = reshape(beta2', M*n1, 1);
+        c1 = vec(reshape(beta1', M*n1, 1));
+        c2 = vec(reshape(beta2', M*n1, 1));
         opt = zeros(M+n1*n1+1);
         swap = false;
         fopts = zeros(5);
@@ -334,8 +335,8 @@ function group_action_by_gamma(q, gamma)
     qn = zeros(n, T);
 
     for j = 1:n
-        s = Spline1D(linspace(0, 1, T), q[j, :]);
-        qn[j, :] = evaluate(s, gamma) * sqrt(gammadot);
+        s = Spline1D(linspace(0, 1, T), vec(q[j, :]));
+        qn[j, :] = evaluate(s, gamma) .* sqrt(gammadot);
     end
 
     qn /= sqrt(innerprod_q2(qn,qn));
@@ -349,7 +350,7 @@ function group_action_by_gamma_coord(f, gamma)
     fn = zeros(n,T);
 
     for j = 1:n
-        s = Spline1D(linspace(0,1,T), f[j, :]);
+        s = Spline1D(linspace(0,1,T), vec(f[j, :]));
         fn[j,:] = evaluate(s, gamma);
     end
 
@@ -370,7 +371,7 @@ function project_curve(q)
 
     r = [psi3,psi4];
     rnorm = zeros(maxit+1);
-    rnomr[1] = norm(r);
+    rnorm[1] = norm(r);
 
     while itr <= maxit
         basis = find_basis_normal(q);
@@ -394,7 +395,7 @@ function project_curve(q)
         # calculate the new value of psi
         psi1, psi2, psi3, psi4 = psi(x,a,q);
         r = [psi3,psi4];
-        rnomr[iter+1] = norm(r);
+        rnorm[itr+1] = norm(r);
 
         if norm(r) < tol
             break
@@ -426,7 +427,7 @@ end
 function inverse_exp_coord(beta1, beta2)
     T = size(beta1,2);
     centroid1 = calculatecentroid(beta1);
-    beta1 -= repamat(centroid1,1,T);
+    beta1 -= repmat(centroid1,1,T);
     centroid2 = calculatecentroid(beta2);
     beta2 -= repmat(centroid2,1,T);
 
@@ -435,7 +436,7 @@ function inverse_exp_coord(beta1, beta2)
     # Iteratively optimize over SO(n) x Gamma using old DP
     gam, R, tau = optimum_reparam(beta1, beta2);
     beta2 = R * shift_f(beta2, tau);
-    gamI = invertGamma(gam);
+    gamI = invert_gamma(gam);
     beta2 = group_action_by_gamma_coord(beta2, gamI);
     beta2, R, tau = find_rotation_seed_coord(beta1, beta2);
     q2n = curve_to_q(beta2);
@@ -470,7 +471,7 @@ function inverse_exp(q1, q2, beta2)
     # Optimize over SO(n) x Gamma
     beta1 = q_to_curve(q1);
     gam, R, tau = optimum_reparam(beta1, beta2);
-    gamI = invertGamma(gam);
+    gamI = invert_gamma(gam);
     beta2 = R * shift_f(beta2, tau);
 
     # Applying optimal re-parameterization to the second curve
@@ -510,7 +511,7 @@ function gram_schmidt(basis)
     b2 = b2 - innerprod_q2(basis1,b2)*basis1;
     basis2 = b2 / sqrt(innerprod_q2(b2, b2));
 
-    basis_o = Array(any,2);
+    basis_o = Array(Any,2);
     basis_o[1] = basis1;
     basis_o[2] = basis2;
 
@@ -533,7 +534,7 @@ function scale_curve(beta)
     normbetadot = zeros(T);
     betadot = zeros(n,T);
     for i = 1:n
-        betadot[n,:] = gradient(beta[n,:], 1.0/(T-1));
+        betadot[i,:] = gradient(vec(beta[i,:]), 1.0/T);
     end
     for i = 1:T
         normbetadot[i] = norm(betadot[:,i]);

@@ -2,12 +2,12 @@ function curve_karcher_mean(beta::Array{Float64, 3}, mode='O')
     n, T, N = size(beta)
     q = zeros(n, T, N);
     for ii = 1:N
-        q[:,:,ii] = curve_to_q(beta[:,:,ii])
+        q[:, :, ii] = curve_to_q(beta[:, :, ii];)
     end
 
     # Initialize mu as one of the shapes
-    mu = q[:, :, 0];
-    betamean = beta[:, :, 0];
+    mu = q[:, :, 1];
+    betamean = beta[:, :, 1];
 
     delta = 0.5;
     tolv = 1e-4;
@@ -16,7 +16,7 @@ function curve_karcher_mean(beta::Array{Float64, 3}, mode='O')
     itr = 1;
     sumd = zeros(maxit+1);
     v = zeros(n,T,N);
-    mormvbar = zeros(maxit+1);
+    normvbar = zeros(maxit+1);
 
     while itr < maxit
         @printf("Iteration: %d\n", itr)
@@ -27,7 +27,6 @@ function curve_karcher_mean(beta::Array{Float64, 3}, mode='O')
         sumd[itr] = 0.;
 
         # TODO: parallelize
-
         for i = 1:N
             v1, d = karcher_calc(beta[:,:,n],q[:,:,n], betamean, mu, mode);
             v[:,:,i] = v1;
@@ -53,7 +52,7 @@ function curve_karcher_mean(beta::Array{Float64, 3}, mode='O')
 
             x = q_to_curve(mu);
             a = -1 * calculatecentroid(x);
-            betamean = x + repat(a,1,T);
+            betamean = x + repmat(a,1,T);
         else
             break
         end
@@ -69,7 +68,7 @@ end
 function curve_srvf_align(beta::Array{Float64, 3}, mode='O')
     n, T, N = size(beta);
     # find mean
-    mu, betamean, v, q = curve_karcher_mean(beta, mode=mode);
+    mu, betamean, v, q = curve_karcher_mean(beta, mode);
 
     qn = zeros(n,T,N);
     betan = zeros(n,T,N);
@@ -81,19 +80,19 @@ function curve_srvf_align(beta::Array{Float64, 3}, mode='O')
     for ii = 1:N
         beta1 = beta[:,:,ii];
         centroid1 = calculatecentroid(beta1);
-        beta1 -= repamt(centroid1, 1, T);
+        beta1 -= repmat(centroid1, 1, T);
 
         # Iteratively optimzie over SO(n) x Gamma
         # Optimize over SO(n) x Gamma
         gam, R, tau = optimum_reparam(betamean, beta1);
-        gamI = invertGamma(gam);
+        gamI = invert_gamma(gam);
         beta1 = R * shift_f(beta1, tau);
 
         # Applying optimal re-parameterization to the second curve
         beta1 = group_action_by_gamma_coord(beta1, gamI);
 
         # Optimize over SO(n)
-        beta1, R, tau = find_rotation_and_seed_coord(betamean, beta1);
+        beta1, R, tau = find_rotation_seed_coord(betamean, beta1);
         qn[:,:,ii] = curve_to_q(beta1);
         betan[:,:,ii] = beta1;
     end
@@ -131,8 +130,8 @@ function curve_karcher_cov(betamean::Array{Float64,2}, beta::Array{Float64,3},
 
     for i = 1:N
         w = v[:,:,i];
-        w = [w[1,:], w[2,:]];
-        K = K + w'*w';
+        w = [vec(w[1,:]), vec(w[2,:])];
+        K = K + w*w';
     end
 
     K /= (N-1);
@@ -141,17 +140,17 @@ function curve_karcher_cov(betamean::Array{Float64,2}, beta::Array{Float64,3},
 end
 
 
-function curve_principal_directions(betamean::Array{Float64, 2}, mu, K,
+function curve_principal_directions(betamean::Array{Float64, 2}, mu, K;
                                     mode='O', no=3, N=5)
     n, T = size(betamean);
     U, s, V = svd(K);
 
-    qarray = Array(any, no, 2*N+1);
-    qarray1 = Array(any, N);
-    qarray2 = Array(any, N);
-    pd = Array(any, no, 2*N+1);
-    pd1 = Array(any, N);
-    pd2 = Array(any, N);
+    qarray = Array(Any, no, 2*N+1);
+    qarray1 = Array(Any, N);
+    qarray2 = Array(Any, N);
+    pd = Array(Any, no, 2*N+1);
+    pd1 = Array(Any, N);
+    pd2 = Array(Any, N);
 
     for m = 1:no
         princDir = [U[1:T,m]'; U[T+1:2*T,m]'];
@@ -235,7 +234,7 @@ function curve_principal_directions(betamean::Array{Float64, 2}, mu, K,
 end
 
 
-function sample_shapes(mu::Array{Float64,2}, K, mode='O', no=3, numSamp=10)
+function sample_shapes(mu::Array{Float64,2}, K; mode='O', no=3, numSamp=10)
     n, T = size(mu);
 
     U,s,V = svd(K);
@@ -248,7 +247,7 @@ function sample_shapes(mu::Array{Float64,2}, K, mode='O', no=3, numSamp=10)
 
     epsilon = 1./(N-1);
 
-    samples = Array(any, numSamp);
+    samples = Array(Any, numSamp);
     for i = 1:numSamp
         v = zeros(2,T);
         for m = 1:no
