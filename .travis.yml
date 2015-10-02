@@ -13,7 +13,12 @@ notifications:
 
 addons:
   apt:
+    sources:
+    - ubuntu-toolchain-r-test
     packages:
+    - gcc-4.8
+    - g++-4.8
+    - clang
     - gfortran
 
 matrix:
@@ -21,6 +26,7 @@ matrix:
     - os: osx # allow OS X to fail until intermittent failures can be resolved.
 
 script:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - xvfb-run julia -e 'Pkg.clone(pwd()); Pkg.build("ElasticFDA"); Pkg.test("ElasticFDA"; coverage=true)'
 
