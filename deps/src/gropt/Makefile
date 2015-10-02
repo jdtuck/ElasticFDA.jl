@@ -1,6 +1,6 @@
 .PHONY : clean
 
-ERR = $(shell which icpc2>/dev/null; echo $$?)
+ERR = $(shell which icpc>/dev/null; echo $$?)
 ifeq "$(ERR)" "0"
     CC = icpc
 	CFLAGS =  -fPIC -O3 -g # C flags
