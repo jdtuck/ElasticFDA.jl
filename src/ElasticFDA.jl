@@ -46,7 +46,7 @@ const libfdasrsf = joinpath(dirname(@__FILE__), @unix? unixpath : winpath)
 
 # Ensure library is available.
 if (dlopen_e(libfdasrsf) == C_NULL)
-    error("libfdasrsf not properly installed. Run Pkg.build(\"FDAsrsf\")")
+    error("libfdasrsf not properly installed. Run Pkg.build(\"ElasticFDA\")")
 end
 
 # load gropt library
@@ -56,7 +56,7 @@ const libgropt = joinpath(dirname(@__FILE__), @unix? unixpath1 : winpath1)
 
 # Ensure library is available.
 if (dlopen_e(libgropt) == C_NULL)
-    error("libgropt not properly installed. Run Pkg.build(\"FDAsrsf\")")
+    error("libgropt not properly installed. Run Pkg.build(\"ElasticFDA\")")
 end
 
 ### source files
