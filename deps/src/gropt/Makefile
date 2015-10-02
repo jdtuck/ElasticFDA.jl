@@ -1,13 +1,13 @@
 .PHONY : clean
 
-ERR = $(shell which icpc>/dev/null; echo $$?)
+ERR = $(shell which icpc2>/dev/null; echo $$?)
 ifeq "$(ERR)" "0"
     CC = icpc
 	CFLAGS =  -fPIC -O3 -g # C flags
 	LDFLAGS = -shared -lmkl_rt -lpthread # linking flags
 else
     CC = g++
-	CFLAGS = -fPIC -O3 -g -lopenblas # C flags
+	CFLAGS =  -fPIC -std=c++11 -O3 -g -lopenblas # C flags
 	LDFLAGS = -shared -lopenblas # linking flags
 endif
 

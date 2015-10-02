@@ -88,7 +88,7 @@ void RBroydenFamily::UpdateData(void)
 		H->ScaledIdOPE(inpsy / Mani->Metric(x2, y, y));
 	Mani->TranHInvTran(x1, eta2, x2, H, tildeH);
 	inpss = Mani->Metric(x2, s, s);
-	if (inpsy / inpss >= nu * pow(ngf, mu) && inpss > std::numeric_limits<double>::epsilon() 
+	if (inpsy / inpss >= nu * pow(ngf, mu) && inpss > std::numeric_limits<double>::epsilon()
         && inpsy > std::numeric_limits<double>::epsilon())
 	{
 		Mani->LinearOPEEta(x2, tildeH, y, zeta); // zeta = tildeH y
