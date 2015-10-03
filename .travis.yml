@@ -26,7 +26,7 @@ matrix:
 
 before_install:
   # Prepare compilers
-  - if [[ "$CXX" == "g++" || "$CC" == "gcc" ]]; then sh scripts/install-gcc.sh; fi
+  - sh scripts/install-gcc.sh
 
   # Debug information
   - if [[ "$TRAVIS_OS_NAME" = "linux" ]]; then lsb_release -a; fi
