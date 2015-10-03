@@ -25,9 +25,6 @@ matrix:
     - os: osx # allow OS X to fail until intermittent failures can be resolved.
 
 before_install:
-  # Setup cmake
-  - sh scripts/install-cmake.sh
-
   # Prepare compilers
   - if [[ "$CXX" == "g++" || "$CC" == "gcc" ]]; then sh scripts/install-gcc.sh; fi
 
