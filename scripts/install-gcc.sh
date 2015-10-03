@@ -18,6 +18,9 @@ if [ "$TRAVIS_OS_NAME" = linux -o -z "$TRAVIS_OS_NAME" ]; then
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${LIBSTDC_VERSION} 50
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${LIBSTDC_VERSION} 50
 
+    # Install openblas
+    sudo apt-get install libopenblas-dev
+
 elif [ "$TRAVIS_OS_NAME" = osx ]; then
 
     # Make sure xcode is setup
