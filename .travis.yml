@@ -31,8 +31,6 @@ before_install:
   # Debug information
   - if [[ "$TRAVIS_OS_NAME" = "linux" ]]; then lsb_release -a; fi
   - uname -a
-  - $CC --version
-  - $CXX --version
 
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
