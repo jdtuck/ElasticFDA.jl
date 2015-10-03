@@ -21,6 +21,9 @@ if [ "$TRAVIS_OS_NAME" = linux -o -z "$TRAVIS_OS_NAME" ]; then
     # Install openblas
     sudo apt-get install libopenblas-dev
 
+    # Install gfortran
+    sudo apt-get install gfortran
+
 elif [ "$TRAVIS_OS_NAME" = osx ]; then
 
     # Make sure xcode is setup
