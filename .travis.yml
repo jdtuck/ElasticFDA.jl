@@ -1,8 +1,17 @@
 sudo: required
 language: julia
+
 os:
     - osx
     - linux
+
+compiler:
+    - gcc
+
+env:
+  global:
+    - LIBSTDC_VERSION=4.8
+
 julia:
     - 0.3
     - 0.4
@@ -11,24 +20,24 @@ julia:
 notifications:
     email: false
 
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - gcc-4.8
-    - g++-4.8
-    - clang
-    - gfortran
-
 matrix:
   allow_failures:
     - os: osx # allow OS X to fail until intermittent failures can be resolved.
 
+before_install:
+  # Setup cmake
+  - sh scripts/install-cmake.sh
+
+  # Prepare compilers
+  - if [[ "$CXX" == "g++" || "$CC" == "gcc" ]]; then sh scripts/install-gcc.sh; fi
+
+  # Debug information
+  - if [[ "$TRAVIS_OS_NAME" = "linux" ]]; then lsb_release -a; fi
+  - uname -a
+  - $CC --version
+  - $CXX --version
+
 script:
-  - $CXX --version
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-  - $CXX --version
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - xvfb-run julia -e 'Pkg.clone(pwd()); Pkg.build("ElasticFDA"); Pkg.test("ElasticFDA"; coverage=true)'
 
