@@ -22,7 +22,7 @@ addons:
     - gfortran
 
 matrix:
-  allow_failures: 
+  allow_failures:
     - os: osx # allow OS X to fail until intermittent failures can be resolved.
 
 script:

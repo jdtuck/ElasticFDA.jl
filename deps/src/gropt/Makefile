@@ -2,7 +2,7 @@
 
 ERR = $(shell which icpc>/dev/null; echo $$?)
 ifeq "$(ERR)" "0"
-    CC = icpc
+    CXX = icpc
 	CFLAGS =  -fPIC -O3 -g # C flags
 	LDFLAGS = -shared -lmkl_rt -lpthread # linking flags
 else
@@ -25,7 +25,7 @@ clean:
 	rm -f $(OBJECTS) $(TARGET)
 
 src/%.o: src/%.cpp
-	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	$(CXX) $(CFLAGS) $(INC) -c -o $@ $<
 
 $(TARGET) : $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CXX) $(LDFLAGS) -o $@ $^
