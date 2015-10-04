@@ -137,8 +137,8 @@ function pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1,
         title("Traceplot of log posterior after burn-in")
     end
 
-    out = ["f1" => f1, "f2_q" => reg_q, "gam_q" => (bestidy-1)/p,
-           "f2a" => reg_a, "gam_a" => (Meanidy-1)/p,
-           "dist_collect" => dist_collect, "best_match" => best_match];
+    out = Dict("f1" => f1, "f2_q" => reg_q, "gam_q" => (bestidy-1)/p,
+               "f2a" => reg_a, "gam_a" => (Meanidy-1)/p,
+               "dist_collect" => dist_collect, "best_match" => best_match);
     return out
 end

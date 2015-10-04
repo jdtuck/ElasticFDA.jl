@@ -127,9 +127,9 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
     match_collect += 1;
     best_match += 1;
 
-    out = ["best_match" => best_match, "match_collect" => match_collect,
+    out = Dict("best_match" => best_match, "match_collect" => match_collect,
            "dist_collect" => dist_collect, "kappafamily" => kappa_collect,
-           "log_posterior" => log_collect, "dist_min" => dist_min];
+           "log_posterior" => log_collect, "dist_min" => dist_min);
     return out
 end
 
@@ -318,10 +318,10 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
     best_match_matrix += 1;
     bayes_warps += 1;
 
-    out = ["mu_q_standard" => mu_q_standard, "mu_q" => mu_q,
-           "best_match_matrix" => best_match_matrix,
-           "sumdist" => sumdist, "kappafamily" => kappa_collect,
-           "log_posterior" => log_collect, "dist" => sum(best_vec),
-           "MAP" => MAP, "bayes_warps" => bayes_warps];
+    out = Dict("mu_q_standard" => mu_q_standard, "mu_q" => mu_q,
+               "best_match_matrix" => best_match_matrix,
+               "sumdist" => sumdist, "kappafamily" => kappa_collect,
+               "log_posterior" => log_collect, "dist" => sum(best_vec),
+               "MAP" => MAP, "bayes_warps" => bayes_warps);
     return out
 end

@@ -78,7 +78,7 @@ function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
         end
     end
 
-    out = ["fs" => fs, "gams" => rgam, "ft" => ft];
+    out = Dict("fs" => fs, "gams" => rgam, "ft" => ft);
     return out
 
 end

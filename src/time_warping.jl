@@ -228,9 +228,9 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0,
     amp_var = trapz(timet, std_fn.^2);
     phase_var = trapz(timet, var_fgam);
 
-    out = ["fn" => fn, "qn" => qn, "q0" => q0, "fmean" => fmean,
-           "mqn" => mqn, "gam" => gam, "orig_var" => orig_var,
-           "amp_var" => amp_var, "phase_var" => phase_var];
+    out = Dict("fn" => fn, "qn" => qn, "q0" => q0, "fmean" => fmean,
+               "mqn" => mqn, "gam" => gam, "orig_var" => orig_var,
+               "amp_var" => amp_var, "phase_var" => phase_var);
     return out
 end
 
@@ -423,10 +423,10 @@ function align_fPCA(f, timett; num_comp=3, smooth=false, sparam=10)
     amp_var = trapz(timet, std_fn.^2);
     phase_var = trapz(timet, var_fgam);
 
-    out2 = ["fn" => fn, "qn" => qn, "q0" => q0, "fmean" => fmean,
-           "mqn" => mqn, "gam" => gamf, "q_pca" => out["q_pca"],
-           "f_pca" => out["f_pca"], "latent" => out["latent"],
-           "coef" => out["coef"], "U" => out["U"], "orig_var" => orig_var,
-           "amp_var" => amp_var, "phase_var" => phase_var];
+    out2 = Dict("fn" => fn, "qn" => qn, "q0" => q0, "fmean" => fmean,
+                "mqn" => mqn, "gam" => gamf, "q_pca" => out["q_pca"],
+                "f_pca" => out["f_pca"], "latent" => out["latent"],
+                "coef" => out["coef"], "U" => out["U"], "orig_var" => orig_var,
+                "amp_var" => amp_var, "phase_var" => phase_var);
     return out2
 end

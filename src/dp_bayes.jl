@@ -205,10 +205,10 @@ function DP_mean(f, times=5, fig=false)
         end
     end
 
-    out = ["distfamily" => dist_matrix, "match_matrix" => match_matrix,
+    out = Dict("distfamily" => dist_matrix, "match_matrix" => match_matrix,
            "position" => position, "mu_5" => mu_5,
            "rtmatrix" => rtmatrix, "sumdist" => sumdist,
            "qt_fiited" => qt_fitted_matrix, "estimator" => estimator,
-           "estimator2" => estimator2, "regcurve" => reg_curve];
+           "estimator2" => estimator2, "regcurve" => reg_curve);
     return out
 end

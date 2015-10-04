@@ -59,8 +59,8 @@ function vert_fPCA(fn, timet, qn; no=1)
         end
     end
 
-    out = ["q_pca" => q_pca, "f_pca" => f_pca, "latent" => s,
-           "coef" => c, "U" => U];
+    out = Dict("q_pca" => q_pca, "f_pca" => f_pca, "latent" => s,
+           "coef" => c, "U" => U);
     return out
 end
 
@@ -114,7 +114,7 @@ function horiz_fPCA(fn, timet, qn; no=1)
         end
     end
 
-    out = ["gam_pca" => gam_pca, "psi_pca" => psi_pca, "latent" => s,
-           "U" => U, "gam_mu" => gam_mu];
+    out = Dict("gam_pca" => gam_pca, "psi_pca" => psi_pca, "latent" => s,
+           "U" => U, "gam_mu" => gam_mu);
     return out
 end

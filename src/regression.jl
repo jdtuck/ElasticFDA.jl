@@ -110,9 +110,9 @@ function elastic_regression(f, y, timet; B=None, lambda=0, df=20, max_itr=20,
         gamma[:, k] = approx(timet, gamma_new[:, k], timet0);
     end
 
-    out = ["alpha" => alpha, "beta" => beta, "fn" => fn, "qn" => qn,
-           "gamma" => gamma, "q" => q, "B" => B, "type" => "linear",
-           "b" => b[2:end], "SSE" => SSE[1:itr-1]];
+    out = Dict("alpha" => alpha, "beta" => beta, "fn" => fn, "qn" => qn,
+               "gamma" => gamma, "q" => q, "B" => B, "type" => "linear",
+               "b" => b[2:end], "SSE" => SSE[1:itr-1]);
     return out
 end
 
@@ -308,9 +308,9 @@ function elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20,
         itr += 1;
     end
 
-    out = ["alpha" => alpha, "beta" => beta, "fn" => fn, "qn" => qn,
-           "gamma" => gamma, "q" => q, "B" => B, "type" => "mlogisistic",
-           "b" => b[2:end], "n_classes" => m, "Loss" => LL[1:itr-1]];
+    out = Dict("alpha" => alpha, "beta" => beta, "fn" => fn, "qn" => qn,
+               "gamma" => gamma, "q" => q, "B" => B, "type" => "mlogisistic",
+               "b" => b[2:end], "n_classes" => m, "Loss" => LL[1:itr-1]);
     return out
 end
 
@@ -373,7 +373,7 @@ function elastic_prediction(f, timet, model::Dict; y=None, smooth=false)
             y_pred = reshpae(y_pred,n,m);
             max_val, y_labels = findmax(y_pred, 2);
             Perf = zeros(m);
-            cls_set [1:m+1];
+            cls_set[1:m+1];
             for ii in 1:m
                 cls_sub = setdiff(cls_set, ii);
                 TP = sum(y[y_labels .== ii] .== ii);
