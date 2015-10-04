@@ -203,9 +203,9 @@ function elastic_logistic(f, y, timet; B=None, df=20, max_itr=20,
         itr += 1;
     end
 
-    out = ["alpha" => alpha, "beta" => beta, "fn" => fn, "qn" => qn,
-           "gamma" => gamma, "q" => q, "B" => B, "type" => "logisistic",
-           "b" => b[2:end], "Loss" => LL[1:itr-1]];
+    out = Dict("alpha" => alpha, "beta" => beta, "fn" => fn, "qn" => qn,
+               "gamma" => gamma, "q" => q, "B" => B, "type" => "logisistic",
+               "b" => b[2:end], "Loss" => LL[1:itr-1]);
     return out
 end
 
