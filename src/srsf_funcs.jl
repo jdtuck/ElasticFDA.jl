@@ -104,7 +104,7 @@ end
 
 function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
                          q2::Array{Float64,1}, lam::Float64=0.0;
-                         method::ASCIIString="DP", w=0.01, f1o::Float64=0.0,
+                         method::AbstractString="DP", w=0.01, f1o::Float64=0.0,
                          f2o::Float64=0.0)
     q1 = q1./norm(q1);
     q2 = q2./norm(q2);
@@ -185,7 +185,7 @@ end
 
 function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
                          q2::Array{Float64,1}, time2::Array{Float64,1},
-                         lam::Float64=0.0; method::ASCIIString="DP", w = 0.01,
+                         lam::Float64=0.0; method::AbstractString="DP", w = 0.01,
                          f1o::Float64=0.0, f2o::Float64=0.0)
     q1 = q1./norm(q1);
     q2 = q2./norm(q2);
@@ -270,7 +270,7 @@ end
 
 function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
                          q2::Array{Float64,2}, lam::Float64=0.0;
-                         method::ASCIIString="DP", w=0.01, f1o::Float64=0.0,
+                         method::AbstractString="DP", w=0.01, f1o::Float64=0.0,
                          f2o::Array{Float64,1}=zeros(length(q2)))
     q1 = q1./norm(q1);
     c1 = srsf_to_f(q1,timet,f1o);
@@ -355,7 +355,7 @@ end
 
 function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
                          q2::Array{Float64,2}, lam::Float64=0.0;
-                         method::ASCIIString="DP", w=0.01,
+                         method::AbstractString="DP", w=0.01,
                          f1o::Array{Float64,1}=zeros(length(q1)),
                          f2o::Array{Float64,1}=zeros(length(q2)))
     M, N = size(q1);

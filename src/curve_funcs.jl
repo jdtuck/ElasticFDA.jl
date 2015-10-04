@@ -81,7 +81,7 @@ end
 
 
 function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
-                         lam::Float64=0.0; method::ASCIIString="DP", w=0.01,
+                         lam::Float64=0.0; method::AbstractString="DP", w=0.01,
                          rotated::Bool=true, isclosed::Bool=false)
     n1, M = size(beta2);
     timet = linspace(0,1,M);
