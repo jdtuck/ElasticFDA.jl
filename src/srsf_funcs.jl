@@ -129,6 +129,10 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
         T = T[1:int(sizei[1])];
         yi = InterpIrregular(T, G, BCnil, InterpLinear);
         gam = yi[timet];
+    elseif (method == "SIMUL")
+        s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1,c2);
+        u = linspace(0,1,length(g1));
+        gam = simul_gam(u,g1,g2,timet,s1,s2,timet);
     elseif (method == "DP2")
         opt = zeros(M+n1*n1+1);
         swap = false;
@@ -210,6 +214,10 @@ function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
         T = T[1:int(sizei[1])];
         yi = InterpIrregular(T, G, BCnil, InterpLinear);
         gam = yi[time1];
+    elseif (method == "SIMUL")
+        s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1,c2);
+        u = linspace(0,1,length(g1));
+        gam = simul_gam(u,g1,g2,time1,s1,s2,time1);
     elseif (method == "DP2")
         opt = zeros(M1+n1*n1+1);
         swap = false;
@@ -290,6 +298,10 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
             T = T[1:int(sizei[1])];
             yi = InterpIrregular(T, G, BCnil, InterpLinear);
             gam0 = yi[timet];
+        elseif (method == "SIMUL")
+            s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1,ci);
+            u = linspace(0,1,length(g1));
+            gam0 = simul_gam(u,g1,g2,timet,s1,s2,timet);
         elseif (method == "DP2")
             opt = zeros(M+n1*n1+1);
             swap = false;
@@ -372,6 +384,10 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
             yi = InterpIrregular(T, G, BCnil, InterpLinear);
             gam0 = yi[timet];
             sizei = Cdouble[0];
+        elseif (method == "SIMUL")
+            s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1i,c2i);
+            u = linspace(0,1,length(g1));
+            gam0 = simul_gam(u,g1,g2,timet,s1,s2,timet);
         elseif (method == "DP2")
             opt = zeros(M+n1*n1+1);
             swap = false;
