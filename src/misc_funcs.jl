@@ -50,7 +50,7 @@ end
 
 
 function cumtrapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
-    perm = [dim:max(length(size(y)),dim), 1:dim-1];
+    perm = [dim:max(length(size(y)),dim); 1:dim-1];
     y = permutedims(y, perm);
     if ndims(y) == 1
         n = 1;
@@ -61,7 +61,7 @@ function cumtrapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
 
     if n == 1
         dt = diff(x)/2.0;
-        z = [0, cumsum(dt.*(y[1:(m-1)] + y[2:m]))];
+        z = [0; cumsum(dt.*(y[1:(m-1)] + y[2:m]))];
     else
         dt = repmat(diff(x)/2.0,1,n);
         z = [zeros(1,n); cumsum(dt.*(y[1:(m-1), :] + y[2:m, :]),1)];

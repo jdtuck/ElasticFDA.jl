@@ -132,7 +132,7 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
     elseif (method == "SIMUL")
         s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1,c2);
         u = linspace(0,1,length(g1));
-        gam = simul_gam(u,g1,g2,timet,s1,s2,timet);
+        gam = simul_gam(collect(u),g1,g2,timet,s1,s2,timet);
     elseif (method == "DP2")
         opt = zeros(M+n1*n1+1);
         swap = false;
@@ -813,7 +813,7 @@ function match_ext(t1,ext1::Array{Integer,1},d1,t2,ext2::Array{Integer,1},d2)
 
     if mod(length(te1),2)==1
         te1a = zeros(length(te1)+1);
-        te2a[1:end-1] = te1;
+        te1a[1:end-1] = te1;
         te1a[end] = te1[end];
         te1 = copy(te1a);
         pad1[2] = 1;
