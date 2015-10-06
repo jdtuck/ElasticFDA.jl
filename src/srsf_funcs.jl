@@ -735,7 +735,7 @@ function simul_align(f1::Vector,f2::Vector)
     s2 = arclength(f2);
 
     len1 = maximum(s1);
-    len2 = maximum(s3);
+    len2 = maximum(s2);
 
     f1 /= len1;
     s1 /= len1;
@@ -760,7 +760,7 @@ function simul_align(f1::Vector,f2::Vector)
     fe1 = f1[ext1];
     fe2 = f2[ext2];
 
-    g1, g2 = simul_reparam(te1,te2,mapth);
+    g1, g2 = simul_reparam(te1,te2,mpath);
 
     return s1,s2,g1,g2,ext1,ext2,mpath
 end
@@ -787,22 +787,22 @@ function extrema_1s(t::Vector, q::Vector)
 
     ext = find(diff(q))+1;
 
-    ext2 = zeros(length(ext+2));
+    ext2 = zeros(Integer, length(ext)+2);
     ext2[1] = 1;
-    ext2[2:end-1] = ext;
+    ext2[2:end-1] = round(ext);
     ext2[end] = length(t);
 
-    return ext, d
+    return ext2, d
 end
 
 
-function match_ext(t1,ext1,d1,t2,ext2,d2)
+function match_ext(t1,ext1::Array{Integer,1},d1,t2,ext2::Array{Integer,1},d2)
     te1 = t1[ext1];
     te2 = t2[ext2];
 
     # We'll pad each sequence to start on a 'peak' and end on a 'valley'
-    pad1 = zeros(2);
-    pad2 = zeros(2);
+    pad1 = zeros(Integer, 2);
+    pad2 = zeros(Integer, 2);
     if d1==-1
         te1a = zeros(length(te1)+1);
         te1a[2:end] = te1
@@ -811,7 +811,7 @@ function match_ext(t1,ext1,d1,t2,ext2,d2)
         pad1[1] = 1;
     end
 
-    if mod(length(te1,2))==1
+    if mod(length(te1),2)==1
         te1a = zeros(length(te1)+1);
         te2a[1:end-1] = te1;
         te1a[end] = te1[end];
@@ -827,7 +827,7 @@ function match_ext(t1,ext1,d1,t2,ext2,d2)
         pad2[1] = 1;
     end
 
-    if mod(length(te2,2)) == 1
+    if mod(length(te2),2) == 1
         te2a = zeros(length(te2)+1);
         te2a[1:end-1] = te2;
         te2a[end] = te2[end];
@@ -870,15 +870,19 @@ function match_ext(t1,ext1,d1,t2,ext2,d2)
     # Retrieve Best Path
     if pad1[2] == pad2[2]
         mpath = collect(size(D));
-    elseif D[end-1,end] > D[end,end]
+    elseif D[end-1,end] > D[end,end-1]
         mpath = collect(size(D)) - [1,0];
     else
         mpath = collect(size(D)) - [0,1];
     end
-    prev_vert = reshape(P[mpath[1,1],mpath[1,2],:],1,2);
+    mpath = round(Integer, mpath);
+    P = round(Integer, P);
+    prev_vert = reshape(P[mpath[1],mpath[2],:],1,2);
 
-    while prev_ver>0
-        mpath = [prev_ver;mpath];
+    mpath = mpath';
+
+    while any(prev_vert.>0)
+        mpath = [prev_vert;mpath];
         prev_vert = reshape(P[mpath[1,1],mpath[1,2],:],1,2);
     end
 
@@ -898,9 +902,10 @@ function simul_reparam(te1, te2, mpath)
         g2 = [g2; 0.];
     end
 
-    m = length(mpath);
+    m = size(mpath,1);
     for i = 1:m-1
-        gg1, gg2 = simul_reparam_segment(mpath[i,:],mpath[i+1,:],te1,te2);
+        gg1, gg2 = simul_reparam_segment(vec(mpath[i,:]),vec(mpath[i+1,:]),
+                                         te1,te2);
 
         g1 = [g1;gg1];
         g2 = [g2;gg2];
@@ -909,8 +914,8 @@ function simul_reparam(te1, te2, mpath)
     n1 = length(te1);
     n2 = length(te2);
     if (mpath[end,1] == n1-1) || (mpath[end,2] == n2-1)
-        g1 = [g1; 1];
-        g2 = [g2; 1];
+        g1 = [g1; 1.];
+        g2 = [g2; 1.];
     end
 
     return g1, g2
@@ -932,8 +937,8 @@ function simul_reparam_segment(src, tgt, te1, te2)
     u1 = 0.;
     u2 = 0.;
 
-    gg1 = [];
-    gg2 = [];
+    gg1 = Array(Float64,0);
+    gg2 = Array(Float64,0);
 
     while (a1<tgt[1]) && (a2<tgt[2])
         if a1==tgt[1]-1 && a2==tgt[2]-1
@@ -954,7 +959,7 @@ function simul_reparam_segment(src, tgt, te1, te2)
                 t2 = copy(lam);
                 a1 += 2;
             else
-                lam = t1 = (1./R)*(te2[a2+1]-t2);
+                lam = t1 + (1./R)*(te2[a2+1]-t2);
                 gg1 = [gg1; lam; lam];
                 gg2 = [gg2; te2[a2+1]; te2[a2+2]];
                 u1 = u1 + lam - t1;
@@ -970,7 +975,8 @@ function simul_reparam_segment(src, tgt, te1, te2)
 end
 
 
-function simul_gam(u,g1,g2,t,s1,s2,tt)
+function simul_gam(u::Array{Float64,1},g1,g2,t::Array{Float64,1},s1,s2,
+                   tt::Array{Float64,1})
     ss = copy(tt);
     tmp = InterpIrregular(u, g1, BCnil, InterpLinear);
     gs1 = tmp[ss];

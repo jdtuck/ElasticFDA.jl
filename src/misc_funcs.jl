@@ -107,7 +107,7 @@ function interp1_flat(x,y,xx)
 
     if n==0
         tmp = InterpIrregular(x,y,BCnil,InterpLinear);
-        yy = tmp(xx);
+        yy = tmp[xx];
     else
         yy = zeros(size(xx));
         i1 = 1;
@@ -119,7 +119,7 @@ function interp1_flat(x,y,xx)
             i2 = flat[1];
             j = (xx.>=x[i1]) & (xx.<=x[i2]);
             tmp = InterpIrregular(x[i1:i2],y[i1:i2],BCnil,InterpLinear);
-            yy[j] = tmp(xx[j]);
+            yy[j] = tmp[xx[j]];
             i1 = copy(i2);
         end
         for k = 2:n
@@ -127,7 +127,7 @@ function interp1_flat(x,y,xx)
             if i2 > i1+1
                 j = (xx.>=x[i1]) & (xx.<=x[i2]);
                 tmp = InterpIrregular(x[i1+1:i2],y[i1+1:i2],BCnil,InterpLinear);
-                yy[j] = tmp(xx[j]);
+                yy[j] = tmp[xx[j]];
             end
             j = xx.==x[i2];
             yy[j] = minimum(y[i2:i2+1]);
@@ -139,7 +139,7 @@ function interp1_flat(x,y,xx)
             yy[j] = y[i2];
         else
             tmp = InterpIrregular(x[i1+1:i2],y[i1+1:i2],BCnil,InterpLinear);
-            yy[j] = tmp(xx[j]);
+            yy[j] = tmp[xx[j]];
         end
     end
 
