@@ -977,11 +977,8 @@ end
 
 function simul_gam(u::Array{Float64,1},g1,g2,t::Array{Float64,1},s1,s2,
                    tt::Array{Float64,1})
-    ss = copy(tt);
-    tmp = InterpIrregular(u, g1, BCnil, InterpLinear);
-    gs1 = tmp[ss];
-    tmp = InterpIrregular(u, g2, BCnil, InterpLinear);
-    gs2 = tmp[ss];
+    gs1 = interp1_flat(u,g1,tt);
+    gs2 = interp1_flat(u,g2,tt);
 
     gt1 = interp1_flat(s1,t,gs1);
     gt2 = interp1_flat(s2,t,gs2);
