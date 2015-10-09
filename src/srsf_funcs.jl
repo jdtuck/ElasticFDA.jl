@@ -210,8 +210,8 @@ function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
             Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32, Ptr{Float64},
             Ptr{Float64}, Ptr{Float64}, Float64), q1, time1, q2, time2,
             n1, M1, M2, time1, time2, M1, M2, G, T, sizei, lam)
-        G = G[1:int(sizei[1])];
-        T = T[1:int(sizei[1])];
+        G = G[1:round(Integer,sizei[1])];
+        T = T[1:round(Integer,sizei[1])];
         yi = InterpIrregular(T, G, BCnil, InterpLinear);
         gam = yi[time1];
     elseif (method == "SIMUL")
@@ -294,8 +294,8 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
               Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32,
               Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Float64), q1, timet,
               qi, timet, n1, M, M, timet, timet, M, M, G, T, sizei, lam)
-            G = G[1:int(sizei[1])];
-            T = T[1:int(sizei[1])];
+            G = G[1:round(Integer,sizei[1])];
+            T = T[1:round(Integer,sizei[1])];
             yi = InterpIrregular(T, G, BCnil, InterpLinear);
             gam0 = yi[timet];
         elseif (method == "SIMUL")
@@ -379,8 +379,8 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
               Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32,
               Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Float64), q1i, timet,
               q2i, timet, n1, M, M, timet, timet, M, M, G, T, sizei, lam)
-            G = G[1:int(sizei[1])];
-            T = T[1:int(sizei[1])];
+            G = G[1:round(Integer,sizei[1])];
+            T = T[1:round(Integer,sizei[1])];
             yi = InterpIrregular(T, G, BCnil, InterpLinear);
             gam0 = yi[timet];
             sizei = Cdouble[0];
