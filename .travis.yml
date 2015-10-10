@@ -13,7 +13,6 @@ env:
     - LIBSTDC_VERSION=4.8
 
 julia:
-    - 0.3
     - 0.4
     - nightly
 
