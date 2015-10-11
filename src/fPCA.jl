@@ -1,23 +1,20 @@
+"""
+Calculates vertical functional principal component analysis on aligned data
+
+    vert_fPCA(fn, timet, qn; no=1)
+    :param fn: array of shape (M,N) of N aligned functions with M samples
+    :param timet: vector of size M describing the sample points
+    :param qn: array of shape (M,N) of N aligned SRSF with M samples
+    :param no: number of components to extract (default = 1)
+
+    Returns Dict containing
+    :return q_pca: srsf principal directions
+    :return f_pca: functional principal directions
+    :return latent: latent values
+    :return coef: coefficients
+    :return U: eigenvectors
+"""
 function vert_fPCA(fn, timet, qn; no=1)
-    ####################################################################
-    # This function calculates vertical functional principal component analysis
-    # on aligned data
-
-    # :param fn: numpy ndarray of shape (M,N) of M aligned functions with N
-    #            samples
-    # :param time: vector of size N describing the sample points
-    # :param qn: numpy ndarray of shape (M,N) of M aligned SRSF with N samples
-    # :param no: number of components to extract (default = 1)
-    # :param showplot: Shows plots of results using matplotlib (default = T)
-    # :type showplot: bool
-    # :type no: int
-
-    # :return q_pca: srsf principal directions
-    # :return f_pca: functional principal directions
-    # :return latent: latent values
-    # :return coef: coefficients
-    # :return U: eigenvectors
-    ####################################################################
     coef = [-2:3];
     Nstd = length(coef);
 
@@ -65,25 +62,22 @@ function vert_fPCA(fn, timet, qn; no=1)
 end
 
 
-function horiz_fPCA(fn, timet, qn; no=1)
-    ####################################################################
-    # This function calculates horizontal functional principal component
-    # analysis on aligned data
+"""
+Calculates horizontal functional principal component analysis on aligned data
 
-    # :param gam: numpy ndarray of shape (M,N) of M warping functions
-    # :param time: vector of size N describing the sample points
-    # :param no: number of components to extract (default = 1)
-    # :param showplot: Shows plots of results using matplotlib (default = T)
-    # :type showplot: bool
-    # :type no: int
+    horiz_fPCA(gam, timet; no=1)
+    :param gam: array of shape (M,N) of N warping functions with M samples
+    :param timet: vector of size M describing the sample points
+    :param no: number of components to extract (default = 1)
 
-    # :return q_pca: srsf principal directions
-    # :return f_pca: functional principal directions
-    # :return latent: latent values
-    # :return coef: coefficients
-    # :return U: eigenvectors
-    ####################################################################
-
+    Returns Dict containing
+    :return gam_pca: warping principal directions
+    :return psi_pca: srsf functional principal directions
+    :return latent: latent values
+    :return U: eigenvectors
+    :return gam_mu: mean warping function
+"""
+function horiz_fPCA(gam, timet; no=1)
     mu, gam_mu, psi, vec1 = sqrt_mean(gam);
     tau = [1:6];
     TT = length(timet);

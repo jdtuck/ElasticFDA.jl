@@ -1,33 +1,35 @@
-function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0,
+"""
+Aligns a collection of functions using the elastic square-root slope (srsf)
+framework.
+
+    srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
+               optim="DP")
+    :param f: array of shape (M,N) of N functions with M samples
+    :param timet: vector of size M describing the sample points
+    :param method: (string) warp calculate Karcher Mean or Median
+    (options = "mean" or "median") (default="mean")
+    :param smooth: Smooth the data using a box filter (default = false)
+    :param sparam: Number of times to run smoothing filter (default 10)
+    :param lam: controls the elasticity (default = 0)
+    :param optim: optimization method to find warping, default is
+                  Dynamic Programming ("DP"). Other options are
+                  Coordiante Descent ("DP2"), Riemanain BFGS
+                  ("LRBFGS"), Simultaneous Aligntment ("SIMUL")
+
+    Returns Dict containing
+    :return fn: aligned functions - array of shape (M,N) of N
+                functions with M samples
+    :return qn: aligned srsfs - similar structure to fn
+    :return q0: original srsfs - similar structure to fn
+    :return fmean: function mean or median - vector of length N
+    :return mqn: srvf mean or median - vector of length N
+    :return gam: warping functions - similar structure to fn
+    :return orig_var: Original Variance of Functions
+    :return amp_var: Amplitude Variance
+    :return phase_var: Phase Variance
+"""
+function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
                     optim="DP")
-    ####################################################################
-    # This function aligns a collection of functions using the elastic
-    # square-root slope (srsf) framework.
-
-    # :param f:darray of shape (M,N) of M functions with N samples
-    # :param time: vector of size N describing the sample points
-    # :param method: (string) warp calculate Karcher Mean or Median
-    # (options = "mean" or "median") (default="mean")
-    # :param showplot: Shows plots of results using matplotlib (default = T)
-    # :param smoothdata: Smooth the data using a box filter (default = F)
-    # :param lam: controls the elasticity (default = 0)
-    # :param optim: optimization method to find warping, default is
-    #               Dynamic Programming ("DP"). Other options are
-    #               Coordiante Descent ("DP2") and Riemanain BFGS
-    #               ("LRBFGS")
-
-    # :return fn: aligned functions - array of shape (M,N) of M
-    # functions with N samples
-    # :return qn: aligned srvfs - similar structure to fn
-    # :return q0: original srvf - similar structure to fn
-    # :return fmean: function mean or median - vector of length N
-    # :return mqn: srvf mean or median - vector of length N
-    # :return gam: warping functions - similar structure to fn
-    # :return orig_var: Original Variance of Functions
-    # :return amp_var: Amplitude Variance
-    # :return phase_var: Phase Variance
-    ####################################################################
-
     M, N = size(f);
     if smooth
         smooth_data!(f, sparam);
@@ -235,33 +237,34 @@ function srsf_align(f, timett; method="mean", smooth=false, sparam=10, lam=0.0,
 end
 
 
-function align_fPCA(f, timett; num_comp=3, smooth=false, sparam=10)
-    ####################################################################
-    # aligns a collection of functions while extracting principal components.
-    # The functions are aligned to the principal components
+"""
+Aligns a collection of functions while extracting principal components.
+The functions are aligned to the principal components
 
-    # :param f: array of shape (M,N) of M functions with N samples
-    # :param time: vector of size N describing the sample points
-    # :param num_comp: number of fPCA components
-    # :param showplot: Shows plots of results using matplotlib (default = T)
-    # :param smooth_data: Smooth the data using a box filter (default = F)
-    # :param sparam: Number of times to run box filter (default = 25)
+    align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
+    :param f: array of shape (M,N) of N functions with M samples
+    :param timet: vector of size M describing the sample points
+    :param num_comp: Number of componets (default = 3)
+    :param smooth: Smooth the data using a box filter (default = false)
+    :param sparam: Number of times to run smoothing filter (default 10)
 
-    # :return fn: aligned functions - numpy ndarray of shape (M,N) of M
-    #             functions with N samples
-    # :return qn: aligned srvfs - similar structure to fn
-    # :return q0: original srvf - similar structure to fn
-    # :return mqn: srvf mean or median - vector of length N
-    # :return gam: warping functions - similar structure to fn
-    # :return q_pca: srsf principal directions
-    # :return f_pca: functional principal directions
-    # :return latent: latent values
-    # :return coef: coefficients
-    # :return U: eigenvectors
-    # :return orig_var: Original Variance of Functions
-    # :return amp_var: Amplitude Variance
-    # :return phase_var: Phase Variance
-    ####################################################################
+    Returns Dict containing
+    :return fn: aligned functions - array of shape (M,N) of N functions with M
+                samples
+    :return qn: aligned srvfs - similar structure to fn
+    :return q0: original srvf - similar structure to fn
+    :return mqn: srvf mean or median - vector of length M
+    :return gam: warping functions - similar structure to fn
+    :return q_pca: srsf principal directions
+    :return f_pca: functional principal directions
+    :return latent: latent values
+    :return coef: coefficients
+    :return U: eigenvectors
+    :return orig_var: Original Variance of Functions
+    :return amp_var: Amplitude Variance
+    :return phase_var: Phase Variance
+"""
+function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
     lam = 0.0;
     MaxItr = 50;
     coef = [-2:2];

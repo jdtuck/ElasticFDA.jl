@@ -1,16 +1,27 @@
+"""
+Calculate normal Energy on an Array
+
+    Enorm(x::Array{Float64,1})
+"""
 function Enorm(x::Array{Float64,1})
     n = sqrt(sum(diagm(x'*x)));
     n = n[1];
     return n
 end
 
-
+"""
+    Enorm(x::Array{Complex64,1})
+"""
 function Enorm(x::Array{Complex64,1})
     n = sqrt(real(x'*x));
     return n[1]
 end
 
 
+"""
+Smooth functional data using box filter in place
+    smooth_data!(f::Array{Float64,2}, sparam=10)
+"""
 function smooth_data!(f::Array{Float64,2}, sparam=10)
     M, N = size(f);
     for r in 1:sparam
@@ -21,6 +32,10 @@ function smooth_data!(f::Array{Float64,2}, sparam=10)
 end
 
 
+"""
+    smooth_data!(f::Array{Float64,1}, sparam=10)
+    :param sparam: Number of times to run filter (default = 10)
+"""
 function smooth_data!(f::Array{Float64,1}, sparam=10)
     M = length(f);
     for r in 1:sparam
@@ -29,6 +44,11 @@ function smooth_data!(f::Array{Float64,1}, sparam=10)
 end
 
 
+"""
+Smooth functional data using box filter
+    smooth_data(f::Array{Float64,1}, sparam=10)
+    :param sparam: Number of times to run filter (default = 10)
+"""
 function smooth_data(f::Array{Float64,1}, sparam=10)
     M = length(f);
     g = zeros(Float64, M);
@@ -41,6 +61,13 @@ function smooth_data(f::Array{Float64,1}, sparam=10)
 end
 
 
+"""
+Calculate gradient of function using B-splines
+    gradient_spline(timet::Vector, f, smooth=false)
+    :param: timet: Vector describing time samples
+    :param: f: Vector or Array (M,N) describing functions of M samples
+    :param: smooth: smooth data (default = false)
+"""
 function gradient_spline(timet::Vector, f, smooth=false)
     M = size(f,1);
     spar = 0.0;
@@ -73,6 +100,14 @@ function gradient_spline(timet::Vector, f, smooth=false)
 end
 
 
+"""
+Convert function to square-root slope function (srsf)
+    f_to_srsf(f::Array, timet=0, smooth=false)
+    :param f: array of shape (M,N) describing N functions of M samples
+    :param timet: vector describing time samples (default = 0) will generate
+                  linearly spaced time vector of length M
+    :param smooth: smooth data (default = false)
+"""
 function f_to_srsf(f::Array, timet=0, smooth=false)
     if (timet == 0)
         timet = linspace(0,1,length(f));
@@ -83,6 +118,13 @@ function f_to_srsf(f::Array, timet=0, smooth=false)
 end
 
 
+"""
+Convert square-root slope function (srsf) to f
+    srsf_to_f(q::Array, time, f0=0.0)
+    :param q: array of shape (M,N) describing N srsf of M samples
+    :param time: vector describing time samples of length M
+    :param f0: initial value of f
+"""
 function srsf_to_f(q::Array, time, f0=0.0)
     M = size(q,1);
     if ndims(q) > 1
@@ -102,6 +144,25 @@ function srsf_to_f(q::Array, time, f0=0.0)
 end
 
 
+"""
+Calculate optimum reparamertization (warping of q2 to q1)
+
+    optimum_reparam(q1, timet, q1, lam=0.0, method="DP", w=0.01, f1o=0.0,
+                    f2o=0.0)
+    :param q1: array (M,N) or vector (M) describing srsf set 1
+    :param timet: vector describing time samples of length M
+    :param q2: array (M,N) or vector (M) describing srsf of set 2
+    :param lam: control amount of warping (default=0.0)
+    :param method: optimization method to find warping, default is
+                   Dynamic Programming ("DP"). Other options are
+                   Coordiante Descent ("DP2"), Riemanain BFGS
+                   ("LRBFGS"), Simultaneous Aligntment ("SIMUL")
+    :param w: Controls LRBFGS (default = 0.01)
+    :param f1o: initial value of f1, vector or scalar depending on q1, defaults
+                to zero
+    :param f2o: initial value of f2, vector or scalar depending on q1, defaults
+                to zero
+"""
 function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
                          q2::Array{Float64,1}, lam::Float64=0.0;
                          method::AbstractString="DP", w=0.01, f1o::Float64=0.0,
@@ -182,7 +243,11 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
     return gam
 end
 
-
+"""
+    optimum_reparam(q1, time1, q2, time2, lam=0.0, method="DP", w=0.01, f1o=0.0,
+                    f2o=0.0)
+    same as above, but different timing for q1 and q2
+"""
 function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
                          q2::Array{Float64,1}, time2::Array{Float64,1},
                          lam::Float64=0.0; method::AbstractString="DP", w = 0.01,
@@ -439,6 +504,13 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
 end
 
 
+"""
+Warp srsf by gamma
+    warp_q_gamma(time::Vector, q::Vector, gam::Vector)
+    :param time: describes time samples
+    :param q: describes srsf
+    :param gam: descrbies warping function
+"""
 function warp_q_gamma(time::Vector, q::Vector, gam::Vector)
     M = length(gam);
     gam_dev = gradient(gam, 1/(M-1));
@@ -450,6 +522,13 @@ function warp_q_gamma(time::Vector, q::Vector, gam::Vector)
 end
 
 
+"""
+Warp function by gamma
+    warp_f_gamma(time::Vector, f::Vector, gam::Vector)
+    :param time: describes time samples
+    :param f: describes function
+    :param gam: describes warping function
+"""
 function warp_f_gamma(time::Vector, f::Vector, gam::Vector)
     M = length(gam);
     tmp = InterpIrregular(time, f, BCnil, InterpLinear);
@@ -460,6 +539,13 @@ function warp_f_gamma(time::Vector, f::Vector, gam::Vector)
 end
 
 
+"""
+Generate random warping functions
+    rgam(N, sigma, num)
+    :param N: number of time points
+    :param sigma: standard deviation across samples
+    :param num: number of random warpings
+"""
 function rgam(N, sigma, num)
     gam = zeros(N, num);
 
@@ -492,6 +578,12 @@ function rgam(N, sigma, num)
 end
 
 
+"""
+Generates random warping functions based on gam
+    random_gamma(gam, num)
+    :param gam: array (M,N) describing warping functions
+    :param num: number of functions to gerenerate
+"""
 function random_gamma(gam, num)
     mu, gam_mu, psi, vec1 = sqrt_mean(gam);
     K = cov(vec1, vardim=2);
@@ -518,7 +610,12 @@ function random_gamma(gam, num)
 end
 
 
-function invert_gamma(gam)
+"""
+Invert warping function
+    invert_gamma(gam)
+    :param gam: vector describing warping function
+"""
+function invert_gamma(gam::Vector)
     N = length(gam);
     x = [1:N]/N;
     gamI = approx(gam,x,x);
@@ -527,20 +624,12 @@ function invert_gamma(gam)
 end
 
 
-function qtocurve(q, timet=0)
-    m = length(q);
-    if (timet == 0)
-        timet = linspace(0, 1, m+1);
-    end
-    curve = zeros(m+1);
-    for i = 2:(m+1)
-        curve[i] = q[i-1]*abs(q[i-1])*(timet[i]-timet[i-1])+curve[i-1]
-    end
-    return curve
-end
-
-
-function sqrt_mean_inverse(gam)
+"""
+Calculate sqrt mean inverse of warping function
+    sqrt_mean_inverse(gam)
+    :param gam: array (M,N) describing warping functions
+"""
+function sqrt_mean_inverse(gam::Array)
     eps1 = eps(Float64);
     T1, n = size(gam);
     dt = 1.0/(T1-1);
@@ -595,6 +684,10 @@ function sqrt_mean_inverse(gam)
 end
 
 
+"""
+Calculate zero crossing of optimal warping function
+    zero_crossing(Y,q,bt,timet,y_max,y_min,gmax,gmin)
+"""
 function zero_crossing(Y, q, bt, timet, y_max, y_min, gmax, gmin)
     max_itr = 100;
     a = zeros(max_itr);
@@ -639,7 +732,12 @@ function zero_crossing(Y, q, bt, timet, y_max, y_min, gmax, gmin)
 end
 
 
-function sqrt_mean(gam)
+"""
+Calcluate sqrt mean of warping functions
+    sqrt_mean(gam)
+    :param gam: array (M,N) describing warping functions
+"""
+function sqrt_mean(gam::Array)
     eps1 = eps(Float64);
     TT, n = size(gam);
     psi = Array(Float64,TT-1,n);
@@ -692,6 +790,10 @@ function sqrt_mean(gam)
 end
 
 
+"""
+Find karcher inverse of warping functions
+    findkarcherinv(warps, times, roundi=false)
+"""
 function findkarcherinv(warps, times, roundi=false)
     m, n = size(warps);
     psi_m = zeros(m-1, n);
@@ -729,6 +831,11 @@ function findkarcherinv(warps, times, roundi=false)
     return invidy, revscalevec
 end
 
+
+"""
+Simulataeous aligment between two functions
+    simul_align(f1::Vector, f2::Vector)
+"""
 function simul_align(f1::Vector,f2::Vector)
     # parameterize by arc-length
     s1 = arclength(f1);
@@ -766,6 +873,10 @@ function simul_align(f1::Vector,f2::Vector)
 end
 
 
+"""
+Calculate arclength paramertization of function
+    arclength(f::Vector)
+"""
 function arclength(f::Vector)
     t1 = zeros(length(f));
     t1[2:end] = abs(diff(f));
@@ -775,6 +886,10 @@ function arclength(f::Vector)
 end
 
 
+"""
+Find location of change of sign of srsf that is arclength parameterized
+    extrema_1s(t::Vector, q::Vector)
+"""
 function extrema_1s(t::Vector, q::Vector)
     q = round(q);
 
@@ -796,6 +911,10 @@ function extrema_1s(t::Vector, q::Vector)
 end
 
 
+"""
+Find matching between two extremas
+    match_ext(t1, ext1, d1, t2, ext2, d2)
+"""
 function match_ext(t1,ext1::Array{Integer,1},d1,t2,ext2::Array{Integer,1},d2)
     te1 = t1[ext1];
     te2 = t2[ext2];
@@ -890,6 +1009,10 @@ function match_ext(t1,ext1::Array{Integer,1},d1,t2,ext2::Array{Integer,1},d2)
 end
 
 
+"""
+Find simultaneous reparamerization
+    simul_reparam(te1, te2, mpath)
+"""
 function simul_reparam(te1, te2, mpath)
     g1 = [0.];
     g2 = [0.];
@@ -975,6 +1098,10 @@ function simul_reparam_segment(src, tgt, te1, te2)
 end
 
 
+"""
+Calculate warping from q2 to q2 from simultaneous warping
+    simul_gam(u, g1,g2,t,s1,s2,tt)
+"""
 function simul_gam(u::Array{Float64,1},g1,g2,t::Array{Float64,1},s1,s2,
                    tt::Array{Float64,1})
     gs1 = interp1_flat(u,g1,tt);
