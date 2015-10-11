@@ -102,7 +102,7 @@ end
 
 
 function interp1_flat(x,y,xx)
-    flat = find(diff(x).==0);
+    flat = find(diff(x).<=0);
     n = length(flat);
 
     if n==0
