@@ -145,6 +145,35 @@ end
 
 
 """
+Calculate elastic distance between two functions
+    elastic_distance(f1::Vector, f2::Vector, timet::Vector)
+    :param f1: vector of function 1 samples
+    :param f2: vector of function 2 samples
+    :param timet: vector of time samples
+
+    :return da: amplitude distance
+    :return dp: phase distance
+"""
+function elastic_distance(f1::Vector, f2::Vector, timet::Vector)
+    q1 = f_to_srsf(f1, timet);
+    q2 = f_to_srsf(f2, timet);
+
+    gam = optimum_reparam(q1, timet, q2);
+
+    q2a = warp_q_gamma(timet, q2, gam);
+
+    da = sqrt(sum(trapz(timet, (q1-q2a).^2)));
+
+    M = length(gam);
+    psi = sqrt(diff(gam)*(M-1));
+    mu = ones(M-1);
+    dp = real(acos(sum(mu.*psi)/(M-1)));
+
+    return da, dp
+end
+
+
+"""
 Calculate optimum reparamertization (warping of q2 to q1)
 
     optimum_reparam(q1, timet, q1, lam=0.0, method="DP", w=0.01, f1o=0.0,

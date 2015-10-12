@@ -23,6 +23,7 @@ export
     gauss_model,
     group_warping_bayes,
     pair_warping_bayes,
+    elastic_distance,
     elastic_regression,
     elastic_logistic,
     elastic_mlogistic,
