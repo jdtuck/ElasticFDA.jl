@@ -37,7 +37,8 @@ export
     curve_karcher_cov,
     sample_shapes,
     curve_to_q,
-    q_to_curve
+    q_to_curve,
+    calc_shape_dist
 
 # load fdasrsf library
 unixpath = "../deps/src/fdasrsf/fdasrsf"

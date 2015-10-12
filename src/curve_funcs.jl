@@ -629,3 +629,13 @@ function innerprod_q2(q1, q2)
     return val
 end
 
+
+function calc_shape_dist(beta1::Array{Float64,2}, beta2::Array{Float64,2})
+
+    q1 = curve_to_q(beta1);
+    q2 = curve_to_q(beta2);
+
+    d = acos(innerprod_q2(q1,q2));
+
+    return d
+end
