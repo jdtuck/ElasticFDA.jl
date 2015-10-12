@@ -1,3 +1,21 @@
+"""
+Compute pair waring between two functions using Bayesian method
+    pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1, showplot=true)
+    :param f1, f2: vectors describing functions
+    :param iter: number of iterations
+    :param times: MCMC parameter
+    :param powera: MCMC parameter
+    :param showplot: show plots
+
+    Returns Dict containing
+    :return f1:
+    :return f2_q: srsf registration
+    :return gam_q: warping funtion
+    :return f2a: registered f2
+    :return gam: warping function
+    :return dist_collect: distance
+    :return best_match: best match
+"""
 function pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1,
                             showplot=true)
 

@@ -1,3 +1,11 @@
+"""
+Compute B-Spline basis
+    bs(x, df, norder, nderiv=0)
+    :param x: time samples
+    :param df: degree of freedom
+    :param norder: order of splines
+    :param nderiv: derivative number
+"""
 function bs(x::Vector, df, norder, nderiv=0)
     n = length(x);
 

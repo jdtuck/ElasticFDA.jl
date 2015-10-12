@@ -1,5 +1,31 @@
-function elastic_regression(f, y, timet; B=None, lambda=0, df=20, max_itr=20,
-                            smooth=false)
+"""
+Calcluate elastic regression from function data f, for response y
+    elastic_regression(f, y, timet; B=None, lambda=0, df=20, max_itr=20,
+                       smooth=false)
+    :param f: array (M,N) of N functions
+    :param y: vector (N) of respsones
+    :param timet: vecotr (N) describing time samples
+    :param B: matrix describing basis functions (M,N) (default=None generates a
+              B-spline basis
+    :param lambda:
+    :param df: degree of freedom of basis
+    :param max_itr: maximum number of interations
+    :param smooth: smooth data
+
+    Returns Dict describing regression
+    :return alpha: intercept
+    :return beta: regression function
+    :return fn: aligned functions
+    :return qn: aligned srsfs
+    :return gamma: warping functions
+    :return q: original srsfs
+    :retrun B: basis functions
+    :return type: type of regressions
+    :return b: coefficients
+    :return SSE: sum of squared error
+"""
+function elastic_regression(f::Array, y::Vector, timet; B=None, lambda=0, df=20,
+                            max_itr=20, smooth=false)
 
     M, N = size(f);
 
@@ -117,6 +143,30 @@ function elastic_regression(f, y, timet; B=None, lambda=0, df=20, max_itr=20,
 end
 
 
+"""
+Calcluate elastic logistic regression from function data f, for response y
+    elastic_logistic(f, y, timet; B=None, df=20, max_itr=20, smooth=false)
+    :param f: array (M,N) of N functions
+    :param y: vector (N) of respsones
+    :param timet: vecotr (N) describing time samples
+    :param B: matrix describing basis functions (M,N) (default=None generates a
+              B-spline basis
+    :param df: degree of freedom of basis
+    :param max_itr: maximum number of interations
+    :param smooth: smooth data
+
+    Returns Dict describing regression
+    :return alpha: intercept
+    :return beta: regression function
+    :return fn: aligned functions
+    :return qn: aligned srsfs
+    :return gamma: warping functions
+    :return q: original srsfs
+    :retrun B: basis functions
+    :return type: type of regressions
+    :return b: coefficients
+    :return LL: logistic loss
+"""
 function elastic_logistic(f, y, timet; B=None, df=20, max_itr=20,
                           smooth=false)
 
@@ -210,6 +260,31 @@ function elastic_logistic(f, y, timet; B=None, df=20, max_itr=20,
 end
 
 
+"""
+Calcluate elastic m-logistic regression from function data f, for response y
+    elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20, smooth=false)
+    :param f: array (M,N) of N functions
+    :param y: vector (N) of respsones
+    :param timet: vecotr (N) describing time samples
+    :param B: matrix describing basis functions (M,N) (default=None generates a
+              B-spline basis
+    :param df: degree of freedom of basis
+    :param max_itr: maximum number of interations
+    :param smooth: smooth data
+
+    Returns Dict describing regression
+    :return alpha: intercept
+    :return beta: regression function
+    :return fn: aligned functions
+    :return qn: aligned srsfs
+    :return gamma: warping functions
+    :return q: original srsfs
+    :retrun B: basis functions
+    :return type: type of regressions
+    :return b: coefficients
+    :return n_classes: number of classes
+    :return LL: logistic loss
+"""
 function elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20,
                            delta=.01, smooth=false)
 
@@ -315,6 +390,15 @@ function elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20,
 end
 
 
+"""
+Prediction from elastic regression model
+    elastic_prediction(f, timet, model; y=None, smooth=false)
+    :param f: functions to predict
+    :param timet: vector describing time samples
+    :param model: calculated model (regression, logisitic, mlogistic)
+    :param y: true respones (default = None)
+    :param smooth: smooth data (default = false)
+"""
 function elastic_prediction(f, timet, model::Dict; y=None, smooth=false)
     q = f_to_srsf(f, timet, smooth);
     n = size(q, 2);

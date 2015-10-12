@@ -1,3 +1,12 @@
+"""
+Optimization function to calculate warping for elastic regression
+    regression_warp(beta, timet, q, y, alpha)
+    :param beta: regression function
+    :param timet: vector describing time samples
+    :param q: vector describing srsf
+    :param y: response value
+    :param alpha: intercept
+"""
 function regression_warp(beta::Vector, timet::Vector, q::Vector, y::Float64,
                          alpha::Float64)
     gam_M = optimum_reparam(beta, timet, q);
@@ -22,6 +31,14 @@ function regression_warp(beta::Vector, timet::Vector, q::Vector, y::Float64,
 end
 
 
+"""
+Calculate warping for logisitc regression
+    logistic_warp(beta, timet, q, y)
+    :param beta: regression function
+    :param timet: time samples
+    :param q: srsf
+    :param y: response
+"""
 function logistic_warp(beta::Vector, timet::Vector, q::Array, y)
     if y == 1
         gamma = optimum_reparam(beta, timet, q);
@@ -34,6 +51,14 @@ function logistic_warp(beta::Vector, timet::Vector, q::Array, y)
 end
 
 
+"""
+Calculate logistic opmization function
+    logit_optm(x::Vector, grad::Vector, Phi, y)
+    :param x: samples
+    :param grad: gradient
+    :param Phi: coefficient matrix
+    :param y: response
+"""
 function logit_optm(x::Vector, grad::Vector, Phi, y)
     if length(grad) > 0
         logit_gradient!(x, grad, Phi, y);
@@ -43,6 +68,10 @@ function logit_optm(x::Vector, grad::Vector, Phi, y)
 end
 
 
+"""
+Logistic function
+    phi(t)
+"""
 function phi(t)
     idx = t .> 0;
     out = Array(Float64, length(t));
@@ -55,6 +84,13 @@ function phi(t)
 end
 
 
+"""
+Calculate logistic loss function
+    logit_loss(b, X, y)
+    :param b: coefficients
+    :param b: matrix
+    :param y: response
+"""
 function logit_loss(b, X, y)
     z = X * b;
     yz = y .* z;
@@ -67,6 +103,14 @@ function logit_loss(b, X, y)
 end
 
 
+"""
+Calculate gradient of logistic optimization in place
+    logit_gradient!(b, grad, X, y)
+    :param b: coefficeints
+    :param grad: gradient
+    :param X: matrix
+    :param y: response
+"""
 function logit_gradient!(b, grad, X, y)
     z = X * b;
     z = phi(y.*z);
@@ -75,6 +119,14 @@ function logit_gradient!(b, grad, X, y)
 end
 
 
+"""
+Calcualte hessian of logistic optimization
+    logit_hessian(s, b, X, y)
+    :param s:
+    :param b: coefficients
+    :param X: matrix
+    :param y: response
+"""
 function logit_hessian(s, b, X, y)
     z = X*b;
     z = phi(y.*z);
@@ -85,6 +137,20 @@ function logit_hessian(s, b, X, y)
 end
 
 
+"""
+Calculate mlogistic warping using gradient method
+    mlogit_warp_grad(alpha, beta, timet, q, y; max_itr=8000, tol=1e-10,
+                     delt=0.008, display=0)
+    :param alpha: intercept
+    :param beta: regression function
+    :param timet: vector describing time samples
+    :param q: srsf
+    :param y: response
+    :param max_itr: maximum number of iterations
+    :param tol: stopping tolerance
+    :param delt: gradient step size
+    :param display: dispaly optimization iterations
+"""
 function mlogit_warp_grad(alpha, beta, timet, q, y; max_itr=8000,
                           tol=1e-10, delt=0.008, display=0)
     m1 = length(timet);
@@ -109,6 +175,14 @@ function mlogit_warp_grad(alpha, beta, timet, q, y; max_itr=8000,
 end
 
 
+"""
+Calcluate warping for mlogistic elastic regression
+    mlogit_optim(x, grad, Phi, Y)
+    :param x: sample
+    :param grad: gradient
+    :param Phi: matrix
+    :param Y: response matrix
+"""
 function mlogit_optm(x::Vector, grad::Vector, Phi, Y)
     if length(grad) > 0
         mlogit_gradient!(x, grad, Phi, Y);
@@ -118,6 +192,13 @@ function mlogit_optm(x::Vector, grad::Vector, Phi, Y)
 end
 
 
+"""
+Calculate loss for mlogistic regression
+    mlogit_loss(b, X, Y)
+    :param b: coefficients
+    :param X: matrix
+    :param Y: response matrix
+"""
 function mlogit_loss(b, X, Y)
     N, m = size(Y);  # n_samples, n_classes
     M = size(X,2); # n_features
@@ -136,6 +217,14 @@ function mlogit_loss(b, X, Y)
 end
 
 
+"""
+Calculate mlogistic elastic regression loss function gradient in place
+    mlogit_gradient!(b, grad, X, Y)
+    :param b: coefficeints
+    :param grad: gradient
+    :param X: matrix
+    :param Y: response matrix
+"""
 function mlogit_gradient!(b, grad, X, Y)
     N, m = size(Y);  # n_samples, n_classes
     M = size(X,2); # n_features

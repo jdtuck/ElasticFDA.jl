@@ -1,3 +1,10 @@
+"""
+Linear interpolation
+    approx(xd, yd, xi)
+    :param xd: x samples
+    :param yd: response samples
+    :param xi: new x samples
+"""
 function approx(xd, yd, xi)
     nd = length(xd);
     ni = length(xi);
@@ -25,6 +32,13 @@ function approx(xd, yd, xi)
 end
 
 
+"""
+Trapezodial Integration
+    trapz(x, y, dim=1)
+    :param x: vector of time samples
+    :param y: array of response samples
+    :param dim: dimension along which to integrate
+"""
 function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
     perm = [dim:max(ndims(y),dim), 1:dim-1];
     y = permutedims(y, perm);
@@ -49,6 +63,13 @@ function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
 end
 
 
+"""
+Cumulative Trapezodial Integration
+    cumtrapz(x, y, dim=1)
+    :param x: vector describing time samples
+    :param y: array describing response
+    :param dim: dimension to integrate over
+"""
 function cumtrapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
     perm = [dim:max(length(size(y)),dim); 1:dim-1];
     y = permutedims(y, perm);
@@ -72,6 +93,13 @@ function cumtrapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
 end
 
 
+"""
+Cumulative Trapezodial Integration using midpoint
+    cumtrapzmid(x, y, c)
+    :param x: time samples
+    :param y: resposne samples
+    :param c: midpoint
+"""
 function cumtrapzmid(x, y, c)
     a = length(x);
     mid = round(a/2);
@@ -91,6 +119,13 @@ function cumtrapzmid(x, y, c)
 end
 
 
+"""
+Multivariate Normal random number generation
+    mvnrand(mu, C, n)
+    :param mu: mean vector
+    :param C: covariance matrix
+    :param n: number of samples
+"""
 function mvnrand(mu, C, n)
     tmp = cholfact(C, :U, pivot=true);
     R = tmp[:U];
@@ -101,6 +136,13 @@ function mvnrand(mu, C, n)
 end
 
 
+"""
+Linear interpolation when resposne contains flat regions
+    interp1_flat(x, y, xx)
+    :param x: time samples
+    :param y: response samples
+    :param xx: new time samples
+"""
 function interp1_flat(x,y,xx)
     flat = find(diff(x).<=0);
     n = length(flat);
