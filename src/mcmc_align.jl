@@ -1,3 +1,6 @@
+"""
+MCMC iteration for pairwise alignment
+"""
 function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
                   powera, dist, dist_min, best_match, match, thin, cut)
 
@@ -134,6 +137,9 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
 end
 
 
+"""
+MCMC iteration for group alignment
+"""
 function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
                    qt_fitted_matrix, L, tau, times, kappa, alpha, beta,
                    powera, best_vec, dist_vec, best_match_matrix, mu_prior,

@@ -1,3 +1,9 @@
+"""
+Resample curve
+    resamplecurve(x, N=100)
+    :param x: array describing curve (n,T)
+    :param N: Number of samples to resample curve, N usually is > T
+"""
 function resamplecurve(x, N=100)
     n, T = size(x);
     xn = zeros(n, N);
@@ -20,6 +26,11 @@ function resamplecurve(x, N=100)
 end
 
 
+"""
+Calculate centroid of curve
+    calculatecentroid(beta)
+    :param beta: array describing curve (n,T)
+"""
 function calculatecentroid(beta)
     n, T = size(beta);
     betadot = zeros(n,T);
@@ -39,6 +50,11 @@ function calculatecentroid(beta)
 end
 
 
+"""
+Convert curve to square-root velocity function (srvf)
+    curve_to_q(beta)
+    :param beta: array describing curve (n,T)
+"""
 function curve_to_q(beta)
     n, T = size(beta);
     v = zeros(n,T);
@@ -64,6 +80,11 @@ function curve_to_q(beta)
 end
 
 
+"""
+Convert srvf to curve
+    q_to_curve(q)
+    :param q: array describing srvf (n,T)
+"""
 function q_to_curve(q)
     T = size(q,2);
     qnorm = zeros(T);
@@ -80,6 +101,24 @@ function q_to_curve(q)
 end
 
 
+"""
+    optimum_reparam(beta1, beta2, lam, method="DP", w=0.01, rotated=true,
+                    isclosed=false)
+    :param beta1: array (n,T) describing curve 1
+    :param beta2: array (n,T) describing curve 2
+    :param lam: control amount of warping (default=0.0)
+    :param method: optimization method to find warping, default is
+                   Dynamic Programming ("DP"). Other options are
+                   Coordiante Descent ("DP2"), Riemanain BFGS
+                   ("LRBFGS"), Simultaneous Aligntment ("SIMUL")
+    :param w: Controls LRBFGS (default = 0.01)
+    :param rotated: calcule rotation (default = true)
+    :param isclosed: closed curve (default = false)
+
+    :return gam: warping function
+    :return R: rotation matrix
+    :return tau: seed value
+"""
 function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
                          lam::Float64=0.0; method::AbstractString="DP", w=0.01,
                          rotated::Bool=true, isclosed::Bool=false)
@@ -171,6 +210,12 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
 end
 
 
+"""
+Find best rotation between two srvfs
+    find_best_roation(q1,q2)
+    :param q1: array (n, T)
+    :param q2: array (n, T)
+"""
 function find_best_rotation(q1, q2)
     epsilon = eps(Float64);
     n, T = size(q1);
@@ -189,6 +234,11 @@ function find_best_rotation(q1, q2)
 end
 
 
+"""
+Calculate variance along curve
+    calculate_variance(beta)
+    :param beta: array (n, T)
+"""
 function calculate_variance(beta)
     n, T = size(beta);
     betadot = zeros(n, T);
@@ -212,6 +262,13 @@ function calculate_variance(beta)
 end
 
 
+"""
+Calculate psi
+    psi(x,a,q)
+    :param x: array (n, T) of curve
+    :param a: vector (n) of centroid
+    :param q: array (n, T) of srvf
+"""
 function psi(x, a, q)
     T = size(q,2);
     covmat = calculate_variance(x+repmat(a,1,T));
@@ -224,6 +281,11 @@ function psi(x, a, q)
 end
 
 
+"""
+Find basis normal to srvf
+    find_basis_normal(q)
+    :param q: array (n, T)
+"""
 function find_basis_normal(q)
     n, T = size(q);
 
@@ -252,6 +314,11 @@ function find_basis_normal(q)
 end
 
 
+"""
+Calculate Jacobian of basis
+    calc_j(basis)
+    :param basis: array of (2) from find_basis_normal
+"""
 function calc_j(basis)
     b1 = basis[1];
     b2 = basis[2];
@@ -277,6 +344,12 @@ function calc_j(basis)
 end
 
 
+"""
+Shift curve f by tau
+    shift_f(f, tau)
+    :param f: array (n,T)
+    :param tau: scalar
+"""
 function shift_f(f, tau)
     n, T = size(f);
     fn = zeros(n,T);
@@ -287,6 +360,16 @@ function shift_f(f, tau)
 end
 
 
+"""
+Finds best rotation and seed value between two curves beta1, beta2
+    find_rotation_seed_coord(beta1,beta2)
+    :param beta1: array (n,T)
+    :param beta2: array (n,T)
+
+    :return beta2new: rotated curve
+    :return O_hat1: rotation matrix
+    :return tau: seed value
+"""
 function find_rotation_seed_coord(beta1,beta2)
     n,T = size(beta1);
     q1 = curve_to_q(beta1);
@@ -309,6 +392,16 @@ function find_rotation_seed_coord(beta1,beta2)
 end
 
 
+"""
+Find best rotation and seed value between two srvfs, q1 and q2
+    find_rotation_and_seed_q(q1,q2)
+    :param q1: array (n,T)
+    :param q2: array (n,T)
+
+    :return q2new: rotated srvf
+    :return O_hat: rotation matrix
+    :return tau: seed value
+"""
 function find_rotation_and_seed_q(q1,q2)
     n, T = size(q1);
     Ltwo = zeros(T);
@@ -329,6 +422,12 @@ function find_rotation_and_seed_q(q1,q2)
 end
 
 
+"""
+Warp srvf by gamma
+    group_action_by_gamma(q, gamma)
+    :param q: array (n,T)
+    :param gamma: vector (T)
+"""
 function group_action_by_gamma(q, gamma)
     n, T = size(q);
     gammadot = gradient(gamma, 1.0/T);
@@ -345,6 +444,12 @@ function group_action_by_gamma(q, gamma)
 end
 
 
+"""
+Warp curve f by gamma
+    group_action_by_gamma_coord(f, gamma)
+    :param f: array (n,T)
+    :param gamma: vector (T)
+"""
 function group_action_by_gamma_coord(f, gamma)
     n, T = size(f);
     fn = zeros(n,T);
@@ -358,6 +463,11 @@ function group_action_by_gamma_coord(f, gamma)
 end
 
 
+"""
+Project curve onto normal tangent space
+    project_curve(q)
+    :param q: array (n,T)
+"""
 function project_curve(q)
     T = size(q,2);
     tol = 1e-5;
@@ -411,6 +521,16 @@ function project_curve(q)
 end
 
 
+"""
+Pre-processes curve by centerting and projecting to tangent space
+    pre_proc_curve(beta, T=100)
+    :param beta: array (n,T)
+    :param T: number of resample points
+
+    :return betanew: resampled and centered curve
+    :return qnew: projected srvf
+    :return A: rotation matrix
+"""
 function pre_proc_curve(beta, T=100)
     beta = resamplecurve(beta, T);
     q = curve_to_q(beta);
@@ -424,6 +544,15 @@ function pre_proc_curve(beta, T=100)
 end
 
 
+"""
+Calculate shooting vector and distance between two curves beta1 and beta2
+    inverse_exp_coord(beta1, beta2)
+    :param beta1: array (n,T)
+    :param beta2: array (n,T)
+
+    :return v: shooting vector
+    :return dist: shape distance
+"""
 function inverse_exp_coord(beta1, beta2)
     T = size(beta1,2);
     centroid1 = calculatecentroid(beta1);
@@ -463,6 +592,15 @@ function inverse_exp_coord(beta1, beta2)
 end
 
 
+"""
+Calculate shooting vector between two srvfs q1 and q2
+    inverse_exp(q1, q2, beta2)
+    :param q1: array (n,T)
+    :param q2: array (n,T)
+    :param beta2: array (n,T)
+
+    :return v: shooting vector
+"""
 function inverse_exp(q1, q2, beta2)
     T = size(q1,2);
     centroid1 = calculatecentroid(beta2);
@@ -503,6 +641,11 @@ function inverse_exp(q1, q2, beta2)
 end
 
 
+"""
+Gram-Schmidt Orthogonlization of basis
+    gram_schmidt(basis)
+    :param basis: basis out of find_basis_normal
+"""
 function gram_schmidt(basis)
     b1 = basis[1];
     b2 = basis[2];
@@ -519,6 +662,13 @@ function gram_schmidt(basis)
 end
 
 
+"""
+Project srvf onto tangent space
+    project_tangent(w, q, basis)
+    :param w: shooting vector
+    :param q: array (n,T)
+    :param basis: basis out of find_basis_normal
+"""
 function project_tangent(w, q, basis)
     w = w - innerprod_q2(w, q) * q;
     bo = gram_schmidt(basis);
@@ -529,6 +679,11 @@ function project_tangent(w, q, basis)
 end
 
 
+"""
+Scale curve to unit length
+    scale_curve(beta)
+    :param beta: array (n,T)
+"""
 function scale_curve(beta)
     n, T = size(beta);
     normbetadot = zeros(T);
@@ -546,6 +701,15 @@ function scale_curve(beta)
 end
 
 
+"""
+Parallel translate srvf  along tangent space
+    parallel_translate(w, q1, q2, basis, mode='O')
+    :param w: shooting vector
+    :param q1: array (n,T)
+    :param q2: array (n,T)
+    :param basis: basis out of find_basis_normal
+    :param mode: Open ('O') or Closed ('C') curves
+"""
 function parallel_translate(w, q1, q2, basis, mode='O')
     wtilde = w - 2*innerprod_q2(w,q2) / innerprod_q2(q1+q2, q1+q2) * (q1+q2);
     l = sqrt(innerprod_q2(wtilde, wtilde));
@@ -564,6 +728,9 @@ function parallel_translate(w, q1, q2, basis, mode='O')
 end
 
 
+"""
+Calculate zero crossing for optimal regression between curves
+"""
 function curve_zero_crossing(Y, beta, bt, y_max, y_min, gmax, gmin)
     T = size(beta,2);
     betanu = q_to_curve(bt);
@@ -615,6 +782,10 @@ function curve_zero_crossing(Y, beta, bt, y_max, y_min, gmax, gmin)
 end
 
 
+"""
+Find rotation matrix for angle theta
+    rot_mat(theta)
+"""
 function rot_mat(theta)
     O = [cos(theta) -1*sin(theta); sin(theta) cos(theta)];
 
@@ -622,6 +793,12 @@ function rot_mat(theta)
 end
 
 
+"""
+Find inner product between two srvfs, q1 and q2
+    innerprod_q2(q1, q2)
+    :param q1: array (n,T)
+    :param q2: array (n,T)
+"""
 function innerprod_q2(q1, q2)
     T = size(q1,2);
     val = sum(sum(q1.*q2))/T;
@@ -630,6 +807,12 @@ function innerprod_q2(q1, q2)
 end
 
 
+"""
+Calculate elastic shape distance between two curves beta1 and beta2
+    calc_shape_dist(beta1, beta2)
+    :param beta1: array (n,T)
+    :param beta2: array (n,T)
+"""
 function calc_shape_dist(beta1::Array{Float64,2}, beta2::Array{Float64,2})
 
     q1 = curve_to_q(beta1);

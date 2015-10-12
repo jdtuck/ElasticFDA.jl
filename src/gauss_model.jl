@@ -1,3 +1,19 @@
+"""
+Computes random samples of functions from aligned data using Gaussian model
+
+    gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
+    :param fn: aligned functions (M,N)
+    :param timet: vector (M) describing time
+    :param qn: aligned srvfs (M,N)
+    :param gam: warping functions (M,N)
+    :param n: number of samples
+    :param sort_samples: sort samples
+
+    Returns Dict containing
+    :return fs: random aligned functions
+    :return gams: random warping functions
+    :return ft: random functions
+"""
 function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
 
     # Parameters

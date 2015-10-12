@@ -17,7 +17,6 @@ export
     optimum_reparam,
     warp_q_gamma,
     warp_f_gamma,
-    qtocurve,
     vert_fPCA,
     horiz_fPCA,
     gauss_model,

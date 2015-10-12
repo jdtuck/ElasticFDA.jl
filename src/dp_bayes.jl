@@ -1,3 +1,16 @@
+"""
+Calculate Dynamic Programming using Bayesian approach
+    dp_bayes(q1, q1L, q2L, times, cut)
+    :param q1: vector (N)
+    :param q1L: vector (q1L)
+    :param q2L: vector (q2L)
+    :param times: MCMC parameter number of simulations
+    :param cut: MCMC parameter number of cuts
+
+    :return MatchIn2: warping function
+    :return NDist: minimal distance
+    :return q2LL: reparameterized q2L
+"""
 function dp_bayes(q1, q1L, q2L, times, cut)
 
     colnum = length(q1L);
@@ -108,6 +121,25 @@ function dp_bayes(q1, q1L, q2L, times, cut)
 end
 
 
+"""
+Caluclate mean function using Bayesian Dynamic Programming
+    DP_mean(f, times=5, fig=false)
+    :param f: array (M,N) of N functions
+    :param times: MCMC parameter number of times to split
+    :param fig: display figures
+
+    Returns Dict containing
+    :return distmfamily: distance matrix
+    :return match_matrix: match_matrix
+    :return position: position
+    :return mu_5: mean function
+    :return rtmatrix: rtmatrix
+    :return sumdist: sum distance
+    :return qt_fitted: qt fitted matrix
+    :return esimator: estimator
+    :return estimator2: estimator2
+    :return regcurve: registered curves
+"""
 function DP_mean(f, times=5, fig=false)
     cut = 5*times;
     iter = 20;
@@ -208,7 +240,7 @@ function DP_mean(f, times=5, fig=false)
     out = Dict("distfamily" => dist_matrix, "match_matrix" => match_matrix,
            "position" => position, "mu_5" => mu_5,
            "rtmatrix" => rtmatrix, "sumdist" => sumdist,
-           "qt_fiited" => qt_fitted_matrix, "estimator" => estimator,
+           "qt_fitted" => qt_fitted_matrix, "estimator" => estimator,
            "estimator2" => estimator2, "regcurve" => reg_curve);
     return out
 end
