@@ -1,3 +1,13 @@
+"""
+Group alignment of functions using Bayesian method
+
+    group_warping_bayes(f; iter=20000, times=5, powera=1, showplot=true)
+    :param f: array (M,N) of N functions
+    :param iter: number of MCMC iterations
+    :param times: time slicing
+    :param powera: MCMC parameter
+    :param showplot: show plots
+"""
 function group_warping_bayes(f; iter=20000, times=5, powera=1,
                              showplot=true)
 

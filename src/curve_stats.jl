@@ -1,3 +1,16 @@
+"""
+Calculates Karcher mean of a collection of curves using the elastic square-root
+velocity (srvf) framework.
+
+    curve_karcher_mean(beta, mode='O')
+    :param beta: array (n,T,N) for N number of curves
+    :param mode: Open ('O') or Closed ('C') curves
+
+    :return mu: mean srvf
+    :return betamean: mean curve
+    :return v: shooting vectors
+    :return q: array of srvfs
+"""
 function curve_karcher_mean(beta::Array{Float64, 3}, mode='O')
     n, T, N = size(beta)
     q = zeros(n, T, N);
@@ -65,6 +78,20 @@ function curve_karcher_mean(beta::Array{Float64, 3}, mode='O')
 end
 
 
+"""
+Aligns a collection of curves using the elastic square-root velocity (srvf)
+framework.
+
+    curve_srvf_align(beta, mode='O')
+               optim="DP")
+    :param beta: array (n,T,N) for N number of curves
+    :param mode: Open ('O') or Closed ('C') curves
+
+    :return betan: aligned curves
+    :return qn: aligned srvfs
+    :return betamean: mean curve
+    :return q_mu: mean srvf
+"""
 function curve_srvf_align(beta::Array{Float64, 3}, mode='O')
     n, T, N = size(beta);
     # find mean
@@ -101,6 +128,16 @@ function curve_srvf_align(beta::Array{Float64, 3}, mode='O')
 end
 
 
+"""
+Calculate Karcher Covariance of a set of curves
+
+    curve_karcher_cov(betamean, beta, mode='O')
+    :param betamean: array (n,T) of mean curve
+    :param beta: array (n,T,N) for N number of curves
+    :param mode: Open ('O') or Closed ('C') curves
+
+    :return K: covariance matrix
+"""
 function curve_karcher_cov(betamean::Array{Float64,2}, beta::Array{Float64,3},
                            mode='O')
     n, T, N = size(beta);
@@ -140,6 +177,19 @@ function curve_karcher_cov(betamean::Array{Float64,2}, beta::Array{Float64,3},
 end
 
 
+"""
+Calculate principal directions of a set of curves
+
+    curve_principal_directions(betamean, mu, K; mode='O', no=3, N=5)
+    :param betamean: array (n,T) of mean curve
+    :param mu: array (n,T) of mean srvf
+    :param K: array (T,T) covariance matrix
+    :param mode: Open ('O') or Closed ('C') curve
+    :param no: number of components
+    :param N: number of samples on each side of mean
+
+    :return pd: array describing principal directions
+"""
 function curve_principal_directions(betamean::Array{Float64, 2}, mu, K;
                                     mode='O', no=3, N=5)
     n, T = size(betamean);
@@ -234,6 +284,18 @@ function curve_principal_directions(betamean::Array{Float64, 2}, mu, K;
 end
 
 
+"""
+Sample shapes from model
+
+    sample_shapes(mu, K; mode='O', no=3, numSamp=10)
+    :param mu: array (n,T) mean srvf
+    :param K: array (T,T) covaraince matrix
+    :param mode: Open ('O') or Closed ('C') curves
+    :param no: number of principal components
+    :param numSamp: number of samples
+
+    :return samples: array (n,T,numSamp) of sample curves
+"""
 function sample_shapes(mu::Array{Float64,2}, K; mode='O', no=3, numSamp=10)
     n, T = size(mu);
 
@@ -281,6 +343,18 @@ function sample_shapes(mu::Array{Float64,2}, K; mode='O', no=3, numSamp=10)
 end
 
 
+"""
+karcher mean calculation function
+    karcher_calc(beta, q, betamean, mu, mode='O')
+    :param beta: array (n,T)
+    :param q: array (n,T)
+    :param betamean: array (n,T)
+    :param mu: array (n,T)
+    :parma mode: Open ('O') or Closed ('C') curves
+
+    :return v: shooting vector
+    :return d: elastic distance
+"""
 function karcher_calc(beta, q, betamean, mu, mode='O')
     if mode == 'C'
         basis = find_basis_normal(mu);
