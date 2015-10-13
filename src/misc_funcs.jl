@@ -1,5 +1,6 @@
 """
 Linear interpolation
+
     approx(xd, yd, xi)
     :param xd: x samples
     :param yd: response samples
@@ -34,6 +35,7 @@ end
 
 """
 Trapezodial Integration
+
     trapz(x, y, dim=1)
     :param x: vector of time samples
     :param y: array of response samples
@@ -58,7 +60,9 @@ function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
         out = ipermutedims(out, perm);
         ind = find(collect(size(out)).==1);
         out = squeeze(out,ind[1]);
-        out = out[1];
+        if length(out) == 1;
+            out = out[1];
+        end
     end
 
     return out
@@ -67,6 +71,7 @@ end
 
 """
 Cumulative Trapezodial Integration
+
     cumtrapz(x, y, dim=1)
     :param x: vector describing time samples
     :param y: array describing response
@@ -97,6 +102,7 @@ end
 
 """
 Cumulative Trapezodial Integration using midpoint
+
     cumtrapzmid(x, y, c)
     :param x: time samples
     :param y: resposne samples
@@ -123,14 +129,16 @@ end
 
 """
 Multivariate Normal random number generation
+
     mvnrand(mu, C, n)
     :param mu: mean vector
     :param C: covariance matrix
     :param n: number of samples
 """
 function mvnrand(mu, C, n)
-    tmp = cholfact(C, :U, pivot=true);
+    tmp = cholfact(C, :U, Val{true});
     R = tmp[:U];
+    R = Array(R);
     R = R[:, tmp.piv];
     retval = randn(n, size(R,1)) * R;
     retval += transpose(repmat(mu, 1, n));
@@ -140,6 +148,7 @@ end
 
 """
 Linear interpolation when resposne contains flat regions
+
     interp1_flat(x, y, xx)
     :param x: time samples
     :param y: response samples

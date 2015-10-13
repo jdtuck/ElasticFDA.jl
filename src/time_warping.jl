@@ -3,7 +3,7 @@ Aligns a collection of functions using the elastic square-root slope (srsf)
 framework.
 
     srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
-               optim="DP")
+               optim="SIMUL")
     :param f: array of shape (M,N) of N functions with M samples
     :param timet: vector of size M describing the sample points
     :param method: (string) warp calculate Karcher Mean or Median

@@ -15,7 +15,6 @@ Computes random samples of functions from aligned data using Gaussian model
     :return ft: random functions
 """
 function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
-
     # Parameters
     eps1 = eps(Float64);
     binsize = mean(diff(timet));
@@ -23,9 +22,9 @@ function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
 
     # compute mean and covariance in q-domain
     mq_new = mean(qn,2);
-    mididx = round(M/2);
+    mididx = round(Integer, M/2);
     m_new = sign(fn[mididx,:]) .* sqrt(abs(fn[mididx,:]));
-    mqn = vec([mq_new, mean(m_new)]);
+    mqn = vec([mq_new; mean(m_new)]);
     qn2 = vcat(qn, m_new);
     C = cov(qn2, vardim=2);
 
@@ -82,7 +81,7 @@ function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
     else
         # combine x-variability and y-variability
         ft = zeros(M, n);
-        time0 = [0:(M-1)]./(M-1);
+        time0 = collect(0:(M-1))./(M-1);
         for k in 1:n
             ft[:,k] = approx(time0, fs[:,k], gams[:,k]);
             tmp = isnan(ft[:, k]);

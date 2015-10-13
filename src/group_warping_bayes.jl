@@ -8,11 +8,10 @@ Group alignment of functions using Bayesian method
     :param powera: MCMC parameter
     :param showplot: show plots
 """
-function group_warping_bayes(f; iter=20000, times=5, powera=1,
-                             showplot=true)
+function group_warping_bayes(f; iter=20000, times=5, powera=1, showplot=true)
 
     tau = ceil(times*.4);
-    gp = [1:size(f,2)];
+    gp = collect(1:size(f,2));
     # Default setting shall work for many situations.
     # If convergence issues arise then adjust proposal variance tau.
     if (times == 2)
@@ -32,20 +31,20 @@ function group_warping_bayes(f; iter=20000, times=5, powera=1,
     if mod(m, times) != 0
         error(@sprintf("Number of points on q function = %d is not a mulitple of times = %d", m, times))
     end
-    timet = linspace(0, 1, m+1);
+    timet = collect(linspace(0, 1, m+1));
     n = size(f, 2)
     qt_matrix = zeros(m, n);
     qt_fitted_matrix = zeros(m, n);
 
     for j = 1:n
-        qt_matrix[:, j] = f_to_srsf(f[:, j], timet);
+        qt_matrix[:, j] = sign(diff(f[:,j])).*sqrt(abs(diff(f[:,j]))./diff(timet));
         if scale_data
             rescale = sqrt(m/sum(qt_matrix[:, j].^2));
             qt_matrix[:, j] = rescale.*qt_matrix[:, j];
         end
     end
 
-    row = [1:times:m];
+    row = collect(1:times:m);
     L = length(row);
 
     res_dp = DP_mean(f, times);
@@ -63,11 +62,11 @@ function group_warping_bayes(f; iter=20000, times=5, powera=1,
     logmax = 0;
     mu_prior  = ones(m);
     cov_prior = diagm(var_const.*ones(m));
-    mu_q = zeros(int(iter/thin), m);
+    mu_q = zeros(round(Integer, iter/thin), m);
     mu_q_standard = zeros(mu_q);
 
-    burnin = round(0.5*iter/thin);
-    AVG = length([burnin:(int(iter/thin))]);
+    burnin = round(Integer, 0.5*iter/thin);
+    AVG = length(collect(burnin:(round(Integer, iter/thin))));
     res = itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
                     qt_fitted_matrix, L, tau, times, kappa, alpha, beta,
                     powera, best_vec, dist_vec, best_match_matrix, mu_prior,
@@ -83,10 +82,10 @@ function group_warping_bayes(f; iter=20000, times=5, powera=1,
     log_posterior = res["log_posterior"];
     dist = res["dist"]
 
-    mu_est = mean(mu_q_standard[burnin:(iter/thin),:], 1);
+    mu_est = mean(mu_q_standard[burnin:round(Integer, iter/thin),:], 1);
     rescale = sqrt(m/sum(mu_est.^2));
     mu_est *= rescale;
-    mu_est2 = mean(mu_q[burnin:(iter/thin),:], 1);
+    mu_est2 = mean(mu_q[burnin:round(Integer, iter/thin),:], 1);
     rescale = sqrt(m/sum(mu_est2.^2));
     mu_est2 *= rescale;
 
@@ -97,14 +96,14 @@ function group_warping_bayes(f; iter=20000, times=5, powera=1,
     f_q = zeros(m+1, n);
 
     for t = 1:n
-         f_i = InterpIrregular([row, m+1], best_match_matrix[:, t], BCnearest, InterpLinear);
+         f_i = InterpIrregular([row; m+1], best_match_matrix[:, t], BCnearest, InterpLinear);
          gam_q[:, t] = f_i[1:(m+1)];
          f_o = InterpGrid(f[:, t], BCnil, InterpCubic);
          tmp = f_o[linspace(1,m,times*(m+1)-1)];
-         f_q[:, t] = tmp[int((gam_q[:, t]-1)*times+1)];
-         f_i = InterpIrregular([row, m+1], bayes_warps[:, t], BCnearest, InterpLinear);
+         f_q[:, t] = tmp[round(Integer, (gam_q[:, t]-1)*times+1)];
+         f_i = InterpIrregular([row; m+1], bayes_warps[:, t], BCnearest, InterpLinear);
          gam_a[:, t] = f_i[1:(m+1)];
-         f_a[:, t] = tmp[int((gam_a[:, t]-1)*times+1)];
+         f_a[:, t] = tmp[round(Integer, (gam_a[:, t]-1)*times+1)];
     end
 
     if (showplot)

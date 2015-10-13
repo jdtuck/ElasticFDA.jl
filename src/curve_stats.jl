@@ -74,6 +74,8 @@ function curve_karcher_mean(beta::Array{Float64, 3}, mode='O')
 
     end
 
+    mu = mu[:,:,1];
+
     return (mu, betamean, v, q)
 end
 
@@ -167,7 +169,7 @@ function curve_karcher_cov(betamean::Array{Float64,2}, beta::Array{Float64,3},
 
     for i = 1:N
         w = v[:,:,i];
-        w = [vec(w[1,:]), vec(w[2,:])];
+        w = [vec(w[1,:]); vec(w[2,:])];
         K = K + w*w';
     end
 
@@ -309,6 +311,8 @@ function sample_shapes(mu::Array{Float64,2}, K; mode='O', no=3, numSamp=10)
 
     epsilon = 1./(N-1);
 
+    q1 = copy(mu);
+    q2 = copy(mu);
     samples = Array(Any, numSamp);
     for i = 1:numSamp
         v = zeros(2,T);

@@ -20,6 +20,7 @@ end
 
 """
 Smooth functional data using box filter in place
+
     smooth_data!(f::Array{Float64,2}, sparam=10)
 """
 function smooth_data!(f::Array{Float64,2}, sparam=10)
@@ -46,6 +47,7 @@ end
 
 """
 Smooth functional data using box filter
+
     smooth_data(f::Array{Float64,1}, sparam=10)
     :param sparam: Number of times to run filter (default = 10)
 """
@@ -63,6 +65,7 @@ end
 
 """
 Calculate gradient of function using B-splines
+
     gradient_spline(timet::Vector, f, smooth=false)
     :param: timet: Vector describing time samples
     :param: f: Vector or Array (M,N) describing functions of M samples
@@ -102,6 +105,7 @@ end
 
 """
 Convert function to square-root slope function (srsf)
+
     f_to_srsf(f::Array, timet=0, smooth=false)
     :param f: array of shape (M,N) describing N functions of M samples
     :param timet: vector describing time samples (default = 0) will generate
@@ -110,7 +114,7 @@ Convert function to square-root slope function (srsf)
 """
 function f_to_srsf(f::Array, timet=0, smooth=false)
     if (timet == 0)
-        timet = linspace(0,1,length(f));
+        timet = collect(linspace(0,1,length(f)));
     end
     f0, g, g2 = gradient_spline(timet, f, smooth);
     q = g ./ sqrt(abs(g)+eps(Float64));
@@ -120,6 +124,7 @@ end
 
 """
 Convert square-root slope function (srsf) to f
+
     srsf_to_f(q::Array, time, f0=0.0)
     :param q: array of shape (M,N) describing N srsf of M samples
     :param time: vector describing time samples of length M
@@ -146,6 +151,7 @@ end
 
 """
 Calculate elastic distance between two functions
+
     elastic_distance(f1::Vector, f2::Vector, timet::Vector)
     :param f1: vector of function 1 samples
     :param f2: vector of function 2 samples
@@ -551,6 +557,7 @@ end
 
 """
 Warp srsf by gamma
+
     warp_q_gamma(time::Vector, q::Vector, gam::Vector)
     :param time: describes time samples
     :param q: describes srsf
@@ -569,6 +576,7 @@ end
 
 """
 Warp function by gamma
+
     warp_f_gamma(time::Vector, f::Vector, gam::Vector)
     :param time: describes time samples
     :param f: describes function
@@ -586,6 +594,7 @@ end
 
 """
 Generate random warping functions
+
     rgam(N, sigma, num)
     :param N: number of time points
     :param sigma: standard deviation across samples
@@ -625,6 +634,7 @@ end
 
 """
 Generates random warping functions based on gam
+
     random_gamma(gam, num)
     :param gam: array (M,N) describing warping functions
     :param num: number of functions to gerenerate
@@ -657,6 +667,7 @@ end
 
 """
 Invert warping function
+
     invert_gamma(gam)
     :param gam: vector describing warping function
 """
@@ -670,7 +681,27 @@ end
 
 
 """
+Bayesian qtocurve function
+
+    qtocurve(q, timet=0)
+"""
+function qtocurve(q, timet=0)
+    m = length(q);
+    if (timet == 0)
+        timet = linspace(0, 1, m+1);
+    end
+    curve = zeros(m+1);
+    for i = 2:(m+1)
+        curve[i] = q[i-1]*abs(q[i-1])*(timet[i]-timet[i-1])+curve[i-1];
+    end
+
+    return curve
+end
+
+
+"""
 Calculate sqrt mean inverse of warping function
+
     sqrt_mean_inverse(gam)
     :param gam: array (M,N) describing warping functions
 """
@@ -731,6 +762,7 @@ end
 
 """
 Calculate zero crossing of optimal warping function
+
     zero_crossing(Y,q,bt,timet,y_max,y_min,gmax,gmin)
 """
 function zero_crossing(Y, q, bt, timet, y_max, y_min, gmax, gmin)
@@ -779,6 +811,7 @@ end
 
 """
 Calcluate sqrt mean of warping functions
+
     sqrt_mean(gam)
     :param gam: array (M,N) describing warping functions
 """
@@ -863,13 +896,13 @@ function findkarcherinv(warps, times, roundi=false)
             mupsi_update = cos(0.01*check)*mupsi;
         end
     end
-    karcher_s = 1 + [0, cumsum(mupsi_update.^2)*times];
-    f_i = InterpIrregular(vec(karcher_s), float([1:times:(m-1)*times+1]),
+    karcher_s = 1 + [0; cumsum(mupsi_update.^2)*times];
+    f_i = InterpIrregular(vec(karcher_s), float(collect(1:times:(m-1)*times+1)),
                           BCnil, InterpLinear);
     if (roundi)
-        invidy = [round(f_i[1:((m-1)*times)]), (m-1)*times+1];
+        invidy = [round(f_i[1:((m-1)*times)]); (m-1)*times+1];
     else
-        invidy = [f_i[1:((m-1)*times)], (m-1)*times+1];
+        invidy = [f_i[1:((m-1)*times)]; (m-1)*times+1];
     end
     revscalevec = sqrt(diff(invidy));
 
@@ -879,6 +912,7 @@ end
 
 """
 Simulataeous aligment between two functions
+
     simul_align(f1::Vector, f2::Vector)
 """
 function simul_align(f1::Vector,f2::Vector)
@@ -920,6 +954,7 @@ end
 
 """
 Calculate arclength paramertization of function
+
     arclength(f::Vector)
 """
 function arclength(f::Vector)
@@ -933,6 +968,7 @@ end
 
 """
 Find location of change of sign of srsf that is arclength parameterized
+
     extrema_1s(t::Vector, q::Vector)
 """
 function extrema_1s(t::Vector, q::Vector)
@@ -1056,6 +1092,7 @@ end
 
 """
 Find simultaneous reparamerization
+
     simul_reparam(te1, te2, mpath)
 """
 function simul_reparam(te1, te2, mpath)
@@ -1145,6 +1182,7 @@ end
 
 """
 Calculate warping from q2 to q2 from simultaneous warping
+
     simul_gam(u, g1,g2,t,s1,s2,tt)
 """
 function simul_gam(u::Array{Float64,1},g1,g2,t::Array{Float64,1},s1,s2,

@@ -30,7 +30,6 @@ export
     srsf_align,
     align_fPCA,
     trapz,
-    warp_q_gamma,
     curve_karcher_mean,
     curve_srvf_align,
     curve_principal_directions,

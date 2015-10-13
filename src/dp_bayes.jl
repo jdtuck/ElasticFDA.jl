@@ -17,11 +17,11 @@ function dp_bayes(q1, q1L, q2L, times, cut)
     rownum = div(colnum,times);
     q2LLlen = (colnum-1)*times+1;
     q2LL = zeros(q2LLlen);
-    tempspan1 = [1:q2LLlen]-1;
+    tempspan1 = collect(1:q2LLlen)-1;
     temp_span2 = float(tempspan1);
     timesf = float(times);
     q2LL_time = (temp_span2*(1/timesf))+1;
-    q2L_time1 = [1:colnum];
+    q2L_time1 = collect(1:colnum);
     q2L_time2 = float(q2L_time1);
     q2LL_i = InterpGrid(q2L, BCnil, InterpLinear);
     q2LL = q2LL_i[q2LL_time];
@@ -31,7 +31,7 @@ function dp_bayes(q1, q1L, q2L, times, cut)
     interx = zeros(Int64, times-1);
     intery2 = zeros(times-1);
     intery = zeros(Int64, times-1);
-    span1 = [1:(times-1)];
+    span1 = (1:(times-1));
     span2 = float(span1);
     q1x = Array(Float64, times-1);
     q2y = Array(Float64, times-1);
@@ -46,7 +46,7 @@ function dp_bayes(q1, q1L, q2L, times, cut)
         for j in i:jend-1
             start = max(i-1,j-cut);
             end1 = min(j-1, cut*(i-1));
-            n = start-1+[1:(end1-start+1)];
+            n = start-1+collect(1:(end1-start+1));
             k = length(n);
             interx = times*(i-1)+span1;
             Energy = Array(Float64, k);
@@ -74,7 +74,7 @@ function dp_bayes(q1, q1L, q2L, times, cut)
     j = colnum;
     start = max(i-1,j-cut);
     end1 = min(j-1,cut*(i-1));
-    n = start-1+[1:(end1-start+1)];
+    n = start-1+collect(1:(end1-start+1));
     k = length(n);
     interx = times*(i-1)+span1;
     span2 = float(span1);
@@ -103,14 +103,14 @@ function dp_bayes(q1, q1L, q2L, times, cut)
     ID[i+1,j+1] = loc;
 
     path = Array(Int64,rownum);
-    count = ID[i+1,j+1];
+    count = round(Integer,ID[i+1,j+1]);
     oldcount = 0;
     path[i] = count;
 
     while count>1
         i -= 1;
         oldcount = count;
-        count = ID[i+1,oldcount+1];
+        count = round(Integer, ID[i+1,oldcount+1]);
         path[i] = count;
     end
 
@@ -144,17 +144,17 @@ function DP_mean(f, times=5, fig=false)
     cut = 5*times;
     iter = 20;
     timet = linspace(0,1,size(f,1));
-    group = [1:size(f, 2)];
+    group = collect(1:size(f, 2));
     m = length(timet) - 1;
     n = size(f, 2);
     qt_matrix = zeros(m, n);
 
     for j = 1:n
-        qt_matrix[:, j] = curvetoq(f[:, j], timet);
+        qt_matrix[:, j] = sign(diff(f[:,j])).*sqrt(abs(diff(f[:,j]))./diff(timet));
         rescale = sqrt(m/sum(qt_matrix[:, j].^2));
         qt_matrix[:, j] = rescale.*qt_matrix[:, j];
     end
-    row = [1:times:m];
+    row = collect(1:times:m);
     qt_fitted_matrix = zeros(m, n);
 
     search = Array(Float64, n);
@@ -179,10 +179,10 @@ function DP_mean(f, times=5, fig=false)
         for j = 1:n
             MatchIn2, NDist, q2LL = dp_bayes(mu_5[row], mu_5, qt_matrix[:, j],
                                              times, cut);
-            match = [MatchIn2, m+1];
-            f_i = InterpIrregular([row, m+1], float(match), BCnearest,
+            match = [MatchIn2; m+1];
+            f_i = InterpIrregular([row; m+1], float(match), BCnearest,
                                   InterpLinear);
-            idy = int(f_i[1:m]);
+            idy = round(Integer, f_i[1:m]);
             idy[idy .> m] = m;
             scale1 = sqrt(diff(match)*(1/times));
             scalevec = kron(scale1, ones(times));
@@ -191,7 +191,7 @@ function DP_mean(f, times=5, fig=false)
             q_fitted = scalevec.*q2LL[extended_idy];
             qt_fitted_matrix[:, j] = q_fitted;
             dist_matrix[i+1, j] = NDist;
-            rtmatrix[:, j] = [idy, m+1];
+            rtmatrix[:, j] = [idy; m+1];
             match_matrix[:, j] = match;
         end
         diffdist = abs(sum(dist_matrix[i+1, :]) - sum(dist_matrix[i, :]));
@@ -205,15 +205,15 @@ function DP_mean(f, times=5, fig=false)
     invidy, revscalevec = findkarcherinv(match_matrix, times);
     invidy = invidy[1:m];
     invidy[invidy .>= m] = m;
-    f_i = InterpIrregular([1:m], vec(mu_5), BCnearest, InterpLinear);
+    f_i = InterpIrregular(collect(1:m), vec(mu_5), BCnearest, InterpLinear);
     mu_5 = revscalevec.*f_i[invidy];
     rescale = sqrt(m/sum(mu_5.^2));
     estimator = rescale.*copy(mu_5);
     reg_curve = zeros(m+1, n);
     for j = 1:n
-        f_i = InterpIrregular([0:m], f[:, j], BCnearest, InterpLinear);
+        f_i = InterpIrregular(collect(0:m), f[:, j], BCnearest, InterpLinear);
         tmp = f_i[linspace(0, m, times*(m+1)-1)];
-        reg_curve[:, j] = tmp[(rtmatrix[:,j] - 1)*times+1];
+        reg_curve[:, j] = tmp[round(Integer, (rtmatrix[:,j] - 1)*times+1)];
     end
     crossmean = mean(reg_curve, 2);
     sumdist = sum(reg_curve, 2);

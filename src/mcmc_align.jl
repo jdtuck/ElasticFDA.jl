@@ -31,18 +31,18 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
     kappa_collect = Array(Float64, iter);
     log_collect = Array(Float64, iter);
     dist_collect = Array(Float64, iter);
-    Irow = [1:p]-1;
+    Irow = collect(1:p)-1;
     row = float(Irow);
     scale1 = Array(Float64, L);
-    match_collect = Array(Float64, int(iter/thin), L+1);
+    match_collect = Array(Float64, round(Integer,iter/thin), L+1);
 
     q2LLlen = (p-1)*times+1;
     q2LL = Array(Float64, q2LLlen);
-    tempspan1 = [1:q2LLlen]-1;
+    tempspan1 = collect(1:q2LLlen)-1;
     temp_span2 = float(tempspan1);
     timesf = float(times);
     q2LL_time = (temp_span2*(1/timesf));
-    q2L_time1 = [1:p]-1;
+    q2L_time1 = collect(1:p)-1;
     q2L_time2 = float(q2L_time1);
     q2LL = approx(q2L_time2, q2, q2LL_time);
 
@@ -51,7 +51,7 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
         for i = 2:L
             if ((match[i+1]-match[i-1])>2)
                 increment = rand(Normal(0, tau));
-                increment_int = int(round(increment));
+                increment_int = round(Integer,round(increment));
                 if (increment_int == 0)
                     increment_int = (increment>0)?(1):(-1);
                 end
@@ -66,7 +66,7 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
                     idenmatchvec[1] = times*(i-2);
                     idenmatchvec[2] = times*(i-1);
                     idenmatchvec[3] = times*i;
-                    Ixout = [1:2*times]+times*(i-2)-1;
+                    Ixout = collect(1:2*times)+times*(i-2)-1;
                     xout = float(Ixout);
                     internew = approx(idenmatchvec, newmatchvec, xout);
                     interold = approx(idenmatchvec, oldmatchvec, xout);
@@ -78,13 +78,13 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
                     diff_ynew = interynew[2:2*times+1]-interynew[1:2*times];
                     diff_yold = interyold[2:2*times+1]-interyold[1:2*times];
                     for ll = 1:2*times
-                        tempx = round(interx[ll]);
+                        tempx = round(Integer, interx[ll]);
                         qt1_5_interx[ll] = q1[tempx+1];
                         internew[ll] = (internew[ll]>(p-1))?(p-1):(internew[ll]);
-                        tempnew = round(times*internew[ll]+1);
+                        tempnew = round(Integer, times*internew[ll]+1);
                         qt2_5_internew[ll] = q2LL[tempnew]*sqrt(diff_ynew[ll]);
                         interold[ll] = (interold[ll]>(p-1))?(p-1):(interold[ll]);
-                        tempold = round(times*interold[ll]+1);
+                        tempold = round(Integer, times*interold[ll]+1);
                         qt2_5_interold[ll] = q2LL[tempold]*sqrt(diff_yold[ll]);
                     end
                     n_dist = norm(qt1_5_interx - qt2_5_internew)^2/p;
@@ -101,7 +101,7 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
             end
         end
 
-        Ioriginal = ([1:L+1]-1)*times;
+        Ioriginal = (collect(1:L+1)-1)*times;
         original = float(Ioriginal);
         idy = round(approx(original, match, row));
         for ii = 1:L
@@ -109,8 +109,8 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
         end
         for kk = 1:p
             idy[kk] = (idy[kk]<p)?(idy[kk]):(p-1);
-            scalevec[kk] = scale1[ceil(kk/times)];
-            qt_5_fitted[kk] = scalevec[kk]*q2[idy[kk]+1];
+            scalevec[kk] = scale1[ceil(Integer,kk/times)];
+            qt_5_fitted[kk] = scalevec[kk]*q2[round(Integer,idy[kk])+1];
         end
         dist = norm(q1-qt_5_fitted)^2/p;
         dist_collect[j] = dist;
@@ -119,7 +119,7 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
             dist_min = dist;
         end
         if (mod(j,thin)==0)
-            match_collect[ceil(j/thin),:] = match;
+            match_collect[ceil(Integer, j/thin),:] = match;
         end
         kappa = rand(Gamma(p/2+alpha, 1/(dist+beta)));
         kappa_collect[j] = kappa;
@@ -131,8 +131,8 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
     best_match += 1;
 
     out = Dict("best_match" => best_match, "match_collect" => match_collect,
-           "dist_collect" => dist_collect, "kappafamily" => kappa_collect,
-           "log_posterior" => log_collect, "dist_min" => dist_min);
+               "dist_collect" => dist_collect, "kappafamily" => kappa_collect,
+               "log_posterior" => log_collect, "dist_min" => dist_min);
     return out
 end
 
@@ -179,7 +179,7 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
     poldvec = Array(Float64, 2);
     original = Array(Float64, L+1);
     idy = Array(Float64, m);
-    Irow = [1:m]-1;
+    Irow = collect(1:m)-1;
     row = float(Irow);
     karcher_res = Array(Float64, m+1);
     tempkarcher_res = Array(Float64, m+1);
@@ -195,11 +195,11 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
 
     q2LLlen = (m-1)*times+1;
     q2LL_mat = Array(Float64, q2LLlen, n);
-    tempspan1 = [1:q2LLlen]-1;
+    tempspan1 = collect(1:q2LLlen)-1;
     temp_span2 = float(tempspan1);
     timesf = float(times);
     q2LL_time = (temp_span2*(1/timesf));
-    q2L_time1 = [1:m]-1;
+    q2L_time1 = collect(1:m)-1;
     q2L_time2 = float(q2L_time1);
 
     for LLL in 1:n
@@ -214,7 +214,7 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
             for i = 2:L
                 if ((match[i+1]-match[i-1])>2)
                     increment = rand(Normal(0, tau));
-                    increment_int = int(round(increment));
+                    increment_int = round(Integer, round(increment));
                     if (increment_int == 0)
                         break
                         # increment_int = (increment>0)?(1):(-1);
@@ -230,7 +230,7 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
                         idenmatchvec[1] = times*(i-2);
                         idenmatchvec[2] = times*(i-1);
                         idenmatchvec[3] = times*i;
-                        Ixout = [1:2*times]+times*(i-2)-1;
+                        Ixout = collect(1:2*times)+times*(i-2)-1;
                         xout = float(Ixout);
                         internew = approx(idenmatchvec, newmatchvec, xout);
                         interold = approx(idenmatchvec, oldmatchvec, xout);
@@ -242,15 +242,15 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
                         diff_ynew = interynew[2:(2*times+1)]-interynew[1:2*times];
                         diff_yold = interyold[2:(2*times+1)]-interyold[1:2*times];
                         for ll = 1:2*times
-                            tempx = round(interx[ll]);
+                            tempx = round(Integer, interx[ll]);
                             mu_5_interx[ll] = mu_5[tempx+1];
                             internew[ll] = (internew[ll]>(m-1))?(m-1):(internew[ll]);
-                            tempnew = round(times*internew[ll]+1);
+                            tempnew = round(Integer, times*internew[ll]+1);
                             tempnew = (tempnew > q2LLlen)?(q2LLlen):(tempnew);
                             qt2_5_internew[ll] = q2LL_mat[tempnew, t] *
                                 sqrt(diff_ynew[ll]);
                             interold[ll] = (interold[ll]>(m-1))?(m-1):(interold[ll]);
-                            tempold = round(times*interold[ll]+1);
+                            tempold = round(Integer, times*interold[ll]+1);
                             tempold = (tempold > q2LLlen)?(q2LLlen):(tempold);
                             qt2_5_interold[ll] = q2LL_mat[tempold, t] *
                                 sqrt(diff_yold[ll]);
@@ -268,7 +268,7 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
                     end
                 end
             end
-            Ioriginal = ([1:L+1]-1)*times;
+            Ioriginal = (collect(1:L+1)-1)*times;
             original = float(Ioriginal);
             idy = approx(original, match, row);
             qt2_5_warp = approx(q2L_time2, qt2_5, idy);
@@ -278,7 +278,7 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
             end
 
             for kk = 1:m
-                scalevec[kk] = scale1[ceil(kk/times)];
+                scalevec[kk] = scale1[ceil(Integer, kk/times)];
                 qt_5_fitted[kk] = scalevec[kk]*qt2_5_warp[kk];
             end
 
@@ -296,13 +296,11 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
             best_match_matrix = copy(match_matrix);
         end
         if (mod(j,thin)==0)
-            mu_q[ceil(j/thin),:] = mu_5;
+            mu_q[ceil(Integer, j/thin),:] = mu_5;
             karcher_res, revscalevec = findkarcherinv(match_matrix+1, times);
-            # karcher_res = karcher_res[1:m];
-            # karcher_res[karcher_res .>= m] = m;
             mu_5_warp = approx(q2L_time2, vec(mu_5), karcher_res-1);
             for qq in 1:m
-                mu_q_standard[ceil(j/thin), qq] = revscalevec[qq]*mu_5_warp[qq];
+                mu_q_standard[ceil(Integer, j/thin), qq] = revscalevec[qq]*mu_5_warp[qq];
             end
         end
         kappa = rand(Gamma(n*m/2+alpha, 1/(sum(dist_vec)+beta)));

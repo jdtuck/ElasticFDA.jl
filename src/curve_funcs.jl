@@ -1,5 +1,6 @@
 """
 Resample curve
+
     resamplecurve(x, N=100)
     :param x: array describing curve (n,T)
     :param N: Number of samples to resample curve, N usually is > T
@@ -28,6 +29,7 @@ end
 
 """
 Calculate centroid of curve
+
     calculatecentroid(beta)
     :param beta: array describing curve (n,T)
 """
@@ -43,8 +45,8 @@ function calculatecentroid(beta)
         normbetadot[i] = norm(betadot[:,i]);
         integrand[:,i] = beta[:,i]*normbetadot[i];
     end
-    scale = trapz(linspace(0,1,T), normbetadot);
-    centroid = trapz(linspace(0,1,T), integrand, 2)./scale;
+    scale = trapz(collect(linspace(0,1,T)), normbetadot);
+    centroid = trapz(collect(linspace(0,1,T)), integrand, 2)./scale;
 
     return centroid
 end
@@ -52,6 +54,7 @@ end
 
 """
 Convert curve to square-root velocity function (srvf)
+
     curve_to_q(beta)
     :param beta: array describing curve (n,T)
 """
@@ -82,6 +85,7 @@ end
 
 """
 Convert srvf to curve
+
     q_to_curve(q)
     :param q: array describing srvf (n,T)
 """
@@ -95,7 +99,7 @@ function q_to_curve(q)
     integrand = zeros(2,T);
     integrand[1,:] = vec(q[1,:]).*qnorm;
     integrand[2,:] = vec(q[2,:]).*qnorm;
-    beta = cumtrapz([1.:T], integrand, 2)./T;
+    beta = cumtrapz(collect(1.:T), integrand, 2)./T;
 
     return beta
 end
@@ -123,7 +127,7 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
                          lam::Float64=0.0; method::AbstractString="DP", w=0.01,
                          rotated::Bool=true, isclosed::Bool=false)
     n1, M = size(beta2);
-    timet = linspace(0,1,M);
+    timet = collect(linspace(0,1,M));
     skipm = 4;
     auto = 2;
     tau = 0;
@@ -146,8 +150,8 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
             Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32,
             Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Float64), q2i, timet,
             q1i, timet, n1, M, M, timet, timet, M, M, G, T, sizei, lam)
-        G = G[1:int(sizei[1])];
-        T = T[1:int(sizei[1])];
+        G = G[1:round(Integer,sizei[1])];
+        T = T[1:round(Integer,sizei[1])];
         yi = InterpIrregular(T, G, BCnil, InterpLinear);
         gam = yi[timet];
 
@@ -212,6 +216,7 @@ end
 
 """
 Find best rotation between two srvfs
+
     find_best_roation(q1,q2)
     :param q1: array (n, T)
     :param q2: array (n, T)
@@ -236,6 +241,7 @@ end
 
 """
 Calculate variance along curve
+
     calculate_variance(beta)
     :param beta: array (n, T)
 """
@@ -248,7 +254,7 @@ function calculate_variance(beta)
     normbetadot = zeros(T);
     centroid = calculatecentroid(beta);
     integrand = zeros(n, n, T);
-    t = linspace(0,1,T);
+    t = collect(linspace(0,1,T));
     for i = 1:T
         normbetadot[i] = norm(betadot[:,i]);
         a1 = beta[:,i] - centroid;
@@ -264,6 +270,7 @@ end
 
 """
 Calculate psi
+
     psi(x,a,q)
     :param x: array (n, T) of curve
     :param a: vector (n) of centroid
@@ -283,6 +290,7 @@ end
 
 """
 Find basis normal to srvf
+
     find_basis_normal(q)
     :param q: array (n, T)
 """
@@ -303,8 +311,8 @@ function find_basis_normal(q)
         integrandb3[i] = (q[:,i]'*h3[:,i])[1];
         integrandb4[i] = (q[:,i]'*h4[:,i])[1];
     end
-    b3 = h3 - q*trapz(linspace(0,1,T),integrandb3);
-    b4 = h4 - q*trapz(linspace(0,1,T),integrandb4);
+    b3 = h3 - q*trapz(collect(linspace(0,1,T)),integrandb3);
+    b4 = h4 - q*trapz(collect(linspace(0,1,T)),integrandb4);
 
     basis = Array(Any,2);
     basis[1] = b3;
@@ -316,6 +324,7 @@ end
 
 """
 Calculate Jacobian of basis
+
     calc_j(basis)
     :param basis: array of (2) from find_basis_normal
 """
@@ -335,9 +344,9 @@ function calc_j(basis)
     end
 
     j = zeros(2,2);
-    j[1,1] = trapz(linspace(0,1,T), integrand11);
-    j[1,2] = trapz(linspace(0,1,T), integrand12);
-    j[2,2] = trapz(linspace(0,1,T), integrand22);
+    j[1,1] = trapz(collect(linspace(0,1,T)), integrand11);
+    j[1,2] = trapz(collect(linspace(0,1,T)), integrand12);
+    j[2,2] = trapz(collect(linspace(0,1,T)), integrand22);
     j[2,1] = j[1,2];
 
     return j
@@ -346,6 +355,7 @@ end
 
 """
 Shift curve f by tau
+
     shift_f(f, tau)
     :param f: array (n,T)
     :param tau: scalar
@@ -362,6 +372,7 @@ end
 
 """
 Finds best rotation and seed value between two curves beta1, beta2
+
     find_rotation_seed_coord(beta1,beta2)
     :param beta1: array (n,T)
     :param beta2: array (n,T)
@@ -394,6 +405,7 @@ end
 
 """
 Find best rotation and seed value between two srvfs, q1 and q2
+
     find_rotation_and_seed_q(q1,q2)
     :param q1: array (n,T)
     :param q2: array (n,T)
@@ -424,6 +436,7 @@ end
 
 """
 Warp srvf by gamma
+
     group_action_by_gamma(q, gamma)
     :param q: array (n,T)
     :param gamma: vector (T)
@@ -432,9 +445,10 @@ function group_action_by_gamma(q, gamma)
     n, T = size(q);
     gammadot = gradient(gamma, 1.0/T);
     qn = zeros(n, T);
+    timet = collect(linspace(0, 1, T));
 
     for j = 1:n
-        s = Spline1D(linspace(0, 1, T), vec(q[j, :]));
+        s = Spline1D(timet, vec(q[j, :]));
         qn[j, :] = evaluate(s, gamma) .* sqrt(gammadot);
     end
 
@@ -446,6 +460,7 @@ end
 
 """
 Warp curve f by gamma
+
     group_action_by_gamma_coord(f, gamma)
     :param f: array (n,T)
     :param gamma: vector (T)
@@ -453,9 +468,10 @@ Warp curve f by gamma
 function group_action_by_gamma_coord(f, gamma)
     n, T = size(f);
     fn = zeros(n,T);
+    timet = collect(linspace(0,1,T));
 
     for j = 1:n
-        s = Spline1D(linspace(0,1,T), vec(f[j, :]));
+        s = Spline1D(timet, vec(f[j, :]));
         fn[j,:] = evaluate(s, gamma);
     end
 
@@ -465,6 +481,7 @@ end
 
 """
 Project curve onto normal tangent space
+
     project_curve(q)
     :param q: array (n,T)
 """
@@ -523,6 +540,7 @@ end
 
 """
 Pre-processes curve by centerting and projecting to tangent space
+
     pre_proc_curve(beta, T=100)
     :param beta: array (n,T)
     :param T: number of resample points
@@ -546,6 +564,7 @@ end
 
 """
 Calculate shooting vector and distance between two curves beta1 and beta2
+
     inverse_exp_coord(beta1, beta2)
     :param beta1: array (n,T)
     :param beta2: array (n,T)
@@ -594,6 +613,7 @@ end
 
 """
 Calculate shooting vector between two srvfs q1 and q2
+
     inverse_exp(q1, q2, beta2)
     :param q1: array (n,T)
     :param q2: array (n,T)
@@ -643,6 +663,7 @@ end
 
 """
 Gram-Schmidt Orthogonlization of basis
+
     gram_schmidt(basis)
     :param basis: basis out of find_basis_normal
 """
@@ -664,6 +685,7 @@ end
 
 """
 Project srvf onto tangent space
+
     project_tangent(w, q, basis)
     :param w: shooting vector
     :param q: array (n,T)
@@ -681,6 +703,7 @@ end
 
 """
 Scale curve to unit length
+
     scale_curve(beta)
     :param beta: array (n,T)
 """
@@ -694,7 +717,7 @@ function scale_curve(beta)
     for i = 1:T
         normbetadot[i] = norm(betadot[:,i]);
     end
-    scale = trapz(linspace(0,1,T), normbetadot);
+    scale = trapz(collect(linspace(0,1,T)), normbetadot);
     beta_scaled = beta / scale;
 
     return beta_scaled, scale
@@ -703,6 +726,7 @@ end
 
 """
 Parallel translate srvf  along tangent space
+
     parallel_translate(w, q1, q2, basis, mode='O')
     :param w: shooting vector
     :param q1: array (n,T)
@@ -784,6 +808,7 @@ end
 
 """
 Find rotation matrix for angle theta
+
     rot_mat(theta)
 """
 function rot_mat(theta)
@@ -795,6 +820,7 @@ end
 
 """
 Find inner product between two srvfs, q1 and q2
+
     innerprod_q2(q1, q2)
     :param q1: array (n,T)
     :param q2: array (n,T)
@@ -809,6 +835,7 @@ end
 
 """
 Calculate elastic shape distance between two curves beta1 and beta2
+
     calc_shape_dist(beta1, beta2)
     :param beta1: array (n,T)
     :param beta2: array (n,T)

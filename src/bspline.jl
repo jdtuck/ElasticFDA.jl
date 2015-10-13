@@ -52,7 +52,7 @@ function bs(x::Vector, df, norder, nderiv=0)
     # augment break sequence to get knots by addinga  K-fold knot at
     # each end.
 
-    knots = [breaks[1].*ones(km1), breaks, breaks[nb].*ones(km1)];
+    knots = [breaks[1].*ones(km1); breaks; breaks[nb].*ones(km1)];
     nbasis = length(knots) - k;
 
     # For each i, determine left(i) so that K<= left(i) < nbasis+1, and
@@ -66,9 +66,9 @@ function bs(x::Vector, df, norder, nderiv=0)
     # compute bspline values and derivatives, if needed:
 
     # initialize the b array.
-    temp = transpose([1, zeros(km1)]);
+    temp = transpose([1; zeros(km1)]);
     b = repmat(temp, nd*nx, 1);
-    nxs = nd.*[1:nx];
+    nxs = nd.*collect(1:nx);
 
     # run the recurrence simultaneously for all x(i)
 
@@ -109,13 +109,13 @@ function bs(x::Vector, df, norder, nderiv=0)
 
     for jj in (nd-1):-1:1
         j = k - jj;
-        temp = [jj:(nd-1)].*onenx + ones(nd-jj)*nxn;
+        temp = collect(jj:(nd-1)).*onenx + ones(nd-jj)*nxn;
         nxs = reshape(temp, (nd-1-jj+1)*nx, 1);
         for r in j:-1:1
             leftpr = left + r;
             temp = ones(nd-jj) * (knots[leftpr] - knots[leftpr-j])/j;
             b[nxs,r] = -1.*b[nxs,r]./temp;
-            b[nxs,r+1] - b[nxs,r+1] - b[nxs,r];
+            b[nxs,r+1] = b[nxs,r+1] - b[nxs,r];
         end
     end
 
@@ -135,7 +135,7 @@ function bs(x::Vector, df, norder, nderiv=0)
     cc[index] = b[nd*[1:nx], :];
     # (This uses the fact that for a column bector v and a matrix A,
     #  v(A)(i,j) = v(A(i,j)), all i, j.)
-    bsplinemat = reshape(cc[[(1-nx):0]*onens.' + nx * onenx*[1:ns].'],nx,ns);
+    bsplinemat = reshape(cc[collect((1-nx):0)*onens.' + nx * onenx*collect(1:ns).'],nx,ns);
 
     if sortwrd
         temp = copy(bsplinemat);
