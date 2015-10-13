@@ -12,9 +12,9 @@ framework.
     :param sparam: Number of times to run smoothing filter (default 10)
     :param lam: controls the elasticity (default = 0)
     :param optim: optimization method to find warping, default is
-                  Dynamic Programming ("DP"). Other options are
-                  Coordiante Descent ("DP2"), Riemanain BFGS
-                  ("LRBFGS"), Simultaneous Aligntment ("SIMUL")
+                  Simultaneous Alignment ("SIMUL"). Other options are
+                  Dynamic Programming ("DP2"), Riemanain BFGS
+                  ("LRBFGS")
 
     Returns Dict containing
     :return fn: aligned functions - array of shape (M,N) of N
@@ -29,7 +29,7 @@ framework.
     :return phase_var: Phase Variance
 """
 function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
-                    optim="DP")
+                    optim="SIMUL")
     M, N = size(f);
     if smooth
         smooth_data!(f, sparam);
@@ -175,7 +175,7 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
         end
 
         r1 = r;
-        if (qun[r] < 1e-1) | r >= MaxItr
+        if (qun[r] < 1e-2) || (r >= MaxItr)
             break
         end
     end
@@ -267,7 +267,7 @@ The functions are aligned to the principal components
 function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
     lam = 0.0;
     MaxItr = 50;
-    coef = [-2:2];
+    coef = collect(-2:2);
     Nstd = length(coef);
     M, N = size(f);
 
@@ -300,11 +300,6 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
     min_ind = indmax(dqq);
     @printf("Compute %d functions in SRSF space to %d fPCA components..\n",N,num_comp)
 
-    gamI = sqrt_mean_inverse(gam);
-    xout = (timet[end] -timet[1]) .* gamI + timet[1];
-    mf = approx(timet, mf, xout);
-    mq = f_to_srsf(mf ,timet);
-
     # Compute Karcher Mean
     itr = 1;
     mq = zeros(M, MaxItr+1);
@@ -319,7 +314,7 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
 
     while itr<=MaxItr
         @printf("updating step: r=%d\n", itr)
-        if r == MaxItr
+        if itr == MaxItr
             println("maximal number of iterations reached")
         end
 
@@ -382,18 +377,18 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
     cost = cost[1:itrf];
 
     # Aligned data & stats
-    fn = f[:, :, itrf];
-    qn = q[:, :, itrf];
-    q0 = q[:, :, 1];
+    fn = fi[:, :, itrf];
+    qn = qi[:, :, itrf];
+    q0 = qi[:, :, 1];
     mean_f0 = mean(f0, 2);
     std_f0 = std(f0, 2);
-    mqn = mq[:, r];
-    gamf = gam[:, :, 0];
+    mqn = mq[:, itrf];
+    gamf = gam[:, :, 1];
     for k in 1:itrf-1
         gam_k = gam[:, :, k];
         for l in 1:N
-            time0 = (timet[end] -timet[1]) .* gam_k[:, l] + timet[1];
-            gamf[:,l] = approx(time, gamf[:,l], time0);
+            time0 = (timet[end]-timet[1]) .* gam_k[:, l] + timet[1];
+            gamf[:,l] = approx(timet, gamf[:,l], time0);
         end
     end
 
@@ -411,7 +406,7 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
     std_fn = std(fn, 2);
 
     # Get Final PCA
-    out = vert_fPCA(fn, timet, qn, num_comp);
+    out = vert_fPCA(fn, timet, qn, no=num_comp);
 
     fmean = mean(f0[1,:]) + cumtrapz(timet, mqn .* abs(mqn));
 

@@ -40,7 +40,7 @@ Trapezodial Integration
     :param dim: dimension along which to integrate
 """
 function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
-    perm = [dim:max(ndims(y),dim), 1:dim-1];
+    perm = [dim:max(ndims(y),dim); 1:dim-1];
     y = permutedims(y, perm);
     if ndims(y) == 1
         m = 1;
@@ -56,7 +56,9 @@ function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
         siz = size(y); siz = collect(siz); siz[1] = 1;
         out = reshape(out, tuple(siz...));
         out = ipermutedims(out, perm);
-        out = squeeze(out,length(perm));
+        ind = find(collect(size(out)).==1);
+        out = squeeze(out,ind[1]);
+        out = out[1];
     end
 
     return out
@@ -102,7 +104,7 @@ Cumulative Trapezodial Integration using midpoint
 """
 function cumtrapzmid(x, y, c)
     a = length(x);
-    mid = round(a/2);
+    mid = round(Integer, a/2);
 
     # case < mid
     fn = zeros(a);

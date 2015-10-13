@@ -15,15 +15,15 @@ Calculates vertical functional principal component analysis on aligned data
     :return U: eigenvectors
 """
 function vert_fPCA(fn, timet, qn; no=1)
-    coef = [-2:3];
+    coef = collect(-2:3);
     Nstd = length(coef);
 
     # fPCA
     mq_new = mean(qn, 2);
     N = length(mq_new);
-    mididx = round(length(timet)/2);
+    mididx = round(Integer, length(timet)/2);
     m_new = sign(fn[mididx, :]) .* sqrt(abs(fn[mididx, :]));
-    mqn = [mq_new, mean(m_new)];
+    mqn = [mq_new; mean(m_new)];
     qn2 = vcat(qn, m_new);
     K = cov(qn2, vardim=2);
 
@@ -52,7 +52,7 @@ function vert_fPCA(fn, timet, qn; no=1)
     c = zeros(N2, no);
     for k in 1:no
         for l in 1:N2
-            c[l,k] = sum([qn[:,l], m_new[l]] .* U[:,k]);
+            c[l,k] = sum([qn[:,l]; m_new[l]] .* U[:,k]);
         end
     end
 
@@ -79,7 +79,7 @@ Calculates horizontal functional principal component analysis on aligned data
 """
 function horiz_fPCA(gam, timet; no=1)
     mu, gam_mu, psi, vec1 = sqrt_mean(gam);
-    tau = [1:6];
+    tau = collect(1:6);
     TT = length(timet);
     n = length(tau);
     m = length(mu);
