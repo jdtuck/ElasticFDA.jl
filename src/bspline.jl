@@ -59,8 +59,8 @@ function bs(x::Vector, df, norder, nderiv=0)
     # within that restriction, knots(left(i)) <= pts(i) < knot(left(i)+1)
 
     knotslower = knots[1:nbasis];
-    index = sortperm([knotslower, x]);
-    point = find(index .> nbasis) - [1:length(x)];
+    index = sortperm([knotslower; x]);
+    point = find(index .> nbasis) - collect(1:length(x));
     left = maximum(hcat(point, k*onenx),2);
 
     # compute bspline values and derivatives, if needed:
@@ -77,7 +77,7 @@ function bs(x::Vector, df, norder, nderiv=0)
     for j in 1:(k-nd)
         saved = zeros(nx);
         for r in 1:j
-            leftpr = left + r;
+            leftpr = round(Integer, left + r);
             tr = knots[leftpr] - x;
             tl = x - knots[leftpr-j];
             term = b[nxs,r]./(tr+tl);
@@ -131,11 +131,13 @@ function bs(x::Vector, df, norder, nderiv=0)
     # set up output matrix bsplinemat
     width = maximum([ns, nbasis]) + km1 + km1;
     cc = zeros(nx*width);
-    index = [(1-nx):0]*onenb.' + nx * (left*onenb.' + onenx*[-km1:0].');
-    cc[index] = b[nd*[1:nx], :];
+    index = collect((1-nx):0)*onenb.' + nx * (left*onenb.' + onenx*collect(-km1:0).');
+    index = round(Integer, index);
+    cc[index] = b[nd*collect(1:nx), :];
     # (This uses the fact that for a column bector v and a matrix A,
     #  v(A)(i,j) = v(A(i,j)), all i, j.)
-    bsplinemat = reshape(cc[collect((1-nx):0)*onens.' + nx * onenx*collect(1:ns).'],nx,ns);
+    index2 = round(Integer, collect((1-nx):0)*onens.' + nx * onenx*collect(1:ns).');
+    bsplinemat = reshape(cc[index2],nx,ns);
 
     if sortwrd
         temp = copy(bsplinemat);

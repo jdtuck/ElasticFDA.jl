@@ -1,5 +1,6 @@
 """
 Calcluate elastic regression from function data f, for response y
+
     elastic_regression(f, y, timet; B=None, lambda=0, df=20, max_itr=20,
                        smooth=false)
     :param f: array (M,N) of N functions
@@ -24,9 +25,8 @@ Calcluate elastic regression from function data f, for response y
     :return b: coefficients
     :return SSE: sum of squared error
 """
-function elastic_regression(f::Array, y::Vector, timet; B=None, lambda=0, df=20,
+function elastic_regression(f::Array, y::Vector, timet::Vector; B=Union{}, lambda=0, df=20,
                             max_itr=20, smooth=false)
-
     M, N = size(f);
 
     if M > 500
@@ -40,7 +40,7 @@ function elastic_regression(f::Array, y::Vector, timet; B=None, lambda=0, df=20,
     binsize = mean(diff(timet));
 
     # Create B-spline basis if none provided
-    if B == None
+    if B == Union{}
         B = bs(timet, df, 4);
     end
     Nb = size(B,2);
@@ -59,6 +59,8 @@ function elastic_regression(f::Array, y::Vector, timet; B=None, lambda=0, df=20,
 
     itr = 1;
     SSE = zeros(max_itr);
+    alpha = 0;
+    b = zeros(Nb+1);
     while itr <= max_itr
         @printf("Iteration: %d\n", itr)
         # align data
@@ -125,7 +127,7 @@ function elastic_regression(f::Array, y::Vector, timet; B=None, lambda=0, df=20,
     end
 
     # Last step with centering of gam
-    gamI = sqrt_mean_inverse(gam);
+    gamI = sqrt_mean_inverse(gamma);
     gamI_dev = gradient(gamI, 1/(M-1));
     timet0 = (timet[end] -timet[1]) .* gamI  + timet[1];
     beta = approx(timet, beta, timet0) .* sqrt(gamI_dev);
@@ -133,7 +135,7 @@ function elastic_regression(f::Array, y::Vector, timet; B=None, lambda=0, df=20,
     for k in 1:N
         qn[:, k] = approx(timet, qn[:, k], timet0) .* sqrt(gamI_dev);
         fn[:, k] = approx(timet, fn[:, k], timet0);
-        gamma[:, k] = approx(timet, gamma_new[:, k], timet0);
+        gamma[:, k] = approx(timet, gamma[:, k], timet0);
     end
 
     out = Dict("alpha" => alpha, "beta" => beta, "fn" => fn, "qn" => qn,
@@ -145,6 +147,7 @@ end
 
 """
 Calcluate elastic logistic regression from function data f, for response y
+
     elastic_logistic(f, y, timet; B=None, df=20, max_itr=20, smooth=false)
     :param f: array (M,N) of N functions
     :param y: vector (N) of respsones
@@ -167,7 +170,7 @@ Calcluate elastic logistic regression from function data f, for response y
     :return b: coefficients
     :return LL: logistic loss
 """
-function elastic_logistic(f, y, timet; B=None, df=20, max_itr=20,
+function elastic_logistic(f, y, timet; B=Union{}, df=20, max_itr=20,
                           smooth=false)
 
     M, N = size(f);
@@ -183,7 +186,7 @@ function elastic_logistic(f, y, timet; B=None, df=20, max_itr=20,
     binsize = mean(diff(timet));
 
     # Create B-spline basis if none provided
-    if B == None
+    if B == Union{}
         B = bs(timet, df, 4);
     end
     Nb = size(B,2);
@@ -198,6 +201,7 @@ function elastic_logistic(f, y, timet; B=None, df=20, max_itr=20,
     LL = zeros(max_itr);
     b = zeros(Nb+1);
     alpha = 0.0;
+    beta = zeros(length(timet));
     while itr <= max_itr
         @printf("Iteration: %d\n", itr)
         # align data
@@ -254,7 +258,7 @@ function elastic_logistic(f, y, timet; B=None, df=20, max_itr=20,
     end
 
     out = Dict("alpha" => alpha, "beta" => beta, "fn" => fn, "qn" => qn,
-               "gamma" => gamma, "q" => q, "B" => B, "type" => "logisistic",
+               "gamma" => gamma, "q" => q, "B" => B, "type" => "logistic",
                "b" => b[2:end], "Loss" => LL[1:itr-1]);
     return out
 end
@@ -262,6 +266,7 @@ end
 
 """
 Calcluate elastic m-logistic regression from function data f, for response y
+
     elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20, smooth=false)
     :param f: array (M,N) of N functions
     :param y: vector (N) of respsones
@@ -285,12 +290,12 @@ Calcluate elastic m-logistic regression from function data f, for response y
     :return n_classes: number of classes
     :return LL: logistic loss
 """
-function elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20,
+function elastic_mlogistic(f, y, timet; B=Union{}, df=20, max_itr=20,
                            delta=.01, smooth=false)
 
     M, N = size(f);
     # Code labels
-    m = int(maximum(y));
+    m = Int(maximum(y));
     Y = zeros(Int32, N, m);
     for ii in 1:N
         Y[ii, y[ii]] = 1;
@@ -307,7 +312,7 @@ function elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20,
     binsize = mean(diff(timet));
 
     # Create B-spline basis if none provided
-    if B == None
+    if B == Union{}
         B = bs(timet, df, 4);
     end
     Nb = size(B,2);
@@ -322,6 +327,7 @@ function elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20,
     LL = zeros(max_itr);
     b = zeros(m*(Nb+1));
     alpha = zeros(m);
+    beta = zeros(M, m);
     while itr <= max_itr
         @printf("Iteration: %d\n", itr)
         # align data
@@ -384,7 +390,7 @@ function elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20,
     end
 
     out = Dict("alpha" => alpha, "beta" => beta, "fn" => fn, "qn" => qn,
-               "gamma" => gamma, "q" => q, "B" => B, "type" => "mlogisistic",
+               "gamma" => gamma, "q" => q, "B" => B, "type" => "mlogistic",
                "b" => b[2:end], "n_classes" => m, "Loss" => LL[1:itr-1]);
     return out
 end
@@ -392,6 +398,7 @@ end
 
 """
 Prediction from elastic regression model
+
     elastic_prediction(f, timet, model; y=None, smooth=false)
     :param f: functions to predict
     :param timet: vector describing time samples
@@ -399,50 +406,52 @@ Prediction from elastic regression model
     :param y: true respones (default = None)
     :param smooth: smooth data (default = false)
 """
-function elastic_prediction(f, timet, model::Dict; y=None, smooth=false)
+function elastic_prediction(f, timet, model::Dict; y=Union{}, smooth=false)
     q = f_to_srsf(f, timet, smooth);
     n = size(q, 2);
 
-    if model["type"] == "linear" | model["type"] == "logistic"
+    if model["type"] == "linear" || model["type"] == "logistic"
         y_pred = zeros(n);
-    elseif model["type"] == "mlogisistic"
+    elseif model["type"] == "mlogistic"
         m = model["n_classes"];
         y_pred = zeros(n, m);
     end
 
     for ii in 1:n
         diff = model["q"] - repmat(q[:, ii], 1, size(model["q"], 2));
-        dist = sum(abs(diff).^2, 1)^(1/2);
+        dist = sum(abs(diff).^2, 1).^(1/2);
         q_tmp = warp_q_gamma(timet, q[:, ii],
                              model["gamma"][:, indmin(dist)]);
         if model["type"] == "linear"
             y_pred[ii] = model["alpha"] + trapz(timet, q_tmp.*model["beta"]);
         elseif model["type"] == "logistic"
             y_pred[ii] = model["alpha"] + trapz(timet, q_tmp.*model["beta"]);
-        elseif model["type"] == "mlogisistic"
+        elseif model["type"] == "mlogistic"
             for jj in 1:m
                 y_pred[ii,jj] = model["alpha"][jj] + trapz(timet, q_tmp.*model["beta"][:, jj]);
             end
         end
     end
 
-    if y==None
+    if y==Union{}
         if model["type"] == "linear"
-            Perf = None;
+            Perf = Union{};
+            y_labels =  Array(Integer, 0);
         elseif model["type"] == "logistic"
             y_pred = phi(y_pred);
             y_labels = ones(n);
             y_labels[y_pred .< 0.5] = -1;
-            Perf = None;
+            Perf = Union{};
         elseif model["type"] == "mlogisistic"
             y_pred = phi(reshape(y_pred,n*m,1));
             y_pred = reshpae(y_pred,n,m);
             max_val, y_labels = findmax(y_pred, 2);
-            Perf = None;
+            Perf = Union{};
         end
     else
         if model["type"] == "linear"
-            SSE = sum((y-ypred).^2);
+            Perf = sum((y-y_pred).^2);
+            y_labels = Array(Integer, 0);
         elseif model["type"] == "logistic"
             y_pred = phi(y_pred);
             y_labels = ones(n);
@@ -452,12 +461,14 @@ function elastic_prediction(f, timet, model::Dict; y=None, smooth=false)
             TN = sum(y[y_labels .== -1] .== -1);
             FN = sum(y[y_labels .== 1] .== -1);
             Perf = (TP+TN)/(TP+FP+FN+TN);
-        elseif model["type"] == "mlogisistic"
+        elseif model["type"] == "mlogistic"
             y_pred = phi(reshape(y_pred,n*m,1));
-            y_pred = reshpae(y_pred,n,m);
+            y_pred = reshape(y_pred,n,m);
             max_val, y_labels = findmax(y_pred, 2);
+            temp = ind2sub((n,m),vec(y_labels));
+            y_labels = temp[2];
             Perf = zeros(m);
-            cls_set[1:m+1];
+            cls_set = collect(1:m+1);
             for ii in 1:m
                 cls_sub = setdiff(cls_set, ii);
                 TP = sum(y[y_labels .== ii] .== ii);

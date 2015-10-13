@@ -1,5 +1,6 @@
 """
 Optimization function to calculate warping for elastic regression
+
     regression_warp(beta, timet, q, y, alpha)
     :param beta: regression function
     :param timet: vector describing time samples
@@ -9,11 +10,11 @@ Optimization function to calculate warping for elastic regression
 """
 function regression_warp(beta::Vector, timet::Vector, q::Vector, y::Float64,
                          alpha::Float64)
-    gam_M = optimum_reparam(beta, timet, q);
+    gam_M = optimum_reparam(beta, timet, q, method="DP2");
     qM = warp_q_gamma(timet, q, gam_M);
     y_M = trapz(timet, qM.*beta);
 
-    gam_m = optimum_reparam(-1.*beta, timet, q);
+    gam_m = optimum_reparam(-1.*beta, timet, q, method="DP2");
     qm = warp_q_gamma(timet, q, gam_m);
     y_m = trapz(timet, qm.*beta);
 
@@ -33,6 +34,7 @@ end
 
 """
 Calculate warping for logisitc regression
+
     logistic_warp(beta, timet, q, y)
     :param beta: regression function
     :param timet: time samples
@@ -41,9 +43,9 @@ Calculate warping for logisitc regression
 """
 function logistic_warp(beta::Vector, timet::Vector, q::Array, y)
     if y == 1
-        gamma = optimum_reparam(beta, timet, q);
+        gamma = optimum_reparam(beta, timet, q, method="DP2");
     elseif y == -1
-        gamma = optimum_reparam(-1.*beta, timet, q);
+        gamma = optimum_reparam(-1.*beta, timet, q, method="DP2");
     end
 
     return gamma
@@ -53,6 +55,7 @@ end
 
 """
 Calculate logistic opmization function
+
     logit_optm(x::Vector, grad::Vector, Phi, y)
     :param x: samples
     :param grad: gradient
@@ -70,11 +73,12 @@ end
 
 """
 Logistic function
+
     phi(t)
 """
 function phi(t)
     idx = t .> 0;
-    out = Array(Float64, length(t));
+    out = Array(Float64, size(t));
     if sum(idx) > 0
         out[idx] = 1./(1+exp(-1*t[idx]));
     end
@@ -86,6 +90,7 @@ end
 
 """
 Calculate logistic loss function
+
     logit_loss(b, X, y)
     :param b: coefficients
     :param b: matrix
@@ -105,6 +110,7 @@ end
 
 """
 Calculate gradient of logistic optimization in place
+
     logit_gradient!(b, grad, X, y)
     :param b: coefficeints
     :param grad: gradient
@@ -121,6 +127,7 @@ end
 
 """
 Calcualte hessian of logistic optimization
+
     logit_hessian(s, b, X, y)
     :param s:
     :param b: coefficients
@@ -139,6 +146,7 @@ end
 
 """
 Calculate mlogistic warping using gradient method
+
     mlogit_warp_grad(alpha, beta, timet, q, y; max_itr=8000, tol=1e-10,
                      delt=0.008, display=0)
     :param alpha: intercept
@@ -160,7 +168,7 @@ function mlogit_warp_grad(alpha, beta, timet, q, y; max_itr=8000,
     for i in 1:m
         beta[:, i] = beta[:, i] / norm(beta[:, i]);
     end
-    gam1 = linspace(0, 1, m1);
+    gam1 = collect(linspace(0, 1, m1));
     gamout = zeros(m1);
     beta1 = reshape(beta, m1*m, 1);
 
@@ -177,6 +185,7 @@ end
 
 """
 Calcluate warping for mlogistic elastic regression
+
     mlogit_optim(x, grad, Phi, Y)
     :param x: sample
     :param grad: gradient
@@ -194,6 +203,7 @@ end
 
 """
 Calculate loss for mlogistic regression
+
     mlogit_loss(b, X, Y)
     :param b: coefficients
     :param X: matrix
@@ -201,7 +211,7 @@ Calculate loss for mlogistic regression
 """
 function mlogit_loss(b, X, Y)
     N, m = size(Y);  # n_samples, n_classes
-    M = size(X,2); # n_features
+    M = size(X,2);   # n_features
     B = reshape(b, M, m);
     Yhat = X * B;
     Yhat -= repmat(minimum(Yhat, 2),1,size(Yhat,2));
@@ -219,6 +229,7 @@ end
 
 """
 Calculate mlogistic elastic regression loss function gradient in place
+
     mlogit_gradient!(b, grad, X, Y)
     :param b: coefficeints
     :param grad: gradient
