@@ -7,7 +7,7 @@ ifeq "$(ERR)" "0"
 	LDFLAGS = -shared -lmkl_rt -lpthread # linking flags
 else
 	CFLAGS =  -fPIC -std=c++11 -O3 -g  # C flags
-	LDFLAGS = -shared -lopenblas # linking flags
+	LDFLAGS = -shared -lblas -llapack# linking flags
 endif
 
 
