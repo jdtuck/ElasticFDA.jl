@@ -13,6 +13,11 @@ modeling using functional component analysis and regression.
    :maxdepth: 2
 
    starting.rst
+   alignment.rst
+   fPCA.rst
+   bayes.rst
+   regression.rst
+   curves.rst
 
 .. Indices and tables
 .. ==================

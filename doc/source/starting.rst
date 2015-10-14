@@ -27,9 +27,9 @@ This package is based on code from the following publications:
 
 * Tucker, J. D., Wu, W. and Srivastava, A. (2013). Generative models for functional data using phase and amplitude separation. Computational Statistics and Data Analysis 61, 50-66.
 
-* J. D. Tucker, W. Wu, and A. Srivastava, ``Phase-Amplitude Separation of Proteomics Data Using Extended Fisher-Rao Metric,`` Electronic Journal of Statistics, Vol 8, no. 2. pp 1724-1733, 2014.
+* J. D. Tucker, W. Wu, and A. Srivastava, "Phase-Amplitude Separation of Proteomics Data Using Extended Fisher-Rao Metric," Electronic Journal of Statistics, Vol 8, no. 2. pp 1724-1733, 2014.
 
-* J. D. Tucker, W. Wu, and A. Srivastava, ``Analysis of signals under compositional noise With applications to SONAR data,`` IEEE Journal of Oceanic Engineering, Vol 29, no. 2. pp 318-330, Apr 2014.
+* J. D. Tucker, W. Wu, and A. Srivastava, "Analysis of signals under compositional noise With applications to SONAR data," IEEE Journal of Oceanic Engineering, Vol 29, no. 2. pp 318-330, Apr 2014.
 
 * S. Kurtek, A. Srivastava, and W. Wu. Signal estimation under random time-warpings and nonlinear signal alignment. In Proceedings of Neural Information Processing Systems (NIPS), 2011.
 

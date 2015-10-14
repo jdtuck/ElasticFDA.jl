@@ -10,11 +10,11 @@ Optimization function to calculate warping for elastic regression
 """
 function regression_warp(beta::Vector, timet::Vector, q::Vector, y::Float64,
                          alpha::Float64)
-    gam_M = optimum_reparam(beta, timet, q, method="DP2");
+    gam_M = optimum_reparam(beta, timet, q, method="DP");
     qM = warp_q_gamma(timet, q, gam_M);
     y_M = trapz(timet, qM.*beta);
 
-    gam_m = optimum_reparam(-1.*beta, timet, q, method="DP2");
+    gam_m = optimum_reparam(-1.*beta, timet, q, method="DP");
     qm = warp_q_gamma(timet, q, gam_m);
     y_m = trapz(timet, qm.*beta);
 
@@ -43,9 +43,9 @@ Calculate warping for logisitc regression
 """
 function logistic_warp(beta::Vector, timet::Vector, q::Array, y)
     if y == 1
-        gamma = optimum_reparam(beta, timet, q, method="DP2");
+        gamma = optimum_reparam(beta, timet, q, method="DP");
     elseif y == -1
-        gamma = optimum_reparam(-1.*beta, timet, q, method="DP2");
+        gamma = optimum_reparam(-1.*beta, timet, q, method="DP");
     end
 
     return gamma
