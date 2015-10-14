@@ -19,7 +19,7 @@ if [ "$TRAVIS_OS_NAME" = linux -o -z "$TRAVIS_OS_NAME" ]; then
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${LIBSTDC_VERSION} 50
 
     # Install openblas
-    sudo apt-get install libopenblas-dev
+    sudo apt-get install libopenblas-dev liblapack-dev
 
     # Install gfortran
     sudo apt-get install gfortran
