@@ -1,5 +1,5 @@
 """
-Compute pair waring between two functions using Bayesian method
+Compute pair warping between two functions using Bayesian method
 
     pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1, showplot=true)
     :param f1, f2: vectors describing functions

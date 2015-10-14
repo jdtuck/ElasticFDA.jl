@@ -8,7 +8,7 @@ Calcluate elastic regression from function data f, for response y
     :param timet: vecotr (N) describing time samples
     :param B: matrix describing basis functions (M,N) (default=None generates a
               B-spline basis
-    :param lambda:
+    :param lambda: regularization parameter
     :param df: degree of freedom of basis
     :param max_itr: maximum number of interations
     :param smooth: smooth data
@@ -405,6 +405,11 @@ Prediction from elastic regression model
     :param model: calculated model (regression, logisitic, mlogistic)
     :param y: true respones (default = None)
     :param smooth: smooth data (default = false)
+
+    Returns
+    :return y_pred: predicted value
+    :return y_labels: labels of predicited value
+    :return Perf: Performance metric if truth is supplied
 """
 function elastic_prediction(f, timet, model::Dict; y=Union{}, smooth=false)
     q = f_to_srsf(f, timet, smooth);

@@ -75,7 +75,7 @@ SRSF Functions
     random samples.
 
 Alignment
---------
+---------
 .. function:: srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0, optim="SIMUL")
 
 
@@ -84,7 +84,7 @@ Alignment
 
     ``f`` is and array of shape (M,N) of N functions with M samples
     ``timet`` is a vector of size M describing the sample points
-    ``method` (string) calculate Karcher Mean or Median (options = "mean" or "median") (default="mean")
+    ``method`` (string) calculate Karcher Mean or Median (options = "mean" or "median") (default="mean")
     ``smooth`` Smooth the data using a box filter (default = false)
     ``sparam`` Number of times to run smoothing filter (default 10)
     ``lam`` controls the elasticity (default = 0)
