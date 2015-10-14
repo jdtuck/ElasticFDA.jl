@@ -34,7 +34,7 @@ end
 
 
 """
-Trapezodial Integration
+Trapezoidal Integration
 
     trapz(x, y, dim=1)
     :param x: vector of time samples
@@ -70,7 +70,7 @@ end
 
 
 """
-Cumulative Trapezodial Integration
+Cumulative Trapezoidal Integration
 
     cumtrapz(x, y, dim=1)
     :param x: vector describing time samples
@@ -101,7 +101,7 @@ end
 
 
 """
-Cumulative Trapezodial Integration using midpoint
+Cumulative Trapezoidal Integration using midpoint
 
     cumtrapzmid(x, y, c)
     :param x: time samples
@@ -147,7 +147,7 @@ end
 
 
 """
-Linear interpolation when resposne contains flat regions
+Linear interpolation when response contains flat regions
 
     interp1_flat(x, y, xx)
     :param x: time samples

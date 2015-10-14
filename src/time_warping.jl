@@ -13,7 +13,7 @@ framework.
     :param lam: controls the elasticity (default = 0)
     :param optim: optimization method to find warping, default is
                   Simultaneous Alignment ("SIMUL"). Other options are
-                  Dynamic Programming ("DP2"), Riemanain BFGS
+                  Dynamic Programming ("DP2"), Riemannian BFGS
                   ("LRBFGS")
 
     Returns Dict containing
@@ -244,7 +244,7 @@ The functions are aligned to the principal components
     align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
     :param f: array of shape (M,N) of N functions with M samples
     :param timet: vector of size M describing the sample points
-    :param num_comp: Number of componets (default = 3)
+    :param num_comp: Number of components (default = 3)
     :param smooth: Smooth the data using a box filter (default = false)
     :param sparam: Number of times to run smoothing filter (default 10)
 

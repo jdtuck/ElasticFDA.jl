@@ -11,7 +11,7 @@ Compute pair warping between two functions using Bayesian method
     Returns Dict containing
     :return f1:
     :return f2_q: srsf registration
-    :return gam_q: warping funtion
+    :return gam_q: warping function
     :return f2a: registered f2
     :return gam: warping function
     :return dist_collect: distance
@@ -46,7 +46,7 @@ function pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1,
     p = length(q1);
 
     if (mod(p,times) != 0)
-        error(@sprintf("Number of points on q function = %d is not a mulitple of times = %d", p, times))
+        error(@sprintf("Number of points on q function = %d is not a multiple of times = %d", p, times))
     end
 
     if (scale_data)

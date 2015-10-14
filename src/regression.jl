@@ -1,16 +1,16 @@
 """
-Calcluate elastic regression from function data f, for response y
+Calculate elastic regression from function data f, for response y
 
     elastic_regression(f, y, timet; B=None, lambda=0, df=20, max_itr=20,
                        smooth=false)
     :param f: array (M,N) of N functions
-    :param y: vector (N) of respsones
-    :param timet: vecotr (N) describing time samples
+    :param y: vector (N) of responses
+    :param timet: vector (N) describing time samples
     :param B: matrix describing basis functions (M,N) (default=None generates a
               B-spline basis
     :param lambda: regularization parameter
     :param df: degree of freedom of basis
-    :param max_itr: maximum number of interations
+    :param max_itr: maximum number of iterations
     :param smooth: smooth data
 
     Returns Dict describing regression
@@ -146,16 +146,16 @@ end
 
 
 """
-Calcluate elastic logistic regression from function data f, for response y
+Calculate elastic logistic regression from function data f, for response y
 
     elastic_logistic(f, y, timet; B=None, df=20, max_itr=20, smooth=false)
     :param f: array (M,N) of N functions
-    :param y: vector (N) of respsones
-    :param timet: vecotr (N) describing time samples
+    :param y: vector (N) of responses
+    :param timet: vector (N) describing time samples
     :param B: matrix describing basis functions (M,N) (default=None generates a
               B-spline basis
     :param df: degree of freedom of basis
-    :param max_itr: maximum number of interations
+    :param max_itr: maximum number of iterations
     :param smooth: smooth data
 
     Returns Dict describing regression
@@ -265,16 +265,16 @@ end
 
 
 """
-Calcluate elastic m-logistic regression from function data f, for response y
+Calculate elastic m-logistic regression from function data f, for response y
 
     elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20, smooth=false)
     :param f: array (M,N) of N functions
-    :param y: vector (N) of respsones
-    :param timet: vecotr (N) describing time samples
+    :param y: vector (N) of responses
+    :param timet: vector (N) describing time samples
     :param B: matrix describing basis functions (M,N) (default=None generates a
               B-spline basis
     :param df: degree of freedom of basis
-    :param max_itr: maximum number of interations
+    :param max_itr: maximum number of iterations
     :param smooth: smooth data
 
     Returns Dict describing regression
@@ -402,13 +402,13 @@ Prediction from elastic regression model
     elastic_prediction(f, timet, model; y=None, smooth=false)
     :param f: functions to predict
     :param timet: vector describing time samples
-    :param model: calculated model (regression, logisitic, mlogistic)
-    :param y: true respones (default = None)
+    :param model: calculated model (regression, musicologist, mlogistic)
+    :param y: true response (default = None)
     :param smooth: smooth data (default = false)
 
     Returns
     :return y_pred: predicted value
-    :return y_labels: labels of predicited value
+    :return y_labels: labels of predicted value
     :return Perf: Performance metric if truth is supplied
 """
 function elastic_prediction(f, timet, model::Dict; y=Union{}, smooth=false)

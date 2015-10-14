@@ -49,7 +49,7 @@ function bs(x::Vector, df, norder, nderiv=0)
     onenb = ones(k);
     onens = ones(ns);
 
-    # augment break sequence to get knots by addinga  K-fold knot at
+    # augment break sequence to get knots by adding a  K-fold knot at
     # each end.
 
     knots = [breaks[1].*ones(km1); breaks; breaks[nb].*ones(km1)];
@@ -134,7 +134,7 @@ function bs(x::Vector, df, norder, nderiv=0)
     index = collect((1-nx):0)*onenb.' + nx * (left*onenb.' + onenx*collect(-km1:0).');
     index = round(Integer, index);
     cc[index] = b[nd*collect(1:nx), :];
-    # (This uses the fact that for a column bector v and a matrix A,
+    # (This uses the fact that for a column vector v and a matrix A,
     #  v(A)(i,j) = v(A(i,j)), all i, j.)
     index2 = round(Integer, collect((1-nx):0)*onens.' + nx * onenx*collect(1:ns).');
     bsplinemat = reshape(cc[index2],nx,ns);

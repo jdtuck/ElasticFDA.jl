@@ -3,7 +3,7 @@ Resample curve
 
     resamplecurve(x, N=100)
     :param x: array describing curve (n,T)
-    :param N: Number of samples to resample curve, N usually is > T
+    :param N: Number of samples to re-sample curve, N usually is > T
 """
 function resamplecurve(x, N=100)
     n, T = size(x);
@@ -113,8 +113,8 @@ end
     :param lam: control amount of warping (default=0.0)
     :param method: optimization method to find warping, default is
                    Dynamic Programming ("DP"). Other options are
-                   Coordiante Descent ("DP2"), Riemanain BFGS
-                   ("LRBFGS"), Simultaneous Aligntment ("SIMUL")
+                   Coordinate Descent ("DP2"), Riemanain BFGS
+                   ("LRBFGS"), Simultaneous Alignment ("SIMUL")
     :param w: Controls LRBFGS (default = 0.01)
     :param rotated: calcule rotation (default = true)
     :param isclosed: closed curve (default = false)
@@ -539,13 +539,13 @@ end
 
 
 """
-Pre-processes curve by centerting and projecting to tangent space
+Pre-processes curve by centering and projecting to tangent space
 
     pre_proc_curve(beta, T=100)
     :param beta: array (n,T)
-    :param T: number of resample points
+    :param T: number of re-sample points
 
-    :return betanew: resampled and centered curve
+    :return betanew: re-sampled and centered curve
     :return qnew: projected srvf
     :return A: rotation matrix
 """
@@ -662,7 +662,7 @@ end
 
 
 """
-Gram-Schmidt Orthogonlization of basis
+Gram-Schmidt Orthogonalization of basis
 
     gram_schmidt(basis)
     :param basis: basis out of find_basis_normal

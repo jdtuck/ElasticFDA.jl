@@ -2,22 +2,21 @@ Elastic Functional Regression
 =============================
 
 These functions compute elastic standard, logistic, and m-logistic regression
-models. This code is expertimental and results are not guaranteed
+models. This code is experimental and results are not guaranteed
 
 Regression Models and Prediction
 --------------------------------
 .. function:: elastic_regression(f, y, timet; B=None, lambda=0, df=20, max_itr=20, smooth=false)
 
-    Calcluate elastic regression from function data f, for response y
+    Calculate elastic regression from function data f, for response y
 
     ``f`` array (M,N) of N functions
-    ``y`` vector (N) of respsones
-    ``timet`` vecotr (N) describing time samples
-    ``B`` matrix describing basis functions (M,N) (default=None generates a
-              B-spline basis
+    ``y`` vector (N) of responses
+    ``timet`` vector (N) describing time samples
+    ``B`` matrix describing basis functions (M,N) (default=None generates a B-spline basis
     ``lambda`` regularization parameter
     ``df`` degree of freedom of basis
-    ``max_itr`` maximum number of interations
+    ``max_itr`` maximum number of iterations
     ``smooth`` smooth data
 
     Returns Dict describing regression
@@ -34,15 +33,14 @@ Regression Models and Prediction
 
 .. function:: elastic_logistic(f, y, timet; B=None, df=20, max_itr=20, smooth=false)
 
-    Calcluate elastic logistic regression from function data f, for response y
+    Calculate elastic logistic regression from function data f, for response y
 
     ``f`` array (M,N) of N functions
-    ``y`` vector (N) of respsones
-    ``timet`` vecotr (N) describing time samples
-    ``B`` matrix describing basis functions (M,N) (default=None generates a
-              B-spline basis
+    ``y`` vector (N) of responses
+    ``timet`` vector (N) describing time samples
+    ``B`` matrix describing basis functions (M,N) (default=None generates a B-spline basis
     ``df`` degree of freedom of basis
-    ``max_itr`` maximum number of interations
+    ``max_itr`` maximum number of iterations
     ``smooth`` smooth data
 
     Returns Dict describing regression
@@ -59,15 +57,14 @@ Regression Models and Prediction
 
 .. function:: elastic_mlogistic(f, y, timet; B=None, df=20, max_itr=20, smooth=false)
 
-    Calcluate elastic m-logistic regression from function data f, for response y
+    Calculate elastic m-logistic regression from function data f, for response y
 
     ``f: array (M,N) of N functions
-    ``y: vector (N) of respsones
-    ``timet: vecotr (N) describing time samples
-    ``B: matrix describing basis functions (M,N) (default=None generates a
-              B-spline basis
+    ``y: vector (N) of responses
+    ``timet: vector (N) describing time samples
+    ``B: matrix describing basis functions (M,N) (default=None generates a B-spline basis
     ``df: degree of freedom of basis
-    ``max_itr: maximum number of interations
+    ``max_itr: maximum number of iterations
     ``smooth: smooth data
 
     Returns Dict describing regression
@@ -89,12 +86,12 @@ Regression Models and Prediction
 
     ``f`` functions to predict
     ``timet`` vector describing time samples
-    ``model`` calculated model (regression, logisitic, mlogistic)
-    ``y`` true respones (default = None)
+    ``model`` calculated model (regression, logistic, mlogistic)
+    ``y`` true responses (default = None)
     ``smooth`` smooth data (default = false)
 
     Returns
     ``y_pred`` predicted value
-    ``y_labels`` labels of predicited value
+    ``y_labels`` labels of predicted value
     ``Perf`` Performance metric if truth is supplied
 

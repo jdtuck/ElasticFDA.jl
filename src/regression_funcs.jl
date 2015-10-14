@@ -33,7 +33,7 @@ end
 
 
 """
-Calculate warping for logisitc regression
+Calculate warping for logistic regression
 
     logistic_warp(beta, timet, q, y)
     :param beta: regression function
@@ -54,7 +54,7 @@ end
 
 
 """
-Calculate logistic opmization function
+Calculate logistic optimization function
 
     logit_optm(x::Vector, grad::Vector, Phi, y)
     :param x: samples
@@ -112,7 +112,7 @@ end
 Calculate gradient of logistic optimization in place
 
     logit_gradient!(b, grad, X, y)
-    :param b: coefficeints
+    :param b: coefficients
     :param grad: gradient
     :param X: matrix
     :param y: response
@@ -126,7 +126,7 @@ end
 
 
 """
-Calcualte hessian of logistic optimization
+Calculate Hessian of logistic optimization
 
     logit_hessian(s, b, X, y)
     :param s:
@@ -145,7 +145,7 @@ end
 
 
 """
-Calculate mlogistic warping using gradient method
+Calculate m-logistic warping using gradient method
 
     mlogit_warp_grad(alpha, beta, timet, q, y; max_itr=8000, tol=1e-10,
                      delt=0.008, display=0)
@@ -157,7 +157,7 @@ Calculate mlogistic warping using gradient method
     :param max_itr: maximum number of iterations
     :param tol: stopping tolerance
     :param delt: gradient step size
-    :param display: dispaly optimization iterations
+    :param display: display optimization iterations
 """
 function mlogit_warp_grad(alpha, beta, timet, q, y; max_itr=8000,
                           tol=1e-10, delt=0.008, display=0)
@@ -184,7 +184,7 @@ end
 
 
 """
-Calcluate warping for mlogistic elastic regression
+Calculate warping for m-logistic elastic regression
 
     mlogit_optim(x, grad, Phi, Y)
     :param x: sample
@@ -202,7 +202,7 @@ end
 
 
 """
-Calculate loss for mlogistic regression
+Calculate loss for m-logistic regression
 
     mlogit_loss(b, X, Y)
     :param b: coefficients
@@ -228,10 +228,10 @@ end
 
 
 """
-Calculate mlogistic elastic regression loss function gradient in place
+Calculate m-logistic elastic regression loss function gradient in place
 
     mlogit_gradient!(b, grad, X, Y)
-    :param b: coefficeints
+    :param b: coefficients
     :param grad: gradient
     :param X: matrix
     :param Y: response matrix

@@ -51,7 +51,7 @@ SRSF Functions
 
     ``q1`` and ``q2`` can be vectors or arrays of the standard shape. ``timet``
     is a vector describing the time samples. ``lam`` controls the amount of
-    warlping. ``method`` is the optimization method to find the warping. The
+    warping. ``method`` is the optimization method to find the warping. The
     default is Simultaneous Alignment ("SIMUL"). Other options are Dynamic
     Programming ("DP" or "DP2") and Riemannian BFGS ("LRBFGS").
 
@@ -65,7 +65,7 @@ SRSF Functions
 
 .. function:: elastic_distance(f1::Vector, f2::Vector, timet::Vector)
 
-    Caclulates the elastic distance between two functions and returns the
+    Calculates the elastic distance between two functions and returns the
     amplitude distance ``da`` and phase distance ``dp``.
 
 .. function:: rgam(N, sigma, num)
@@ -108,7 +108,7 @@ Alignment
 
     ``f`` array of shape (M,N) of N functions with M samples
     ``timet`` vector of size M describing the sample points
-    ``num_comp`` Number of componets (default = 3)
+    ``num_comp`` Number of components (default = 3)
     ``smooth`` Smooth the data using a box filter (default = false)
     ``sparam`` Number of times to run smoothing filter (default 10)
 

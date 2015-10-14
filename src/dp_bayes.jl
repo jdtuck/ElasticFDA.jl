@@ -9,7 +9,7 @@ Calculate Dynamic Programming using Bayesian approach
 
     :return MatchIn2: warping function
     :return NDist: minimal distance
-    :return q2LL: reparameterized q2L
+    :return q2LL: re-parameterized q2L
 """
 function dp_bayes(q1, q1L, q2L, times, cut)
 
@@ -122,7 +122,7 @@ end
 
 
 """
-Caluclate mean function using Bayesian Dynamic Programming
+Calculate mean function using Bayesian Dynamic Programming
     DP_mean(f, times=5, fig=false)
     :param f: array (M,N) of N functions
     :param times: MCMC parameter number of times to split
@@ -238,9 +238,9 @@ function DP_mean(f, times=5, fig=false)
     end
 
     out = Dict("distfamily" => dist_matrix, "match_matrix" => match_matrix,
-           "position" => position, "mu_5" => mu_5,
-           "rtmatrix" => rtmatrix, "sumdist" => sumdist,
-           "qt_fitted" => qt_fitted_matrix, "estimator" => estimator,
-           "estimator2" => estimator2, "regcurve" => reg_curve);
+               "position" => position, "mu_5" => mu_5,
+               "rtmatrix" => rtmatrix, "sumdist" => sumdist,
+               "qt_fitted" => qt_fitted_matrix, "estimator" => estimator,
+               "estimator2" => estimator2, "regcurve" => reg_curve);
     return out
 end

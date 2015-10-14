@@ -85,7 +85,7 @@ Aligns a collection of curves using the elastic square-root velocity (srvf)
 framework.
 
     curve_srvf_align(beta, mode='O')
-               optim="DP")
+
     :param beta: array (n,T,N) for N number of curves
     :param mode: Open ('O') or Closed ('C') curves
 
@@ -291,7 +291,7 @@ Sample shapes from model
 
     sample_shapes(mu, K; mode='O', no=3, numSamp=10)
     :param mu: array (n,T) mean srvf
-    :param K: array (T,T) covaraince matrix
+    :param K: array (T,T) covariance matrix
     :param mode: Open ('O') or Closed ('C') curves
     :param no: number of principal components
     :param numSamp: number of samples
@@ -366,7 +366,7 @@ function karcher_calc(beta, q, betamean, mu, mode='O')
     # Compute shooting vector from mu to q_i
     w, d = inverse_exp_coord(betamean, beta);
 
-    # Project to tangent space of mainfold to obtain v_i
+    # Project to tangent space of manifold to obtain v_i
     if mode == 'O'
         v = copy(w);
     else

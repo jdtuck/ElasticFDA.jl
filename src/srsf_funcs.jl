@@ -180,7 +180,7 @@ end
 
 
 """
-Calculate optimum reparamertization (warping of q2 to q1)
+Calculate optimum parameterization (warping of q2 to q1)
 
     optimum_reparam(q1, timet, q2, lam=0.0, method="SIMUL", w=0.01, f1o=0.0,
                     f2o=0.0)
@@ -190,8 +190,8 @@ Calculate optimum reparamertization (warping of q2 to q1)
     :param lam: control amount of warping (default=0.0)
     :param method: optimization method to find warping, default is
                    Dynamic Programming ("DP"). Other options are
-                   Coordiante Descent ("DP2"), Riemannian BFGS
-                   ("LRBFGS"), Simultaneous Aligntment ("SIMUL")
+                   Coordinate Descent ("DP2"), Riemannian BFGS
+                   ("LRBFGS"), Simultaneous Alignment ("SIMUL")
     :param w: Controls LRBFGS (default = 0.01)
     :param f1o: initial value of f1, vector or scalar depending on q1, defaults
                 to zero
@@ -561,7 +561,7 @@ Warp srsf by gamma
     warp_q_gamma(time::Vector, q::Vector, gam::Vector)
     :param time: describes time samples
     :param q: describes srsf
-    :param gam: descrbies warping function
+    :param gam: describes warping function
 """
 function warp_q_gamma(time::Vector, q::Vector, gam::Vector)
     M = length(gam);
@@ -637,7 +637,7 @@ Generates random warping functions based on gam
 
     random_gamma(gam, num)
     :param gam: array (M,N) describing warping functions
-    :param num: number of functions to gerenerate
+    :param num: number of functions to generate
 """
 function random_gamma(gam, num)
     mu, gam_mu, psi, vec1 = sqrt_mean(gam);
@@ -810,7 +810,7 @@ end
 
 
 """
-Calcluate sqrt mean of warping functions
+Calculate sqrt mean of warping functions
 
     sqrt_mean(gam)
     :param gam: array (M,N) describing warping functions
@@ -869,7 +869,8 @@ end
 
 
 """
-Find karcher inverse of warping functions
+Find Karcher inverse of warping functions
+
     findkarcherinv(warps, times, roundi=false)
 """
 function findkarcherinv(warps, times, roundi=false)
@@ -911,7 +912,7 @@ end
 
 
 """
-Simulataeous aligment between two functions
+Simultaneous alignment between two functions
 
     simul_align(f1::Vector, f2::Vector)
 """
@@ -953,7 +954,7 @@ end
 
 
 """
-Calculate arclength paramertization of function
+Calculate arc-length parametrization of function
 
     arclength(f::Vector)
 """
@@ -994,6 +995,7 @@ end
 
 """
 Find matching between two extremas
+
     match_ext(t1, ext1, d1, t2, ext2, d2)
 """
 function match_ext(t1,ext1::Array{Integer,1},d1,t2,ext2::Array{Integer,1},d2)
@@ -1091,7 +1093,7 @@ end
 
 
 """
-Find simultaneous reparamerization
+Find simultaneous re-parametrization
 
     simul_reparam(te1, te2, mpath)
 """
