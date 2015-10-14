@@ -182,7 +182,7 @@ end
 """
 Calculate optimum reparamertization (warping of q2 to q1)
 
-    optimum_reparam(q1, timet, q1, lam=0.0, method="DP", w=0.01, f1o=0.0,
+    optimum_reparam(q1, timet, q2, lam=0.0, method="SIMUL", w=0.01, f1o=0.0,
                     f2o=0.0)
     :param q1: array (M,N) or vector (M) describing srsf set 1
     :param timet: vector describing time samples of length M
@@ -190,7 +190,7 @@ Calculate optimum reparamertization (warping of q2 to q1)
     :param lam: control amount of warping (default=0.0)
     :param method: optimization method to find warping, default is
                    Dynamic Programming ("DP"). Other options are
-                   Coordiante Descent ("DP2"), Riemanain BFGS
+                   Coordiante Descent ("DP2"), Riemannian BFGS
                    ("LRBFGS"), Simultaneous Aligntment ("SIMUL")
     :param w: Controls LRBFGS (default = 0.01)
     :param f1o: initial value of f1, vector or scalar depending on q1, defaults

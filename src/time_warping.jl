@@ -6,7 +6,7 @@ framework.
                optim="SIMUL")
     :param f: array of shape (M,N) of N functions with M samples
     :param timet: vector of size M describing the sample points
-    :param method: (string) warp calculate Karcher Mean or Median
+    :param method: (string) calculate Karcher Mean or Median
     (options = "mean" or "median") (default="mean")
     :param smooth: Smooth the data using a box filter (default = false)
     :param sparam: Number of times to run smoothing filter (default 10)

@@ -1,8 +1,6 @@
 # ElasticFDA
 
 [![ElasticFDA](http://pkg.julialang.org/badges/ElasticFDA_release.svg)](http://pkg.julialang.org/?pkg=ElasticFDA&ver=release)
-[![Build Status](https://travis-ci.org/jdtuck/ElasticFDA.jl.svg?branch=master)](https://travis-ci.org/jdtuck/ElasticFDA.jl)
-[![Coverage Status](https://coveralls.io/repos/jdtuck/ElasticFDA.jl/badge.png?branch=master)](https://coveralls.io/r/jdtuck/ElasticFDA.jl?branch=master)
 
 A julia package for functional data analysis using the square root slope framework
 and curves using the square root velocity framework which performs pair-wise and
@@ -23,7 +21,8 @@ OpenBLAS is used/required.
 We are working on an compiling in Windows and OSX, though time is limited and
 any help would be appreciated.
 
-Documentation is in the works and will hopefully be done soon.
+### Doumentation
+<http://elasticfdajl.readthedocs.org/en/latest/>
 
 ### References
 Tucker, J. D. 2014, Functional Component Analysis and Regression using Elastic
