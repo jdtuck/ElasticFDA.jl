@@ -82,48 +82,49 @@ Alignment
     Aligns a collection of functions using the elastic square-root slope (srsf)
     framework.
 
-    ``f`` is and array of shape (M,N) of N functions with M samples
-    ``timet`` is a vector of size M describing the sample points
-    ``method`` (string) calculate Karcher Mean or Median (options = "mean" or "median") (default="mean")
-    ``smooth`` Smooth the data using a box filter (default = false)
-    ``sparam`` Number of times to run smoothing filter (default 10)
-    ``lam`` controls the elasticity (default = 0)
-    ``optim`` optimization method to find warping, default is Simultaneous Alignment ("SIMUL"). Other options are Dynamic Programming ("DP2"), Riemanain BFGS ("LRBFGS")
+    + ``f`` is and array of shape (M,N) of N functions with M samples
+    + ``timet`` is a vector of size M describing the sample points
+    + ``method`` (string) calculate Karcher Mean or Median (options = "mean" or "median") (default="mean")
+    + ``smooth`` Smooth the data using a box filter (default = false)
+    + ``sparam`` Number of times to run smoothing filter (default 10)
+    + ``lam`` controls the elasticity (default = 0)
+    + ``optim`` optimization method to find warping, default is Simultaneous Alignment ("SIMUL"). Other options are Dynamic Programming ("DP2"), Riemanain BFGS ("LRBFGS")
 
-    Returns Dict containing
-    ``fn`` aligned functions - array of shape (M,N) of N functions with M samples
-    ``qn`` aligned srsfs - similar structure to fn
-    ``q0`` original srsfs - similar structure to fn
-    ``fmean`` function mean or median - vector of length N
-    ``mqn`` srvf mean or median - vector of length N
-    ``gam`` warping functions - similar structure to fn
-    ``orig_var`` Original Variance of Functions
-    ``amp_var`` Amplitude Variance
-    ``phase_var`` Phase Variance
+    Returns Dict containing:
+
+    + ``fn`` aligned functions - array of shape (M,N) of N functions with M samples
+    + ``qn`` aligned srsfs - similar structure to fn
+    + ``q0`` original srsfs - similar structure to fn
+    + ``fmean`` function mean or median - vector of length N
+    + ``mqn`` srvf mean or median - vector of length N
+    + ``gam`` warping functions - similar structure to fn
+    + ``orig_var`` Original Variance of Functions
+    + ``amp_var`` Amplitude Variance
+    + ``phase_var`` Phase Variance
 
 .. function:: align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
 
     Aligns a collection of functions while extracting principal components.
     The functions are aligned to the principal components
 
-    ``f`` array of shape (M,N) of N functions with M samples
-    ``timet`` vector of size M describing the sample points
-    ``num_comp`` Number of components (default = 3)
-    ``smooth`` Smooth the data using a box filter (default = false)
-    ``sparam`` Number of times to run smoothing filter (default 10)
+    + ``f`` array of shape (M,N) of N functions with M samples
+    + ``timet`` vector of size M describing the sample points
+    + ``num_comp`` Number of components (default = 3)
+    + ``smooth`` Smooth the data using a box filter (default = false)
+    + ``sparam`` Number of times to run smoothing filter (default 10)
 
-    Returns Dict containing
-    ``fn`` aligned functions - array of shape (M,N) of N functions with M samples
-    ``qn`` aligned srvfs - similar structure to fn
-    ``q0`` original srvf - similar structure to fn
-    ``mqn`` srvf mean or median - vector of length M
-    ``gam`` warping functions - similar structure to fn
-    ``q_pca`` srsf principal directions
-    ``f_pca`` functional principal directions
-    ``latent`` latent values
-    ``coef`` coefficients
-    ``U`` eigenvectors
-    ``orig_var`` Original Variance of Functions
-    ``amp_var`` Amplitude Variance
-    ``phase_var`` Phase Variance
+    Returns Dict containing:
 
+    + ``fn`` aligned functions - array of shape (M,N) of N functions with M samples
+    + ``qn`` aligned srvfs - similar structure to fn
+    + ``q0`` original srvf - similar structure to fn
+    + ``mqn`` srvf mean or median - vector of length M
+    + ``gam`` warping functions - similar structure to fn
+    + ``q_pca`` srsf principal directions
+    + ``f_pca`` functional principal directions
+    + ``latent`` latent values
+    + ``coef`` coefficients
+    + ``U`` eigenvectors
+    + ``orig_var`` Original Variance of Functions
+    + ``amp_var`` Amplitude Variance
+    + ``phase_var`` Phase Variance

@@ -114,9 +114,9 @@ end
     :param method: optimization method to find warping, default is
                    Dynamic Programming ("DP"). Other options are
                    Coordinate Descent ("DP2"), Riemanain BFGS
-                   ("LRBFGS"), Simultaneous Alignment ("SIMUL")
+                   ("LRBFGS")
     :param w: Controls LRBFGS (default = 0.01)
-    :param rotated: calcule rotation (default = true)
+    :param rotated: calculate rotation (default = true)
     :param isclosed: closed curve (default = false)
 
     :return gam: warping function
