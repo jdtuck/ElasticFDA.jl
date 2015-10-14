@@ -338,11 +338,13 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
         # Matching Step
         if parallel
             gam_t = @parallel (hcat) for i=1:N
-                optimum_reparam(qhat[:,i], timet, qi[:,i,itr], lam);
+                optimum_reparam(qhat[:,i], timet, qi[:,i,itr], lam,
+                                method="DP2");
             end
             gam[:, :, itr] = gam_t;
         else
-            gam[:, :, itr] = optimum_reparam(qhat, timet, qi[:,:,itr], lam);
+            gam[:, :, itr] = optimum_reparam(qhat, timet, qi[:,:,itr], lam,
+                                             method="DP2");
         end
 
         for k in 1:N
