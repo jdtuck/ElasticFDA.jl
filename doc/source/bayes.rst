@@ -11,11 +11,11 @@ Alignment
 
     Compute pair warping between two functions using Bayesian method
 
-    -``f1, f2`` vectors describing functions,
-    -``iter`` number of iterations,
-    -``times`` MCMC parameter,
-    -``powera`` MCMC parameter,
-    -``showplot`` show plots,
+    +``f1, f2`` vectors describing functions
+    +``iter`` number of iterations
+    +``times`` MCMC parameter
+    +``powera`` MCMC parameter
+    +``showplot`` show plots
 
     Returns Dict containing:
     ``f1`` function f1,
