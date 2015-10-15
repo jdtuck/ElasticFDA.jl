@@ -105,4 +105,3 @@ betan, qn, betamean1, q_mu = curve_srvf_align(beta, 'C');
 K = curve_karcher_cov(betamean, beta, 'C');
 pd = curve_principal_directions(betamean, mu, K, mode='C');
 s = sample_shapes(mu, K, mode='C');
-
