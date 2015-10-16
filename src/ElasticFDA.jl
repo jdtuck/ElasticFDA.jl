@@ -7,7 +7,6 @@ using NLopt
 using ProgressMeter
 using Distributions
 using Cpp
-using JLD
 using Winston
 
 export
