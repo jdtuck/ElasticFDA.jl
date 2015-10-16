@@ -4,10 +4,12 @@ ERR = $(shell which icpc>/dev/null; echo $$?)
 ifeq "$(ERR)" "0"
     CXX = icpc
 	CFLAGS =  -fPIC -O3 -g # C flags
-	LDFLAGS = -shared -lmkl_rt -lpthread # linking flags
+	LDFLAGS = -shared # linking flags
+	LIBS = -lmkl_rt -lpthread
 else
 	CFLAGS =  -fPIC -std=c++11 -O3 -g  # C flags
-	LDFLAGS = -shared -lblas -llapack# linking flags
+	LDFLAGS = -shared # linking flags
+	LIBS = -lblas -llapack
 endif
 
 
@@ -28,4 +30,4 @@ src/%.o: src/%.cpp
 	$(CXX) $(CFLAGS) $(INC) -c -o $@ $<
 
 $(TARGET) : $(OBJECTS)
-	$(CXX) $(LDFLAGS) -o $@ $^
+	$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
