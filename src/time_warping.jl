@@ -3,7 +3,7 @@ Aligns a collection of functions using the elastic square-root slope (srsf)
 framework.
 
     srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
-               optim="SIMUL")
+               optim="SIMUL", MaxItr=20)
     :param f: array of shape (M,N) of N functions with M samples
     :param timet: vector of size M describing the sample points
     :param method: (string) calculate Karcher Mean or Median
@@ -15,6 +15,7 @@ framework.
                   Simultaneous Alignment ("SIMUL"). Other options are
                   Dynamic Programming ("DP2"), Riemannian BFGS
                   ("LRBFGS")
+    :param MaxItr: Maximum number of iterations
 
     Returns Dict containing
     :return fn: aligned functions - array of shape (M,N) of N
@@ -29,7 +30,7 @@ framework.
     :return phase_var: Phase Variance
 """
 function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
-                    optim="SIMUL")
+                    optim="SIMUL", MaxItr=20)
     M, N = size(f);
     if smooth
         smooth_data!(f, sparam);
@@ -97,7 +98,6 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
         @printf("Compute Karcher Median of %d functions in SRSF space..\n",N)
     end
 
-    MaxItr = 20;
     ds = zeros(MaxItr+2);
     ds[1] = Inf;
     qun = zeros(MaxItr+1);
@@ -241,12 +241,13 @@ end
 Aligns a collection of functions while extracting principal components.
 The functions are aligned to the principal components
 
-    align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
+    align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
     :param f: array of shape (M,N) of N functions with M samples
     :param timet: vector of size M describing the sample points
     :param num_comp: Number of components (default = 3)
     :param smooth: Smooth the data using a box filter (default = false)
     :param sparam: Number of times to run smoothing filter (default 10)
+    :param MaxItr: Maximum number of iterations
 
     Returns Dict containing
     :return fn: aligned functions - array of shape (M,N) of N functions with M
@@ -264,9 +265,8 @@ The functions are aligned to the principal components
     :return amp_var: Amplitude Variance
     :return phase_var: Phase Variance
 """
-function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
+function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
     lam = 0.0;
-    MaxItr = 50;
     coef = collect(-2:2);
     Nstd = length(coef);
     M, N = size(f);

@@ -76,7 +76,7 @@ SRSF Functions
 
 Alignment
 ---------
-.. function:: srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0, optim="SIMUL")
+.. function:: srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0, optim="SIMUL", MaxItr=20)
 
 
     Aligns a collection of functions using the elastic square-root slope (srsf)
@@ -89,6 +89,7 @@ Alignment
     + ``sparam`` Number of times to run smoothing filter (default 10)
     + ``lam`` controls the elasticity (default = 0)
     + ``optim`` optimization method to find warping, default is Simultaneous Alignment ("SIMUL"). Other options are Dynamic Programming ("DP2"), Riemanain BFGS ("LRBFGS")
+    + ``MaxItr`` maximum number of iterations
 
     Returns Dict containing:
 
@@ -102,7 +103,7 @@ Alignment
     + ``amp_var`` Amplitude Variance
     + ``phase_var`` Phase Variance
 
-.. function:: align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10)
+.. function:: align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
 
     Aligns a collection of functions while extracting principal components.
     The functions are aligned to the principal components
@@ -112,6 +113,7 @@ Alignment
     + ``num_comp`` Number of components (default = 3)
     + ``smooth`` Smooth the data using a box filter (default = false)
     + ``sparam`` Number of times to run smoothing filter (default 10)
+    + ``MaxItr`` maximum number of iterations
 
     Returns Dict containing:
 

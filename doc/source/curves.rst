@@ -44,12 +44,13 @@ SRVF Functions
 
 Alignment and Statistics
 ------------------------
-.. function:: curve_srvf_align(beta, mode='O')
+.. function:: curve_srvf_align(beta; mode='O', maxit=20)
 
     Aligns a collection of curves using the elastic square-root velocity (srvf) framework.
 
     + ``beta`` array (n,T,N) for N number of curves
     + ``mode`` Open ('O') or Closed ('C') curves
+    + ``maxit`` maximum number of iterations
 
     Returns:
 
@@ -58,12 +59,13 @@ Alignment and Statistics
     + ``betamean`` mean curve
     + ``q_mu`` mean srvf
 
-.. function:: curve_karcher_mean(beta, mode='O')
+.. function:: curve_karcher_mean(beta; mode='O', maxit=20)
 
     Calculates Karcher mean of a collection of curves using the elastic square-root velocity (srvf) framework.
 
     + ``beta`` array (n,T,N) for N number of curves
     + ``mode`` Open ('O') or Closed ('C') curves
+    + ``maxit`` maximum number of iterations
 
     Returns:
 
@@ -72,7 +74,7 @@ Alignment and Statistics
     + ``v`` shooting vectors
     + ``q`` array of srvfs
 
-.. function:: curve_karcher_cov(betamean, beta, mode='O')
+.. function:: curve_karcher_cov(betamean, beta; mode='O')
 
     Calculate Karcher Covariance of a set of curves
 

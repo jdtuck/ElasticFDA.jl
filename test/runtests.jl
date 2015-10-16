@@ -37,7 +37,7 @@ fw = warp_f_gamma(timet, f1, gam);
 out = srsf_align(f, timet);
 
 # test align_fPCA
-out1 = align_fPCA(f, timet);
+out1 = align_fPCA(f, timet, MaxItr=2);
 
 # test vert_fPCA
 out1 = vert_fPCA(out["qn"],timet,out["qn"]);
@@ -49,10 +49,10 @@ out1 = horiz_fPCA(out["gam"], timet);
 out1 = gauss_model(out["fn"], timet, out["qn"], out["gam"]);
 
 # test pair_warping_bayes
-out1 = pair_warping_bayes(f1[1:100], f2[1:100], showplot=false);
+out1 = pair_warping_bayes(f1[1:100], f2[1:100], iter=2, showplot=false);
 
 # test group_warping_bayes
-out1 = group_warping_bayes(f, showplot=false);
+out1 = group_warping_bayes(f, iter=2, showplot=false);
 
 # test elastic_distance
 da, dp = elastic_distance(f1, f1, timet);
@@ -65,22 +65,22 @@ gam = rgam(101,.1,10);
 # test elastic_regression
 include("test_warp_regress.jl")
 timet = collect(timet);
-out = elastic_regression(f, y_orig, timet);
+out = elastic_regression(f, y_orig, timet, max_itr=1);
 out1 = elastic_prediction(f, timet, out, y=y_orig);
 
 # test elastic logistic regression
 include("test_warp_logistic.jl")
 timet = collect(timet);
-out = elastic_logistic(f, y_orig, timet);
+out = elastic_logistic(f, y_orig, timet, max_itr=1);
 out1 = elastic_prediction(f, timet, out, y=y_orig);
 
 # test elastic m-logistic regression
 include("test_warp_mlogistic.jl")
 timet = collect(timet);
-out = elastic_mlogistic(f, y_orig, timet);
+out = elastic_mlogistic(f, y_orig, timet, max_itr=1);
 out1 = elastic_prediction(f, timet, out, y=y_orig);
 
-d = load("beta.jld")
+d = load("beta.jld");
 beta = d["beta"];
 
 # test curve_to_q
@@ -93,15 +93,15 @@ d1 = calc_shape_dist(beta1,beta1);
 @test d1==0
 
 # test curve functions 'O'
-mu, betamean, v, q = curve_karcher_mean(beta);
-betan, qn, betamean1, q_mu = curve_srvf_align(beta);
+mu, betamean, v, q = curve_karcher_mean(beta, maxit=1);
+betan, qn, betamean1, q_mu = curve_srvf_align(beta, maxit=1);
 K = curve_karcher_cov(betamean, beta);
 pd = curve_principal_directions(betamean, mu, K);
 s = sample_shapes(mu, K);
 
 # test curve functions 'C'
-mu, betamean, v, q = curve_karcher_mean(beta, 'C');
-betan, qn, betamean1, q_mu = curve_srvf_align(beta, 'C');
-K = curve_karcher_cov(betamean, beta, 'C');
+mu, betamean, v, q = curve_karcher_mean(beta, mode='C', maxit=1);
+betan, qn, betamean1, q_mu = curve_srvf_align(beta, mode='C', maxit=1);
+K = curve_karcher_cov(betamean, beta, mode='C');
 pd = curve_principal_directions(betamean, mu, K, mode='C');
 s = sample_shapes(mu, K, mode='C');

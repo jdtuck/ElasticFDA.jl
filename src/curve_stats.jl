@@ -2,16 +2,17 @@
 Calculates Karcher mean of a collection of curves using the elastic square-root
 velocity (srvf) framework.
 
-    curve_karcher_mean(beta, mode='O')
+    curve_karcher_mean(beta; mode='O', maxit=20)
     :param beta: array (n,T,N) for N number of curves
     :param mode: Open ('O') or Closed ('C') curves
+    :param maxit: maximum number of iterations
 
     :return mu: mean srvf
     :return betamean: mean curve
     :return v: shooting vectors
     :return q: array of srvfs
 """
-function curve_karcher_mean(beta::Array{Float64, 3}, mode='O')
+function curve_karcher_mean(beta::Array{Float64, 3}; mode='O', maxit=20)
     n, T, N = size(beta)
     q = zeros(n, T, N);
     for ii = 1:N
@@ -25,7 +26,6 @@ function curve_karcher_mean(beta::Array{Float64, 3}, mode='O')
     delta = 0.5;
     tolv = 1e-4;
     told = 5*1e-3;
-    maxit = 20;
     itr = 1;
     sumd = zeros(maxit+1);
     v = zeros(n,T,N);
@@ -41,7 +41,7 @@ function curve_karcher_mean(beta::Array{Float64, 3}, mode='O')
 
         # TODO: parallelize
         for i = 1:N
-            v1, d = karcher_calc(beta[:,:,n],q[:,:,n], betamean, mu, mode);
+            v1, d = karcher_calc(beta[:,:,n],q[:,:,n], betamean, mu, mode=mode);
             v[:,:,i] = v1;
             sumd[itr+1] = sumd[itr+1] + d^2;
         end
@@ -84,20 +84,21 @@ end
 Aligns a collection of curves using the elastic square-root velocity (srvf)
 framework.
 
-    curve_srvf_align(beta, mode='O')
+    curve_srvf_align(beta; mode='O', maxit=20)
 
     :param beta: array (n,T,N) for N number of curves
     :param mode: Open ('O') or Closed ('C') curves
+    :param maxit: maximum number of iterations
 
     :return betan: aligned curves
     :return qn: aligned srvfs
     :return betamean: mean curve
     :return q_mu: mean srvf
 """
-function curve_srvf_align(beta::Array{Float64, 3}, mode='O')
+function curve_srvf_align(beta::Array{Float64, 3}; mode='O', maxit=20)
     n, T, N = size(beta);
     # find mean
-    mu, betamean, v, q = curve_karcher_mean(beta, mode);
+    mu, betamean, v, q = curve_karcher_mean(beta, mode=mode, maxit=maxit);
 
     qn = zeros(n,T,N);
     betan = zeros(n,T,N);
@@ -133,14 +134,14 @@ end
 """
 Calculate Karcher Covariance of a set of curves
 
-    curve_karcher_cov(betamean, beta, mode='O')
+    curve_karcher_cov(betamean, beta; mode='O')
     :param betamean: array (n,T) of mean curve
     :param beta: array (n,T,N) for N number of curves
     :param mode: Open ('O') or Closed ('C') curves
 
     :return K: covariance matrix
 """
-function curve_karcher_cov(betamean::Array{Float64,2}, beta::Array{Float64,3},
+function curve_karcher_cov(betamean::Array{Float64,2}, beta::Array{Float64,3};
                            mode='O')
     n, T, N = size(beta);
 
@@ -349,7 +350,7 @@ end
 
 """
 karcher mean calculation function
-    karcher_calc(beta, q, betamean, mu, mode='O')
+    karcher_calc(beta, q, betamean, mu; mode='O')
     :param beta: array (n,T)
     :param q: array (n,T)
     :param betamean: array (n,T)
@@ -359,7 +360,7 @@ karcher mean calculation function
     :return v: shooting vector
     :return d: elastic distance
 """
-function karcher_calc(beta, q, betamean, mu, mode='O')
+function karcher_calc(beta, q, betamean, mu; mode='O')
     if mode == 'C'
         basis = find_basis_normal(mu);
     end
@@ -375,4 +376,3 @@ function karcher_calc(beta, q, betamean, mu, mode='O')
 
     return v,d
 end
-
