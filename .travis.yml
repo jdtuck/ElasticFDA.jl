@@ -33,7 +33,7 @@ before_install:
 
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - xvfb-run julia -e 'Pkg.add("JLD"); Pkg.clone(pwd()); Pkg.build("ElasticFDA"); Pkg.test("ElasticFDA"; coverage=true)'
+  - xvfb-run julia -e 'Pkg.clone(pwd()); Pkg.build("ElasticFDA"); Pkg.test("ElasticFDA"; coverage=true)'
 
 after_success:
   - julia -e 'cd(Pkg.dir("ElasticFDA")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
