@@ -1,8 +1,9 @@
 # ElasticFDA
+* Julia library for elastic functional data analysis*
 
-[![ElasticFDA](http://pkg.julialang.org/badges/ElasticFDA_release.svg)](http://pkg.julialang.org/?pkg=ElasticFDA&ver=release)
--[![Build Status](https://travis-ci.org/jdtuck/ElasticFDA.jl.svg?branch=master)](https://travis-ci.org/jdtuck/ElasticFDA.jl)
--[![Coverage Status](https://coveralls.io/repos/jdtuck/ElasticFDA.jl/badge.png?branch=master)](https://coveralls.io/r/jdtuck/ElasticFDA.jl?branch=master)
+[![Build Status](https://iimg.shield.io/travis/jdtuck/ElasticFDA.jl.svg?style=flat-square&label=linux)](https://travis-ci.org/jdtuck/ElasticFDA.jl)
+[![Build status](https://img.shields.io/appveyor/ci/jdtuck/elasticfda-jl.svg?style=flat-square&label=windows)](https://ci.appveyor.com/project/jdtuck/elasticfda-jl/branch/master)
+[![Coverage Status](https://coveralls.io/repos/jdtuck/ElasticFDA.jl/badge.png?branch=master)](https://coveralls.io/r/jdtuck/ElasticFDA.jl?branch=master)
 
 A julia package for functional data analysis using the square root slope framework
 and curves using the square root velocity framework which performs pair-wise and
@@ -19,9 +20,6 @@ with icc or g++. One of the libraries relies LAPACK and BLAS. The makefile will
 detect if icc is installed and use it, otherwise it will default to g++. If icc
 is detected it will use MKL as the BLAS and LAPACK implementation. Otherwise
 OpenBLAS is used/required.
-
-We are working on an compiling in Windows and OSX, though time is limited and
-any help would be appreciated.
 
 ### Doumentation
 <http://elasticfdajl.readthedocs.org/en/latest/>
