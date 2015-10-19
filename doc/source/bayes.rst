@@ -7,7 +7,7 @@ fully tested
 
 Alignment
 ---------
-.. function:: pair_warping_baye(f1, f2; iter=15000, times=5, powera=1, showplot=true)
+.. function:: pair_warping_baye(f1, f2; iter=15000, times=5, powera=1)
 
     Compute pair warping between two functions using Bayesian method
 
@@ -15,7 +15,6 @@ Alignment
     + ``iter`` number of iterations
     + ``times`` MCMC parameter
     + ``powera`` MCMC parameter
-    + ``showplot`` show plots
 
     Returns Dict containing:
 
@@ -27,7 +26,7 @@ Alignment
     + ``dist_collect`` distance,
     + ``best_match`` best match,
 
-.. function:: group_warping bayes(f; iter=20000, times=5, powera=1, showplot=true)
+.. function:: group_warping bayes(f; iter=20000, times=5, powera=1)
 
     Group alignment of functions using Bayesian method
 
@@ -35,5 +34,11 @@ Alignment
     + ``iter`` number of MCMC iterations,
     + ``times`` time slicing,
     + ``powera`` MCMC parameter,
-    + ``showplot`` show plots,
+
+    Returns Dict containing:
+
+    + ``f_q`` registered srvfs
+    + ``gam_q`` warping functions
+    + ``f_a`` registered functions
+    + ``gam_a`` warping functions
 

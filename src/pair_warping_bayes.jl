@@ -1,12 +1,11 @@
 """
 Compute pair warping between two functions using Bayesian method
 
-    pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1, showplot=true)
+    pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1)
     :param f1, f2: vectors describing functions
     :param iter: number of iterations
     :param times: MCMC parameter
     :param powera: MCMC parameter
-    :param showplot: show plots
 
     Returns Dict containing
     :return f1:
@@ -17,8 +16,7 @@ Compute pair warping between two functions using Bayesian method
     :return dist_collect: distance
     :return best_match: best match
 """
-function pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1,
-                            showplot=true)
+function pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1)
 
     tau = ceil(times*.4);
 
@@ -105,57 +103,6 @@ function pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1,
     reg_q = reg_q[round(Integer, (bestidy-1)*times+1)];
     reg_a = f_i[linspace(1,p,times*(p+1)-1)];
     reg_a = reg_a[floor(Integer, (Meanidy-1)*times+1)];
-
-    if (showplot)
-        timet = collect(linspace(0, 1, length(f1)+1));
-        f11 = qtocurve(q1, timet);
-        f21 = qtocurve(q2, timet);
-        ranges = maximum(f11) - minimum(f11);
-        curve1 = f11 - mean(f11);
-        curve2 = f21 - mean(f21)+1*ranges;
-        figure()
-        plot(timet,curve1)
-        oplot(timet,curve2,"b")
-        for n in 1:length(best_match)
-            oplot([timet[times*(n-1)+1] timet[best_match[n]]], [curve1[times*(n-1)+1] curve2[best_match[n]]],"r")
-        end
-        xlabel("t")
-        title("Correspondence between 2 functions")
-
-        figure()
-        time0 = (collect(1:(L+1))-1)./L;
-        temp = (best_match-1)/p;
-        plot(time0, temp,"b")
-        temp = (LowerP-1)./p;
-        oplot(time0, temp,"r")
-        temp = (UpperP-1)./p;
-        oplot(time0, temp,"r")
-        temp = (MeanP-1)./p;
-        oplot(time0, temp,"k")
-
-        figure()
-        plot(timet, f1, "k")
-        oplot(timet, f2, "b")
-        title("Original Functions")
-
-        figure()
-        plot(timet, f1, "k")
-        oplot(timet, reg_q, "b")
-        title("Registration by Quotient estimate")
-
-        figure()
-        plot(timet, f1, "k")
-        oplot(timet, reg_a, "b")
-        title("Registration by Bayesian estimate")
-
-        figure()
-        plot(kappafamily[burnin:iter])
-        title("Traceplot of kappa after burn-in")
-
-        figure()
-        plot(log_posterior[burnin:iter])
-        title("Traceplot of log posterior after burn-in")
-    end
 
     out = Dict("f1" => f1, "f2_q" => reg_q, "gam_q" => (bestidy-1)/p,
                "f2a" => reg_a, "gam_a" => (Meanidy-1)/p,

@@ -1,14 +1,19 @@
 """
 Group alignment of functions using Bayesian method
 
-    group_warping_bayes(f; iter=20000, times=5, powera=1, showplot=true)
+    group_warping_bayes(f; iter=20000, times=5, powera=1)
     :param f: array (M,N) of N functions
     :param iter: number of MCMC iterations
     :param times: time slicing
     :param powera: MCMC parameter
-    :param showplot: show plots
+
+    Returns Dict containing
+    :return f_q: registered srvfs
+    :return gam_q: warping function
+    :return f_a: registered functions
+    :return gam: warping functions
 """
-function group_warping_bayes(f; iter=20000, times=5, powera=1, showplot=true)
+function group_warping_bayes(f; iter=20000, times=5, powera=1)
 
     tau = ceil(times*.4);
     gp = collect(1:size(f,2));
@@ -106,38 +111,6 @@ function group_warping_bayes(f; iter=20000, times=5, powera=1, showplot=true)
          f_a[:, t] = tmp[round(Integer, (gam_a[:, t]-1)*times+1)];
     end
 
-    if (showplot)
-        colors = ["b", "r", "m", "y", "g", "k"];
-        figure()
-        plot(timet, f[:, 1], colors[1])
-        for n in 2:size(f, 2)
-            oplot(timet, f[:, n], colors[mod(n,length(colors))+1])
-        end
-        xlabel("t")
-        title("Original Functions")
+    out = Dict("f_q" => f_q, "gam_q" => gam_q, "gam_a" => gam_a, "f_a" => f_a);
 
-        figure()
-        plot(timet, f_q[:, 1], colors[1])
-        for n in 2:size(f, 2)
-            oplot(timet, f_q[:, n], colors[mod(n,length(colors))+1])
-        end
-        xlabel("t")
-        title("Registration by Quotient estimate")
-
-        figure()
-        plot(timet, f_a[:, 1], colors[1])
-        for n in 2:size(f, 2)
-            oplot(timet, f_a[:, n], colors[mod(n,length(colors))+1])
-        end
-        xlabel("t")
-        title("Registration by Bayesian estimate")
-
-        figure()
-        plot(kappafamily[burnin:iter])
-        title("Traceplot of kappa after burn-in")
-
-        figure()
-        plot(log_posterior[burnin:iter])
-        title("Traceplot of log posterior after burn-in")
-    end
 end
