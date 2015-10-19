@@ -286,6 +286,23 @@ Calculate optimum parameterization (warping of q2 to q1)
     optimum_reparam(q1, time1, q2, time2, lam=0.0, method="DP", w=0.01, f1o=0.0,
                     f2o=0.0)
     same as above, but different timing for q1 and q2
+
+    optimum_reparam(beta1, beta2, lam, method="DP", w=0.01, rotated=true,
+                    isclosed=false)
+    :param beta1: array (n,T) describing curve 1
+    :param beta2: array (n,T) describing curve 2
+    :param lam: control amount of warping (default=0.0)
+    :param method: optimization method to find warping, default is
+                   Dynamic Programming ("DP"). Other options are
+                   Coordinate Descent ("DP2"), Riemanain BFGS
+                   ("LRBFGS")
+    :param w: Controls LRBFGS (default = 0.01)
+    :param rotated: calculate rotation (default = true)
+    :param isclosed: closed curve (default = false)
+
+    :return gam: warping function
+    :return R: rotation matrix
+    :return tau: seed value
 """
 function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
                          q2::Array{Float64,1}, time2::Array{Float64,1},
