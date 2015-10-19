@@ -26,7 +26,7 @@ Alignment
     + ``dist_collect`` distance,
     + ``best_match`` best match,
 
-.. function:: group_warping bayes(f; iter=20000, times=5, powera=1)
+.. function:: group_warping_bayes(f; iter=20000, times=5, powera=1)
 
     Group alignment of functions using Bayesian method
 
