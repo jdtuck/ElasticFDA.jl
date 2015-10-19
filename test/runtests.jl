@@ -49,10 +49,10 @@ out1 = horiz_fPCA(out["gam"], timet);
 out1 = gauss_model(out["fn"], timet, out["qn"], out["gam"]);
 
 # test pair_warping_bayes
-out1 = pair_warping_bayes(f1[1:100], f2[1:100], iter=2, showplot=false);
+out1 = pair_warping_bayes(f1[1:100], f2[1:100], iter=2);
 
 # test group_warping_bayes
-out1 = group_warping_bayes(f, iter=2, showplot=false);
+out1 = group_warping_bayes(f, iter=2);
 
 # test elastic_distance
 da, dp = elastic_distance(f1, f1, timet);
