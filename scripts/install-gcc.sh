@@ -41,7 +41,7 @@ elif [ "$TRAVIS_OS_NAME" = osx ]; then
     brew upgrade homebrew/versions/gcc${LIBSTDC_VERSION} || echo "suppress failures in order to ignore warnings"
 
     # Install gfortran
-    brew install gfortran
+    brew install gcc
 
 fi
 
