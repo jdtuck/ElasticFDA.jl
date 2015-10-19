@@ -36,8 +36,9 @@ export
     sample_shapes,
     curve_to_q,
     q_to_curve,
-    calc_shape_dist,
-    @cpp
+    calc_shape_dist
+
+export @cpp
 
 # load fdasrsf library
 unixpath = "../deps/src/fdasrsf/fdasrsf"
@@ -59,22 +60,6 @@ if (Libdl.dlopen_e(libgropt) == C_NULL)
     error("libgropt not properly installed. Run Pkg.build(\"ElasticFDA\")")
 end
 
-### source files
-include("curve_funcs.jl")
-include("curve_stats.jl")
-include("srsf_funcs.jl")
-include("misc_funcs.jl")
-include("fPCA.jl")
-include("bspline.jl")
-include("regression_funcs.jl")
-include("dp_bayes.jl")
-include("mcmc_align.jl")
-include("gauss_model.jl")
-include("group_warping_bayes.jl")
-include("pair_warping_bayes.jl")
-include("regression.jl")
-include("regression_funcs.jl")
-include("time_warping.jl")
 
 # CPP.jl workaround not compiling on windows
 # Useful references:
@@ -163,5 +148,22 @@ macro cpp(ex)
     end
     ex
 end
+
+### source files
+include("curve_funcs.jl")
+include("curve_stats.jl")
+include("srsf_funcs.jl")
+include("misc_funcs.jl")
+include("fPCA.jl")
+include("bspline.jl")
+include("regression_funcs.jl")
+include("dp_bayes.jl")
+include("mcmc_align.jl")
+include("gauss_model.jl")
+include("group_warping_bayes.jl")
+include("pair_warping_bayes.jl")
+include("regression.jl")
+include("regression_funcs.jl")
+include("time_warping.jl")
 
 end # module
