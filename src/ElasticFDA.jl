@@ -41,7 +41,7 @@ export
 
 # load fdasrsf library
 unixpath = "../deps/src/fdasrsf/fdasrsf"
-winpath = "../deps/bin$WORD_SIZE/fdasrsf"
+winpath = "../deps/fdasrsf"
 const libfdasrsf = joinpath(dirname(@__FILE__), @unix? unixpath : winpath)
 
 # Ensure library is available.
@@ -51,7 +51,7 @@ end
 
 # load gropt library
 unixpath1 = "../deps/src/gropt/gropt"
-winpath1 = "../deps/bin$WORD_SIZE/gropt"
+winpath1 = "../deps/gropt"
 const libgropt = joinpath(dirname(@__FILE__), @unix? unixpath1 : winpath1)
 
 # Ensure library is available.

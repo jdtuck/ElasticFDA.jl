@@ -179,25 +179,6 @@ function elastic_distance(f1::Vector, f2::Vector, timet::Vector)
 end
 
 
-"""
-Calculate optimum parameterization (warping of q2 to q1)
-
-    optimum_reparam(q1, timet, q2, lam=0.0, method="SIMUL", w=0.01, f1o=0.0,
-                    f2o=0.0)
-    :param q1: array (M,N) or vector (M) describing srsf set 1
-    :param timet: vector describing time samples of length M
-    :param q2: array (M,N) or vector (M) describing srsf of set 2
-    :param lam: control amount of warping (default=0.0)
-    :param method: optimization method to find warping, default is
-                   Dynamic Programming ("DP"). Other options are
-                   Coordinate Descent ("DP2"), Riemannian BFGS
-                   ("LRBFGS"), Simultaneous Alignment ("SIMUL")
-    :param w: Controls LRBFGS (default = 0.01)
-    :param f1o: initial value of f1, vector or scalar depending on q1, defaults
-                to zero
-    :param f2o: initial value of f2, vector or scalar depending on q1, defaults
-                to zero
-"""
 function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
                          q2::Array{Float64,1}, lam::Float64=0.0;
                          method::AbstractString="SIMUL", w=0.01, f1o::Float64=0.0,
@@ -282,7 +263,26 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
     return gam
 end
 
+
 """
+Calculate optimum parameterization (warping of q2 to q1)
+
+    optimum_reparam(q1, timet, q2, lam=0.0, method="SIMUL", w=0.01, f1o=0.0,
+                    f2o=0.0)
+    :param q1: array (M,N) or vector (M) describing srsf set 1
+    :param timet: vector describing time samples of length M
+    :param q2: array (M,N) or vector (M) describing srsf of set 2
+    :param lam: control amount of warping (default=0.0)
+    :param method: optimization method to find warping, default is
+                   Dynamic Programming ("DP"). Other options are
+                   Coordinate Descent ("DP2"), Riemannian BFGS
+                   ("LRBFGS"), Simultaneous Alignment ("SIMUL")
+    :param w: Controls LRBFGS (default = 0.01)
+    :param f1o: initial value of f1, vector or scalar depending on q1, defaults
+                to zero
+    :param f2o: initial value of f2, vector or scalar depending on q1, defaults
+                to zero
+
     optimum_reparam(q1, time1, q2, time2, lam=0.0, method="DP", w=0.01, f1o=0.0,
                     f2o=0.0)
     same as above, but different timing for q1 and q2
