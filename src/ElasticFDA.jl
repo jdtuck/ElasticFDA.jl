@@ -37,7 +37,6 @@ export
     curve_to_q,
     q_to_curve,
     calc_shape_dist,
-    libgropt,
     @cpp
 
 # load fdasrsf library
@@ -47,7 +46,7 @@ const libfdasrsf = joinpath(dirname(@__FILE__), @unix? unixpath : winpath)
 
 # load gropt library
 unixpath1 = "../deps/src/gropt/gropt"
-winpath1 = "../deps/gropt"
+winpath1 = "..\\deps\\gropt"
 const libgropt = joinpath(dirname(@__FILE__), @unix? unixpath1 : winpath1)
 
 # Ensure library is available.
