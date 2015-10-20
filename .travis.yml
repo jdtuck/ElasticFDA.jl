@@ -21,7 +21,7 @@ notifications:
 
 matrix:
   allow_failures:
-    - os: osx # allow OS X to fail until intermittent failures can be resolved.
+      - julia: nightly
 
 before_install:
   # Prepare compilers
