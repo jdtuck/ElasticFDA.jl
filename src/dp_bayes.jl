@@ -123,10 +123,9 @@ end
 
 """
 Calculate mean function using Bayesian Dynamic Programming
-    DP_mean(f, times=5, fig=false)
+    DP_mean(f, times=5)
     :param f: array (M,N) of N functions
     :param times: MCMC parameter number of times to split
-    :param fig: display figures
 
     Returns Dict containing
     :return distmfamily: distance matrix
@@ -140,7 +139,7 @@ Calculate mean function using Bayesian Dynamic Programming
     :return estimator2: estimator2
     :return regcurve: registered curves
 """
-function DP_mean(f, times=5, fig=false)
+function DP_mean(f, times=5)
     cut = 5*times;
     iter = 20;
     timet = linspace(0,1,size(f,1));
@@ -217,25 +216,6 @@ function DP_mean(f, times=5, fig=false)
     end
     crossmean = mean(reg_curve, 2);
     sumdist = sum(reg_curve, 2);
-
-    if (fig)
-        plotl = min(f);
-        plotu = max(f);
-
-        figure()
-        plot(timet, reg_curve[:, 1])
-        for j in 2:n
-            oplot(timet, reg_curve[:, n])
-        end
-        title("registered curves")
-
-        figure()
-        plot(timet, crossmean, "r")
-        title("Cross sectional mean")
-        for j in 1:n
-            oplot(timet, reg_curve[:, j])
-        end
-    end
 
     out = Dict("distfamily" => dist_matrix, "match_matrix" => match_matrix,
                "position" => position, "mu_5" => mu_5,

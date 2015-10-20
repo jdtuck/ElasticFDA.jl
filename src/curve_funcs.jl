@@ -105,24 +105,6 @@ function q_to_curve(q)
 end
 
 
-"""
-    optimum_reparam(beta1, beta2, lam, method="DP", w=0.01, rotated=true,
-                    isclosed=false)
-    :param beta1: array (n,T) describing curve 1
-    :param beta2: array (n,T) describing curve 2
-    :param lam: control amount of warping (default=0.0)
-    :param method: optimization method to find warping, default is
-                   Dynamic Programming ("DP"). Other options are
-                   Coordinate Descent ("DP2"), Riemanain BFGS
-                   ("LRBFGS")
-    :param w: Controls LRBFGS (default = 0.01)
-    :param rotated: calculate rotation (default = true)
-    :param isclosed: closed curve (default = false)
-
-    :return gam: warping function
-    :return R: rotation matrix
-    :return tau: seed value
-"""
 function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
                          lam::Float64=0.0; method::AbstractString="DP", w=0.01,
                          rotated::Bool=true, isclosed::Bool=false)
