@@ -36,19 +36,14 @@ export
     sample_shapes,
     curve_to_q,
     q_to_curve,
-    calc_shape_dist
-
-export @cpp
+    calc_shape_dist,
+    libgropt,
+    @cpp
 
 # load fdasrsf library
 unixpath = "../deps/src/fdasrsf/fdasrsf"
 winpath = "../deps/fdasrsf"
 const libfdasrsf = joinpath(dirname(@__FILE__), @unix? unixpath : winpath)
-
-# Ensure library is available.
-if (Libdl.dlopen_e(libfdasrsf) == C_NULL)
-    error("libfdasrsf not properly installed. Run Pkg.build(\"ElasticFDA\")")
-end
 
 # load gropt library
 unixpath1 = "../deps/src/gropt/gropt"
@@ -56,10 +51,15 @@ winpath1 = "../deps/gropt"
 const libgropt = joinpath(dirname(@__FILE__), @unix? unixpath1 : winpath1)
 
 # Ensure library is available.
-if (Libdl.dlopen_e(libgropt) == C_NULL)
-    error("libgropt not properly installed. Run Pkg.build(\"ElasticFDA\")")
-end
+function __init__()
+    if (Libdl.dlopen_e(libfdasrsf) == C_NULL)
+        error("libfdasrsf not properly installed. Run Pkg.build(\"ElasticFDA\")")
+    end
 
+    if (Libdl.dlopen_e(libgropt) == C_NULL)
+        error("libgropt not properly installed. Run Pkg.build(\"ElasticFDA\")")
+    end
+end
 
 # CPP.jl workaround not compiling on windows
 # Useful references:
