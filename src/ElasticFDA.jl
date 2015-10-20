@@ -61,11 +61,16 @@ function __init__()
 end
 
 # CPP.jl workaround not compiling on windows
+# the following macro was copied from https://github.com/timholy/Cpp.jl with the
+# following modifications:
+# 1) Update const for new julia v0.4 warnings
+# 2) Formating
+# the licensce for the code is included in the package directory
 # Useful references:
 # http://www.agner.org/optimize/calling_conventions.pdf
 # http://mentorembedded.github.io/cxx-abi/abi.html#mangling
 
-const SUBSTITUTION = [""; map(string, collect(0:9)); map(string, collect('A':'Z'))]  # FIXME more than 37 arguments?
+const SUBSTITUTION = [""; map(string, collect(0:9)); map(string, collect('A':'Z'))];
 
 # Allow calling of functions in C++ shared libraries.
 # Usage: a = @cpp ccall((:mysymbol,mylib),...)
@@ -100,7 +105,7 @@ macro cpp(ex)
     pstr = ""
     symtable = (:Void,:Bool,:Cchar,:Char,:ASCIIString,:Int,:Int8,:Uint8,:Int16,:Uint16,:Int32,:Cint,:Uint32,:Int64,:Uint64,:Float32,:Float64)
     # GNU3-4 ABI v.3 and v.4
-    ptable =   ('v',  'b',  'c',   'w',  "Pc",        'i', 'a',  'h',   's',   't',    'i',   'i',  'j',    'l',   'm',    'f',     'd')
+    ptable =   ('v', 'b', 'c', 'w', "Pc", 'i', 'a', 'h', 's', 't', 'i', 'i', 'j', 'l', 'm', 'f', 'd')
     msub = ASCIIString[]
     for iarg = 1:length(exargs)
         thisarg = exargs[iarg]
