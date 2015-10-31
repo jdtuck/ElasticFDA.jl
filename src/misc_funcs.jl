@@ -1,4 +1,17 @@
 """
+Creates Rectangular Grid in 2-D space
+
+    meshgrid(a::LinSpace,b::LinSpace)
+"""
+function meshgrid(a::LinSpace,b::LinSpace)
+    grid_a = [i for i in a, j in b]';
+    grid_b = [j for i in a, j in b]';
+
+    return grid_a, grid_b
+end
+
+
+"""
 Linear interpolation
 
     approx(xd, yd, xi)

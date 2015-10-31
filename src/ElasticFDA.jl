@@ -49,6 +49,12 @@ unixpath1 = "../deps/src/gropt/gropt"
 winpath1 = "..\\deps\\gropt"
 const libgropt = joinpath(dirname(@__FILE__), @unix? unixpath1 : winpath1)
 
+# load fdaqmap library
+unixpath2 = "../deps/src/fdaqmap/fdaqmap"
+winpath2 = "..\\deps\\fdaqmap"
+const libfdaqmap = joinpath(dirname(@__FILE__), @unix? unixpath2 : winpath2)
+
+
 # Ensure library is available.
 function __init__()
     if (Libdl.dlopen_e(libfdasrsf) == C_NULL)
@@ -58,6 +64,11 @@ function __init__()
     if (Libdl.dlopen_e(libgropt) == C_NULL)
         error("libgropt not properly installed. Run Pkg.build(\"ElasticFDA\")")
     end
+
+    if (Libdl.dlopen_e(libfdaqmap) == C_NULL)
+        error("libfdaqmap not properly installed. Run Pkg.build(\"ElasticFDA\")")
+    end
+
 end
 
 # CPP.jl workaround not compiling on windows
