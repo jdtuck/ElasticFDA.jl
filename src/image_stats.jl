@@ -92,3 +92,77 @@ function reparam_image(It::Array, Im::Array, gam::Array, b::Array;
     return gamnew, Inew, H, stepsize
 end
 
+
+"""
+Pairwise align two images
+
+    pair_align_image(I1, I2, M=5, ortho=true, basis_type="t", resizei=true,
+                     N=64, stepsize=1e-5, itermax=1e3)
+    :param I1: reference image
+    :param I2: image to warp
+    :param M: number of basis elements
+    :param ortho: orthonormalize basis
+    :param basis_type: type of basis ("t", "s", "i", "o")
+    :param resizei: resize image
+    :param N: size of resized image
+    :param stepsize: gradient stepsize
+    :param itermax: maximum number of iterations
+
+    :return I2_new: aligned I2
+    :return gam: warping function
+"""
+function pair_align_image(I1, I2, M=5, ortho=true, basis_type="t", resizei=true,
+                          N=64, stepsize=1e-5, itermax=1e3)
+    m,n = size(I1);
+    F1 = zeros(m,n,2);
+    m1,n1 = size(I2);
+    F2 = zeros(m,n,2);
+
+    # Take Gradient
+    fu, fv = gradient2(I1,1./(m-1),1./(n-1));
+    F1[:,:,1] = fu;
+    F1[:,:,2] = fv;
+    fu, fv = gradient2(I2,1./(m1-1),1./(n1-1));
+    F2[:,:,1] = fu;
+    F2[:,:,2] = fv;
+
+    # Resize Data and Center
+    if resizei
+        if N > m || N > n
+            break
+        end
+
+        m_n = linspace(1,m,N);
+        n_n = linspace(1,n,N);
+        F1a = zeros(N,N,2);
+        spl = Spline2D(collect(1:m),collect(1:n),F1[:,:,1]);
+        F1a[:,:,1] = evalgrid(spl,m_n,n_n);
+        spl = Spline2D(collect(1:m),collect(1:n),F1[:,:,2]);
+        F1a[:,:,2] = evalgrid(spl,m_n,n_n);
+        F1 = copy(F1a);
+
+        m_n = linspace(1,m1,N);
+        n_n = linspace(1,n1,N);
+        F2a = zeros(N,N,2);
+        spl = Spline2D(collect(1:m1),collect(1:n1),F2[:,:,1]);
+        F2a[:,:,1] = evalgrid(spl,m_n,n_n);
+        spl = Spline2D(collect(1:m1),collect(1:n1),F2[:,:,2]);
+        F2a[:,:,2] = evalgrid(spl,m_n,n_n);
+        F2 = copy(F2a);
+    end
+
+    F1 -= minimum(F1);
+    F1 /= maximum(F1);
+    F2 -= minimum(F2);
+    F2 /= maximum(F2);
+
+    # Generate basis
+    b, gamid = run_basis(F1, M, basis_type, ortho);
+    gamp = copy(gamid);
+    gam, F2_new, H, stepsize = reparam_image(F1, F2, gamp, b, stepsize, itermax);
+
+    I2_new = apply_gam_to_imag(I2, gam);
+
+    return I2_new, gam
+end
+

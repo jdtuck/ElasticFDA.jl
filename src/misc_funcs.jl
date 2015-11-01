@@ -1,4 +1,32 @@
 """
+2-D Gradient
+
+    gradient2(a::Array, dx::Float64=1, dy::Float=1)
+    :param a: matrix
+    :param dx: stepsize
+    :param dy: stepsize
+
+    :return dxdu: derivatives along x
+    :return dydv: derivatives along y
+"""
+function gradient2(a::Array, dx::Float64=1, dy::Float64=1)
+    m,n = size(a);
+    dxdu = zeros(m,n);
+    dydv = zeros(m,n);
+
+    for i=1:m
+        dxdu[i,:] = gradient(a[i,:], dx)
+    end
+
+    for i=1:n
+        dydv[:,i] = gradient(a[:,i], dy)
+    end
+
+    return dxdu, dydv
+end
+
+
+"""
 Creates Rectangular Grid in 2-D space
 
     meshgrid(a::LinSpace,b::LinSpace)

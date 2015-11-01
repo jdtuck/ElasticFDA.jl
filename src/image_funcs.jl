@@ -379,3 +379,129 @@ function check_crossing(f)
     return is_diffeo
 end
 
+
+"""
+Compute Basis Tid
+
+    formbasisTid(M,m,n;basis_type="tso")
+    :param M: number of basis elements
+    :param m:
+    :param n:
+    :param basis_type: type of basis (options are "t","s","o","i")
+"""
+function formbasisTid(M,m,n;basis_type="t")
+    U, V = meshgrid(linspace(0,1,n), linspace(0,1,m));
+
+    idx = 1;
+
+    if basis_type=="t"
+        b = zeros(m,n,2,2*M);
+        for s = 1:M
+            c = sqrt(2)*pi*s;
+            sPI2 = 2*pi*s;
+
+            b[:,:,1,idx] = zeros(m,n);
+            b[:,:,2,idx] = (cos(sPI2*V)-1)/c;
+
+            b[:,:,1,idx+1] = (cos(sPI2*U)-1)/c;
+            b[:,:,2,idx+1] = zeros(m,n);
+
+            idx += 2;
+        end
+    end
+
+    if basis_type == "s"
+        b = zeros(m,n,2,2*M);
+        for s = 1:M
+            c = sqrt(2)*pi*s;
+            sPI2 = 2*pi*2;
+
+            b[:,:,1,idx] = zeros(m,n);
+            b[:,:,2,idx] = sin(sPI2*U)/c;
+
+            b[:,:,1,idx+1] = sin(sPI2*U)/c;
+            b[:,:,2,idx+1] = zero(m,n);
+
+            idx += 2;
+        end
+    end
+
+    if basis_type == "i"
+        b = zeros(m,n,2,M*M*8);
+        for s1 = 1:M
+            s1PI2 = 2*pi*s1;
+            for s2 = 1:M
+                s2PI2 = 2*pi*s2;
+                c = pi * sqrt(s1^2+3*s2^2);
+                b[:,:,1,idx] = (cos(s1PI2*U)-1).*(cos(s2PI2*V))/c;
+                b[:,:,2,idx] = zeros(m,n);
+                b[:,:,1,idx+2] = ((cos(s1PI2*U)-1).*sin(s2PI2*V))/c;
+                b[:,:,2,idx+2] = zeros(m,n);
+                c = pi*sqrt(s1^2+s2^2);
+                b[:,:,1,idx+4] = sin(s1PI2*U).*(cos(s2PI2*V))/c;
+                b[:,:,2,idx+4] = zeros(m,n);
+                b[:,:,1,idx+6] = (sin(s1PI2*U).*sin(s2PI2*V))/c;
+                b[:,:,2,idx+6] = zeros(m,n);
+
+                c = pi*sqrt(s1^2+3*s2^2);
+                b[:,:,1,idx+1] = zeros(m,n);
+                b[:,:,2,idx+1] = (cos(s1PI2*V)-1).*(cos(s2PI2*U))/c;
+                b[:,:,1,idx+3] = zeros(m,n);
+                b[:,:,2,idx+3] = ((cos(s1PI2*V)-1).*sin(s2PI2*U))/c;
+                c = pi*sqrt(s1^2+s2^2);
+                b[:,:,1,idx+5] = zeros(m,n);
+                b[:,:,2,idx+5] = sin(s1PI2*V).*(cos(s2PI2*U))/c;
+                b[:,:,1,idx+7] = zeros(m,n);
+                b[:,:,2,idx+7] = (sin(s1PI2*V).*sin(s2PI2*U))/c;
+                idx += 8;
+            end
+        end
+    end
+
+    if basis_type == "o"
+        b = zeros(m,n,2,M*4);
+        for s = 1:M
+            c = sqrt((4*pi^2*s^2+9)/6);
+            sPI2 = 2*pi*s;
+            b[:,:,1,idx] = (cos(sPI2*U)-1)*V/c;
+            b[:,:,2,idx] = zeros(m,n);
+            b[:,:,2,idx+1] = (cos(sPI2*V)-1).*U/c;
+            b[:,:,1,idx+1] = zeros(m,n);
+            b[:,:,1,idx+2] = sin(sPI2*U).*V/c;
+            b[:,:,2,idx+2] = zeros(m,n);
+            b[:,:,2,idx+3] = sin(sPI2*V).*U/c;
+            b[:,:,1,idx+3] = zeros(m,n);
+            idx += 4;
+        end
+    end
+
+    return b, U, V
+end
+
+
+"""
+Generate basis elements on T_id(\gamma)
+
+    run_basis(Ft, M=10, basis_type="t", is_orthon=true)
+    :param Ft: Image Array
+    :param M: number of basis elements
+    :param basis_type: type of basis (option "t", "s", "i", "o")
+    :param is_orthon: make basis orthonormal
+
+    :return b: basis elements
+    :retrun gamid: identity diffeo
+"""
+function run_basis(Ft, M=10, basis_type="t", is_orthon=true)
+    m = size(Ft,1);
+    n = size(Ft,2);
+
+    gamid = makediffeoid(m,n);
+
+    b = formbasisTid(M, m, n, basis_type);
+    if is_orthon
+        b = gram_schmidt_c(b);
+    end
+
+    return b, gamid
+end
+

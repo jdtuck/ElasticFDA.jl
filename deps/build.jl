@@ -5,7 +5,7 @@
     cd(joinpath(dirname(@__FILE__), "src", "gropt"))
     run(`make SUFFIX=$suffix`)
     cd(joinpath(dirname(@__FILE__), "src", "fdaqmap"))
-    run(`make SUFFIC=$suffix`)
+    run(`make SUFFIX=$suffix`)
 end
 
 @windows_only begin
