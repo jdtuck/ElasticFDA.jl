@@ -17,7 +17,8 @@ Find optimum reparam between two images
     :return stepsize: final stepsize
 """
 function reparam_image(It::Array, Im::Array, gam::Array, b::Array;
-    stepsize::Float64=1e-5, itermax::Int32=1000,lmark::Bool=false)
+                       stepsize::Float64=1e-5, itermax::Int32=1000,
+                       lmark::Bool=false)
     m = size(It,1);
     n = size(It,2);
     gamid = makediffeoid(m,n);
@@ -129,26 +130,26 @@ function pair_align_image(I1, I2, M=5, ortho=true, basis_type="t", resizei=true,
     # Resize Data and Center
     if resizei
         if N > m || N > n
-            break
+            @printf("Not resizing, N is larger than image size")
+        else
+            m_n = linspace(1,m,N);
+            n_n = linspace(1,n,N);
+            F1a = zeros(N,N,2);
+            spl = Spline2D(collect(1:m),collect(1:n),F1[:,:,1]);
+            F1a[:,:,1] = evalgrid(spl,m_n,n_n);
+            spl = Spline2D(collect(1:m),collect(1:n),F1[:,:,2]);
+            F1a[:,:,2] = evalgrid(spl,m_n,n_n);
+            F1 = copy(F1a);
+
+            m_n = linspace(1,m1,N);
+            n_n = linspace(1,n1,N);
+            F2a = zeros(N,N,2);
+            spl = Spline2D(collect(1:m1),collect(1:n1),F2[:,:,1]);
+            F2a[:,:,1] = evalgrid(spl,m_n,n_n);
+            spl = Spline2D(collect(1:m1),collect(1:n1),F2[:,:,2]);
+            F2a[:,:,2] = evalgrid(spl,m_n,n_n);
+            F2 = copy(F2a);
         end
-
-        m_n = linspace(1,m,N);
-        n_n = linspace(1,n,N);
-        F1a = zeros(N,N,2);
-        spl = Spline2D(collect(1:m),collect(1:n),F1[:,:,1]);
-        F1a[:,:,1] = evalgrid(spl,m_n,n_n);
-        spl = Spline2D(collect(1:m),collect(1:n),F1[:,:,2]);
-        F1a[:,:,2] = evalgrid(spl,m_n,n_n);
-        F1 = copy(F1a);
-
-        m_n = linspace(1,m1,N);
-        n_n = linspace(1,n1,N);
-        F2a = zeros(N,N,2);
-        spl = Spline2D(collect(1:m1),collect(1:n1),F2[:,:,1]);
-        F2a[:,:,1] = evalgrid(spl,m_n,n_n);
-        spl = Spline2D(collect(1:m1),collect(1:n1),F2[:,:,2]);
-        F2a[:,:,2] = evalgrid(spl,m_n,n_n);
-        F2 = copy(F2a);
     end
 
     F1 -= minimum(F1);

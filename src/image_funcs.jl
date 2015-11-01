@@ -5,7 +5,7 @@ Compose to Image Reparameterizations
     :param gamnew: 3-D Array describing new gamma
     :param gam:: 3-D Array describing current gamma
 """
-function gamcum = apply_gam_to_gam(gamnew::Array, gam::Array)
+function apply_gam_to_gam(gamnew::Array, gam::Array)
     # gam \circ gam0
     m, n, D = size(gam);
     md = 8;
@@ -112,7 +112,7 @@ Find 2-D gradient
     :return dfdu: Array
     :return dfdv: Array
 """
-function compgrad2D(f)
+function compgrad2D(f::Array)
     dims = ndims(f);
     if dims < 3
         n,t = size(f);
@@ -165,6 +165,7 @@ function gram_schmidt_c(b)
             cnt += 1;
             G[:,:,:,cnt] = G[:,:,:,cnt]./sqrt(l);
         end
+    end
 
     return G
 end
