@@ -151,7 +151,6 @@ function pair_align_image(I1, I2, M=5, ortho=true, basis_type="t", resizei=true,
             F2 = copy(F2a);
         end
     end
-
     F1 -= minimum(F1);
     F1 /= maximum(F1);
     F2 -= minimum(F2);

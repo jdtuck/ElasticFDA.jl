@@ -11,10 +11,10 @@ function apply_gam_to_gam(gamnew::Array, gam::Array)
     md = 8;
     mt = md*m;
     nt = md*n;
-    U = linspace(0,1,n);
-    V = linspace(0,1,m);
-    Ut = linspace(0,1,nt);
-    Vt = linspace(0,1,mt);
+    U = linspace(0,1,m);
+    V = linspace(0,1,n);
+    Ut = linspace(0,1,mt);
+    Vt = linspace(0,1,nt);
     gam_tmp = zeros(mt, nt, D);
     gam_new_tmp = zeros(mt, nt, D);
     for i = 1:D
@@ -28,7 +28,7 @@ function apply_gam_to_gam(gamnew::Array, gam::Array)
     for i = 1:D
         spl = Spline2D(Ut,Vt,gam_new_tmp[:,:,i],kx=1,ky=1);
         for j = 1:mt
-            gam_cum_tmp[j,:,i] = spl(vec(gam_tmp[j,:,1]),vec(gam_tmp[j,:,2]));
+            gam_cum_tmp[j,:,i] = spl(vec(gam_tmp[j,:,2]), vec(gam_tmp[j,:,1]));
         end
     end
 
@@ -70,7 +70,7 @@ function apply_gam_to_imag(img::Array, gam::Array)
         for i = 1:d
             spl = Spline2D(U,V, img[:,:,i],kx=1,ky=1);
             for j = 1:m
-                img_new[j,:,i] = spl(gam[j,:,1],gam[j,:,2]);
+                img_new[j,:,i] = spl(gam[j,:,2],gam[j,:,1]);
             end
         end
     end
@@ -95,7 +95,7 @@ function apply_gam_gamid(gamid::Array,gaminc::Array)
     for j = 1:d
         spl = Spline2D(U,V,gamid[:,:,j]);
         for i = 1:m
-            gam_cum[i,:,j] = spl(vec(gaminc[i,:,1]),vec(gaminc[i,:,2]));
+            gam_cum[i,:,j] = spl(vec(gaminc[i,:,2]),vec(gaminc[i,:,1]));
         end
     end
 
@@ -103,15 +103,15 @@ function apply_gam_gamid(gamid::Array,gaminc::Array)
 end
 
 
-"""
-Find 2-D gradient
-
-    compgrad2D(f::Array)
-    :param f: Array
-
-    :return dfdu: Array
-    :return dfdv: Array
-"""
+#"""
+#Find 2-D gradient
+#
+#    compgrad2D(f::Array)
+#    :param f: Array
+#
+#    :return dfdu: Array
+#    :return dfdv: Array
+#"""
 function compgrad2D(f::Array)
     dims = ndims(f);
     if dims < 3
@@ -125,9 +125,7 @@ function compgrad2D(f::Array)
         dfdv = zeros(n,t,d);
     end
 
-    @cpp ccall((:findgrad2D, libfdaqmap), Void, (Ptr{Float64}, Ptr{Float64},
-               Ptr{Float64}, Int32, Int32, Int32),
-               dfdu, dfdv, f, n, t, d)
+    @cpp ccall((:findgrad2D, libfdaqmap), Void, (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32, Int32, Int32), dfdu, dfdv, f, n, t, d)
 
     return dfdu, dfdv
 end
@@ -498,7 +496,7 @@ function run_basis(Ft, M=10, basis_type="t", is_orthon=true)
 
     gamid = makediffeoid(m,n);
 
-    b = formbasisTid(M, m, n, basis_type);
+    b, U, V = formbasisTid(M, m, n, basis_type=basis_type);
     if is_orthon
         b = gram_schmidt_c(b);
     end
