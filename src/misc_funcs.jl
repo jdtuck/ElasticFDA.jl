@@ -9,13 +9,13 @@
     :return dxdu: derivatives along x
     :return dydv: derivatives along y
 """
-function gradient2(a::Array, dx::Float64=1, dy::Float64=1)
+function gradient2(a::Array, dx::Float64=1., dy::Float64=1.)
     m,n = size(a);
     dxdu = zeros(m,n);
     dydv = zeros(m,n);
 
     for i=1:m
-        dxdu[i,:] = gradient(a[i,:], dx)
+        dxdu[i,:] = gradient(vec(a[i,:]), dx)
     end
 
     for i=1:n

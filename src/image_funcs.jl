@@ -28,7 +28,7 @@ function apply_gam_to_gam(gamnew::Array, gam::Array)
     for i = 1:D
         spl = Spline2D(Ut,Vt,gam_new_tmp[:,:,i],kx=1,ky=1);
         for j = 1:mt
-            gam_cum_tmp[j,:,i] = spl(gam_tmp[j,:,1],gam_tmp[j,:,2]);
+            gam_cum_tmp[j,:,i] = spl(vec(gam_tmp[j,:,1]),vec(gam_tmp[j,:,2]));
         end
     end
 
@@ -88,14 +88,14 @@ Compose Image Reparameterization with Identity
 """
 function apply_gam_gamid(gamid::Array,gaminc::Array)
     m,n,d = size(gamid);
-    U = linspace(0,1,n);
-    V = linspace(0,1,m);
+    U = linspace(0,1,m);
+    V = linspace(0,1,n);
 
     gam_cum = zeros(m,n,d);
     for j = 1:d
         spl = Spline2D(U,V,gamid[:,:,j]);
         for i = 1:m
-            gam_cum[i,:,j] = spl(gaminc[i,:,1],gaminc[i,:,2]);
+            gam_cum[i,:,j] = spl(vec(gaminc[i,:,1]),vec(gaminc[i,:,2]));
         end
     end
 
