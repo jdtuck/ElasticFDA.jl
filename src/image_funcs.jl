@@ -59,18 +59,19 @@ function apply_gam_to_imag(img::Array, gam::Array)
         img_new = zeros(m,n);
     end
 
-    U = linspace(0,1,n);
+    U = linspace(0,1,m);
+    V = linspace(0,1,n);
 
     if d == 1
-        spl = Spline2D(U,V,img,kx=1,ky=1);
+        spl = Spline2D(U,V,img);
         for j = 1:m
-            img_new[j,:] = spl(gam[j,:,1],gam[j,:,2]);
+            img_new[j,:] = spl(vec(gam[j,:,2]),vec(gam[j,:,1]));
         end
     else
         for i = 1:d
-            spl = Spline2D(U,V, img[:,:,i],kx=1,ky=1);
+            spl = Spline2D(U,V,img[:,:,i]);
             for j = 1:m
-                img_new[j,:,i] = spl(gam[j,:,2],gam[j,:,1]);
+                img_new[j,:,i] = spl(vec(gam[j,:,2]),vec(gam[j,:,1]));
             end
         end
     end
@@ -103,15 +104,15 @@ function apply_gam_gamid(gamid::Array,gaminc::Array)
 end
 
 
-#"""
-#Find 2-D gradient
-#
-#    compgrad2D(f::Array)
-#    :param f: Array
-#
-#    :return dfdu: Array
-#    :return dfdv: Array
-#"""
+"""
+Find 2-D gradient
+
+    compgrad2D(f::Array)
+    :param f: Array
+
+    :return dfdu: Array
+    :return dfdv: Array
+"""
 function compgrad2D(f::Array)
     dims = ndims(f);
     if dims < 3
@@ -125,7 +126,8 @@ function compgrad2D(f::Array)
         dfdv = zeros(n,t,d);
     end
 
-    @cpp ccall((:findgrad2D, libfdaqmap), Void, (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32, Int32, Int32), dfdu, dfdv, f, n, t, d)
+    @cpp ccall((:findgrad2D, libfdaqmap), Void, (Ptr{Float64}, Ptr{Float64},
+               Ptr{Float64}, Int32, Int32, Int32), dfdu, dfdv, f, n, t, d)
 
     return dfdu, dfdv
 end
@@ -159,6 +161,8 @@ function gram_schmidt_c(b)
 
         v = G[:,:,:,i];
         l = vec(v)'*vec(v)*ds;
+        l = l[1];
+
         if l>0
             cnt += 1;
             G[:,:,:,cnt] = G[:,:,:,cnt]./sqrt(l);
@@ -273,6 +277,7 @@ function comp_energy(q1::Array,q2::Array)
 
     tmp = q1-q2;
     H = vec(tmp)'*vec(tmp)*ds;
+    H = H[1];
 
     return H
 end
@@ -343,7 +348,8 @@ function findupdategam(v, w, b)
 
     for k = 1:K
         vt = w[:,:,:,k];
-        innp[k] = vec(v)'*vec(vt)*ds;
+        tmp = vec(v)'*vec(vt)*ds;
+        innp[k] = tmp[1];
 
         gamupdate = gamupdate + innp[k].*b[:,:,:,k];
     end

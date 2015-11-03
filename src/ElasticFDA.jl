@@ -37,12 +37,13 @@ export
     curve_to_q,
     q_to_curve,
     calc_shape_dist,
-    compgrad2D,
+    reparam_image,
+    pair_align_image,
     @cpp
 
 # load fdasrsf library
 unixpath = "../deps/src/fdasrsf/fdasrsf"
-winpath = "../deps/fdasrsf"
+winpath = "..\\deps\\fdasrsf"
 const libfdasrsf = joinpath(dirname(@__FILE__), @unix? unixpath : winpath)
 
 # load gropt library

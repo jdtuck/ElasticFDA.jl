@@ -2,7 +2,8 @@
 Find optimum reparam between two images
 
     reparam_image(It::Array,Im::Array,gam::Array,b::Array;
-    stepsize::Float64=1e-5, itermax::Int32=1000,lmark::Bool=false)
+                  stepsize::Float64=1e-5, itermax::Int32=1000,
+                  lmark::Bool=false)
     :param It: Template Image
     :param Im: Test Image
     :param gam: initial warping
@@ -17,7 +18,7 @@ Find optimum reparam between two images
     :return stepsize: final stepsize
 """
 function reparam_image(It::Array, Im::Array, gam::Array, b::Array;
-                       stepsize::Float64=1e-5, itermax::Int32=1000,
+                       stepsize::Float64=1e-5, itermax::Integer=1000,
                        lmark::Bool=false)
     m = size(It,1);
     n = size(It,2);
@@ -35,6 +36,7 @@ function reparam_image(It::Array, Im::Array, gam::Array, b::Array;
     gamnew = copy(gamold);
     Inew = copy(Iold);
     iter = 1;
+    H = zeros(itermax+1);
     H[iter] = comp_energy(qt,qm);
     @printf("Iteration %d, energy %f\n",iter-1,H[iter])
 
@@ -97,7 +99,7 @@ end
 """
 Pairwise align two images
 
-    pair_align_image(I1, I2, M=5, ortho=true, basis_type="t", resizei=true,
+    pair_align_image(I1, I2; M=5, ortho=true, basis_type="t", resizei=true,
                      N=64, stepsize=1e-5, itermax=1e3)
     :param I1: reference image
     :param I2: image to warp
@@ -112,8 +114,8 @@ Pairwise align two images
     :return I2_new: aligned I2
     :return gam: warping function
 """
-function pair_align_image(I1, I2, M=5, ortho=true, basis_type="t", resizei=true,
-                          N=64, stepsize=1e-5, itermax=1e3)
+function pair_align_image(I1, I2; M=5, ortho=true, basis_type="t", resizei=true,
+                          N=64, stepsize=1e-5, itermax=1000)
     m,n = size(I1);
     F1 = zeros(m,n,2);
     m1,n1 = size(I2);
@@ -159,7 +161,9 @@ function pair_align_image(I1, I2, M=5, ortho=true, basis_type="t", resizei=true,
     # Generate basis
     b, gamid = run_basis(F1, M, basis_type, ortho);
     gamp = copy(gamid);
-    gam, F2_new, H, stepsize = reparam_image(F1, F2, gamp, b, stepsize, itermax);
+    gam, F2_new, H, stepsize = reparam_image(F1, F2, gamp, b,
+                                             stepsize=stepsize,
+                                             itermax=itermax);
 
     I2_new = apply_gam_to_imag(I2, gam);
 

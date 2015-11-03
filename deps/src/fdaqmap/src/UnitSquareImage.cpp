@@ -62,7 +62,7 @@ void findgrad(double *dfdu, double *dfdv, const double *f, int n, int t) {
 }
 
 // ------------------------------------------------------------------------
-void findgrad2D(double *dfdu, double *dfdv, const double *f, int n, int t, int d) {
+void findgrad2D(double *dfdu, double *dfdv, double *f, int n, int t, int d) {
     int i, j, k, N = n*t;
     double du, dv;
 
@@ -176,7 +176,7 @@ void Calculate_Distance(double *H, const double *q1, const double *q2, int n, in
 }
 
 // ------------------------------------------------------------------------
-void findphistar(double *w, const double *q, const double *b, int n, int t, int d, int K) {
+void findphistar(double *w, double *q, const double *b, int n, int t, int d, int K) {
     int D = 2;
     double du, dv, dbxdu, dbydv, divb, *dqdu, *dqdv, *expr1, *expr2;
 
@@ -416,7 +416,7 @@ void Apply_Gamma_Surf(double *Fnew, const double *F, const double *gam, int m, i
 }
 
 // ------------------------------------------------------------------------
-int check_crossing(const double *f, int n, int t, int D) {
+int check_crossing(double *f, int n, int t, int D) {
     int is_diffeo = 1;
     int N = n*t, nC = 0;
     double c, *dfdu, *dfdv;
@@ -445,7 +445,7 @@ int check_crossing(const double *f, int n, int t, int D) {
 
 //-------------------------------------------------------------------------
 int ReparamSurf(double *Fnew, double *gamnew, double *H,
-        const double *Ft, const double *Fm, const double *gam,
+        double *Ft, const double *Fm, const double *gam,
         const double *b, const double *gamid,
         const int n, const int t, const int d, const int D, const int K,
         double eps=0.1, const double tol=1e-8, const int itermax=100)
