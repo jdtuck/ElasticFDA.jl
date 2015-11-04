@@ -291,6 +291,7 @@ Update warping function
 function update_gam(qt, qm, b)
     v = qt - qm;
     w = findphistar(qt,b);
+
     gamupdate, innp = findupdategam(v,w,b);
 
     return gamupdate
@@ -303,32 +304,14 @@ Find phi*
     findphistar(q,b)
 """
 function findphistar(q, b)
-    m,n,tmp,K = size(b);
-    d = size(q,3);
-    dbxdu = zeros(m,n,K);
-    dbydv = zeros(m,n,K);
-    expr1 = zeros(m,n,d,K);
-    expr2 = zeros(m,n,d,K);
 
-    for k = 1:K
-        d1, d2 = compgrad2D(b[:,:,1,k]);
-        dbxdu[:,:,k] = d1;
-        d1, d2 = compgrad2D(b[:,:,1,k]);
-        dbydv[:,:,k] = d2;
-    end
-    divb = dbxdu + dbydv;
+    n,t,d = size(q);
+    K = size(b,4);
 
-    dqdu, dqdv = compgrad2D(q);
+    w = zeros(n,t,d,K);
 
-    for k = 1:K
-        for j = 1:d
-            expr1[:,:,j,k] = divb[:,:,k].*q[:,:,j];
-            expr2[:,:,j,k] = dqdu[:,:,j].*b[:,:,1,k] + dqdv[:,:,j].*b[:,:,2,k];
-        end
-    end
-
-    w = 0.5.*expr1+expr2;
-
+    @cpp ccall((:findphistar, libfdaqmap), Void, (Ptr{Float64}, Ptr{Float64},
+               Ptr{Float64}, Int32, Int32, Int32, Int32), w, q, b, n, t, d, K);
     return w
 end
 

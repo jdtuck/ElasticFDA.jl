@@ -176,7 +176,7 @@ void Calculate_Distance(double *H, const double *q1, const double *q2, int n, in
 }
 
 // ------------------------------------------------------------------------
-void findphistar(double *w, double *q, const double *b, int n, int t, int d, int K) {
+void findphistar(double *w, double *q, double *b, int n, int t, int d, int K) {
     int D = 2;
     double du, dv, dbxdu, dbydv, divb, *dqdu, *dqdv, *expr1, *expr2;
 
@@ -446,7 +446,7 @@ int check_crossing(double *f, int n, int t, int D) {
 //-------------------------------------------------------------------------
 int ReparamSurf(double *Fnew, double *gamnew, double *H,
         double *Ft, const double *Fm, const double *gam,
-        const double *b, const double *gamid,
+        double *b, const double *gamid,
         const int n, const int t, const int d, const int D, const int K,
         double eps=0.1, const double tol=1e-8, const int itermax=100)
 {

@@ -1,6 +1,7 @@
 module ElasticFDA
 
 ## Requirements
+using Debug
 using Grid
 using Dierckx
 using NLopt
