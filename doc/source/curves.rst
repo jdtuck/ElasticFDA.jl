@@ -42,6 +42,13 @@ SRVF Functions
 
     ``beta1`` and ``beta2`` are arrays of shape (n,T) describing the curve, where n is the dimension and T is the number of sample points
 
+.. function:: resamplecurve(x, N=100)
+
+    Resmaples Curve
+
+    + ``x`` array describing curve (n,T)
+    + ``N`` Number of samples to re-sample curve, N usually is > T
+
 Alignment and Statistics
 ------------------------
 .. function:: curve_srvf_align(beta; mode='O', maxit=20)

@@ -18,6 +18,7 @@ modeling using functional component analysis and regression.
    bayes.rst
    regression.rst
    curves.rst
+   images.rst
 
 .. Indices and tables
 .. ==================

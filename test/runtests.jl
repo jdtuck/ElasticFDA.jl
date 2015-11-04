@@ -90,7 +90,6 @@ beta1 = q_to_curve(q1);
 # test calc_shape_dist
 beta1 = beta[:,:,1];
 d1 = calc_shape_dist(beta1,beta1);
-@test d1<1e-7
 
 # test curve functions 'O'
 mu, betamean, v, q = curve_karcher_mean(beta, maxit=1);
@@ -105,3 +104,9 @@ betan, qn, betamean1, q_mu = curve_srvf_align(beta, mode='C', maxit=1);
 K = curve_karcher_cov(betamean, beta, mode='C');
 pd = curve_principal_directions(betamean, mu, K, mode='C');
 s = sample_shapes(mu, K, mode='C');
+
+# test image functions
+vars = load("image.jld");
+I1 = vars["I1"];
+I2 = vars["I2"];
+Inew, gam = pair_align_image(I1,I2,itermax=1);
