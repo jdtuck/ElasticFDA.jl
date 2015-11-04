@@ -5,8 +5,7 @@ These functions are for processing of images using the *q-map framework*
 
 Alignment
 ---------
-.. function:: pair_align_image(I1, I2; M=5, ortho=true, basis_type="t",
-                               resizei=true, N=64, stepsize=1e-5, itermax=1000)
+.. function:: pair_align_image(I1, I2; M=5, ortho=true, basis_type="t", resizei=true, N=64, stepsize=1e-5, itermax=1000)
 
     Pairwise align two images
 
