@@ -100,7 +100,7 @@ end
 Pairwise align two images
 
     pair_align_image(I1, I2; M=5, ortho=true, basis_type="t", resizei=true,
-                     N=64, stepsize=1e-5, itermax=1e3)
+                     N=64, stepsize=1e-5, itermax=1000)
     :param I1: reference image
     :param I2: image to warp
     :param M: number of basis elements

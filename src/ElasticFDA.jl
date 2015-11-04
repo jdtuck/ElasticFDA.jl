@@ -1,7 +1,6 @@
 module ElasticFDA
 
 ## Requirements
-using Debug
 using Grid
 using Dierckx
 using NLopt
@@ -38,6 +37,7 @@ export
     curve_to_q,
     q_to_curve,
     calc_shape_dist,
+    resamplecurve,
     reparam_image,
     pair_align_image,
     @cpp

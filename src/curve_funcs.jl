@@ -824,10 +824,8 @@ Calculate elastic shape distance between two curves beta1 and beta2
 """
 function calc_shape_dist(beta1::Array{Float64,2}, beta2::Array{Float64,2})
 
-    q1 = curve_to_q(beta1);
-    q2 = curve_to_q(beta2);
-
-    d = acos(innerprod_q2(q1,q2));
+    v, d = inverse_exp_coord(beta1, beta2)
 
     return d
 end
+
