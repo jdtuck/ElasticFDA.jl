@@ -90,6 +90,7 @@ beta1 = q_to_curve(q1);
 # test calc_shape_dist
 beta1 = beta[:,:,1];
 d1 = calc_shape_dist(beta1,beta1);
+beta2n, q2n, gam, q1 = curve_pair_align(beta1,beta1);
 
 # test curve functions 'O'
 mu, betamean, v, q = curve_karcher_mean(beta, maxit=1);

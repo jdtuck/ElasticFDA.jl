@@ -82,7 +82,7 @@ Trapezoidal Integration
     :param y: array of response samples
     :param dim: dimension along which to integrate
 """
-function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
+function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Integer=1)
     perm = [dim:max(ndims(y),dim); 1:dim-1];
     y = permutedims(y, perm);
     if ndims(y) == 1
@@ -118,7 +118,7 @@ Cumulative Trapezoidal Integration
     :param y: array describing response
     :param dim: dimension to integrate over
 """
-function cumtrapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Int64=1)
+function cumtrapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Integer=1)
     perm = [dim:max(length(size(y)),dim); 1:dim-1];
     y = permutedims(y, perm);
     if ndims(y) == 1
