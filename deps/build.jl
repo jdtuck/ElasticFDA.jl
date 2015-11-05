@@ -1,10 +1,13 @@
 @unix_only begin
     cd(joinpath(dirname(@__FILE__), "src", "fdasrsf"))
     suffix = @osx? "dylib" : "so"
+    run(`make clean`)
     run(`make SUFFIX=$suffix`)
     cd(joinpath(dirname(@__FILE__), "src", "gropt"))
+    run(`make clean`)
     run(`make SUFFIX=$suffix`)
     cd(joinpath(dirname(@__FILE__), "src", "fdaqmap"))
+    run(`make clean`)
     run(`make SUFFIX=$suffix`)
 end
 

@@ -37,6 +37,7 @@ export
     curve_to_q,
     q_to_curve,
     calc_shape_dist,
+    curve_pair_align,
     resamplecurve,
     reparam_image,
     pair_align_image,

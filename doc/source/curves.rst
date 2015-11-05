@@ -51,6 +51,20 @@ SRVF Functions
 
 Alignment and Statistics
 ------------------------
+.. function:: curve_pair_align(beta1::Array{Float64,2}, beta2::Array{Float64,2})
+
+    Pairwise align two curves
+
+    + ``beta1`` array (n,T)
+    + ``beta2`` array (n,T)
+
+    Returns:
+
+    + ``beta2n`` aligned curve 2 to 1
+    + ``q2n`` aligned srvf 2 to 1
+    + ``gam`` warping function
+    + ``q1`` srvf of curve 1
+
 .. function:: curve_srvf_align(beta; mode='O', maxit=20)
 
     Aligns a collection of curves using the elastic square-root velocity (srvf) framework.

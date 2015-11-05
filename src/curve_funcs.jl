@@ -829,3 +829,37 @@ function calc_shape_dist(beta1::Array{Float64,2}, beta2::Array{Float64,2})
     return d
 end
 
+
+"""
+Pairwise align two curves
+
+    curve_pair_align(beta1::Array{Float64,2}, beta2::Array{Float64,2})
+    :param beta1: array (n,T)
+    :param beta2: array (n,T)
+
+    Returns
+    :return beta2n: aligned curve 2 to 1
+    :return q2n: aligned srvf 2 to 1
+    :return gam: warping function
+    :return q1: srvf of curve 1
+"""
+function curve_pair_align(beta1::Array{Float64,2}, beta2::Array{Float64,2})
+
+    T = size(beta1,2);
+    centroid1 = calculatecentroid(beta1);
+    beta1 -= repmat(centroid1,1,T);
+    centroid2 = calculatecentroid(beta2);
+    beta2 -= repmat(centroid2,1,T);
+
+    q1 = curve_to_q(beta1);
+
+    # Iteratively optimize over SO(n) x Gamma using old DP
+    gam, R, tau = optimum_reparam(beta1, beta2);
+    beta2n = R * shift_f(beta2, tau);
+    gamI = invert_gamma(gam);
+    beta2n = group_action_by_gamma_coord(beta2n, gamI);
+    beta2n, R, tau = find_rotation_seed_coord(beta1, beta2n);
+    q2n = curve_to_q(beta2n);
+
+    return beta2n, q2n, gamI, q1
+end
