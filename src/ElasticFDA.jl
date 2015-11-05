@@ -38,6 +38,7 @@ export
     q_to_curve,
     calc_shape_dist,
     curve_pair_align,
+    curve_geodesic,
     resamplecurve,
     reparam_image,
     pair_align_image,

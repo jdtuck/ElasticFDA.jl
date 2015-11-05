@@ -65,6 +65,19 @@ Alignment and Statistics
     + ``gam`` warping function
     + ``q1`` srvf of curve 1
 
+.. function:: curve_geodesic(beta1::Array{Float64,2}, beta2::Array{Float64,2}, k::Integer=5)
+
+    Find curves along geodesic between two curves
+
+    + ``beta1`` array (n,T)
+    + ``beta2`` array (n,T)
+    + ``k`` number of curves along geodesic
+
+    Returns:
+
+    + ``geod`` curves along geodesic (n,T,k)
+    + ``geod_q`` srvf's along geodesic
+
 .. function:: curve_srvf_align(beta; mode='O', maxit=20)
 
     Aligns a collection of curves using the elastic square-root velocity (srvf) framework.

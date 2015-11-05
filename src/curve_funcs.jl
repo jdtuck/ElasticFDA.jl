@@ -863,3 +863,53 @@ function curve_pair_align(beta1::Array{Float64,2}, beta2::Array{Float64,2})
 
     return beta2n, q2n, gamI, q1
 end
+
+
+"""
+Form geodesic between two curves
+
+    curve_geodesic(beta1::Array{Float64,2}, beta2::Array{Float64,2}, k::Integer=5)
+    :param beta1: array (n,T)
+    :param beta2: array (n,T)
+    :param k: number of curves along geodesic
+
+    Returns
+    :return geod: curves along geodesic (n,T,k)
+    :return geod_q: srvf's along geodesic
+"""
+function curve_geodesic(beta1::Array{Float64,2}, beta2::Array{Float64,2},
+    
+                        k::Integer=5)
+
+    n, T = size(beta1);
+    beta1 = resamplecurve(beta1, T);
+    beta2 = resamplecurve(beta2, T);
+    centroid1 = calculatecentroid(beta1);
+    beta1 -= repmat(centroid1,1,T);
+    centroid2 = calculatecentroid(beta2);
+    beta2 -= repmat(centroid2,1,T);
+
+    q1 = curve_to_q(beta1);
+
+    # Iteratively optimize over SO(n) x Gamma using old DP
+    gam, R, tau = optimum_reparam(beta1, beta2);
+    beta2n = R * shift_f(beta2, tau);
+    gamI = invert_gamma(gam);
+    beta2n = group_action_by_gamma_coord(beta2n, gamI);
+    beta2n, R, tau = find_rotation_seed_coord(beta1, beta2n);
+    q2n = curve_to_q(beta2n);
+
+    # form geodesic between the registered curves
+    dist = acos(innerprod_q2(q1,q2n));
+    geod = zeros(n,T,k);
+    geod_q = zeros(n,T,k);
+
+    for tau = 1:k
+        s = dist*(tau-1)/(k-1);
+        geod_q[:,:,tau] = (sin(dist-s)*q1+sin(s)*q2n)/sin(dist);
+        geod[:,:,tau] = q_to_curve(geod_q[:,:,tau]);
+    end
+
+    return geod, geod_q
+end
+
