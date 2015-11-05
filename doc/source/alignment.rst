@@ -63,7 +63,7 @@ SRSF Functions
 
     Warp srsf q by warping function gamma
 
-.. function:: elastic_distance(f1::Vector, f2::Vector, timet::Vector)
+.. function:: elastic_distance(f1::Vector, f2::Vector, timet::Vector, method="SIMUL")
 
     Calculates the elastic distance between two functions and returns the
     amplitude distance ``da`` and phase distance ``dp``.

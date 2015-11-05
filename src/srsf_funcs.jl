@@ -152,19 +152,25 @@ end
 """
 Calculate elastic distance between two functions
 
-    elastic_distance(f1::Vector, f2::Vector, timet::Vector)
+    elastic_distance(f1::Vector, f2::Vector, timet::Vector,
+                     method::AbstractString="SIMUL")
     :param f1: vector of function 1 samples
     :param f2: vector of function 2 samples
     :param timet: vector of time samples
+    :param method: optimization method to find warping, default is
+                   Dynamic Programming ("DP"). Other options are
+                   Coordinate Descent ("DP2"), Riemannian BFGS
+                   ("LRBFGS"), Simultaneous Alignment ("SIMUL")
 
     :return da: amplitude distance
     :return dp: phase distance
 """
-function elastic_distance(f1::Vector, f2::Vector, timet::Vector)
+function elastic_distance(f1::Vector, f2::Vector, timet::Vector,
+                          method::AbstractString="SIMUL")
     q1 = f_to_srsf(f1, timet);
     q2 = f_to_srsf(f2, timet);
 
-    gam = optimum_reparam(q1, timet, q2);
+    gam = optimum_reparam(q1, timet, q2, 0.0, method);
 
     q2a = warp_q_gamma(timet, q2, gam);
 
