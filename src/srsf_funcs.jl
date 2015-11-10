@@ -170,7 +170,7 @@ function elastic_distance(f1::Vector, f2::Vector, timet::Vector,
     q1 = f_to_srsf(f1, timet);
     q2 = f_to_srsf(f2, timet);
 
-    gam = optimum_reparam(q1, timet, q2, 0.0, method);
+    gam = optimum_reparam(q1, timet, q2, 0.0, method=method);
 
     q2a = warp_q_gamma(timet, q2, gam);
 
@@ -1222,4 +1222,3 @@ function simul_gam(u::Array{Float64,1},g1,g2,t::Array{Float64,1},s1,s2,
 
     return gam
 end
-
