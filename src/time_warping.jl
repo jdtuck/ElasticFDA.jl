@@ -14,7 +14,7 @@ framework.
     :param optim: optimization method to find warping, default is
                   Simultaneous Alignment ("SIMUL"). Other options are
                   Dynamic Programming ("DP2"), Riemannian BFGS
-                  ("LRBFGS")
+                  ("RBFGS")
     :param MaxItr: Maximum number of iterations
 
     Returns Dict containing

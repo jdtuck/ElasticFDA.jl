@@ -17,7 +17,7 @@ void optimum_reparam(double *C1, double *C2, int n, int d, double w,
 
     std::string methodname = "";
     if (!onlyDP)
-        methodname = "LRBFGS";
+        methodname = "RBFGS";
 
     init_genrand(0);
 
@@ -56,4 +56,3 @@ void optimum_reparam(double *C1, double *C2, int n, int d, double w,
     delete CheckMemoryDeleted;
     return;
 }
-

@@ -160,7 +160,7 @@ Calculate elastic distance between two functions
     :param method: optimization method to find warping, default is
                    Dynamic Programming ("DP"). Other options are
                    Coordinate Descent ("DP2"), Riemannian BFGS
-                   ("LRBFGS"), Simultaneous Alignment ("SIMUL")
+                   ("RBFGS"), Simultaneous Alignment ("SIMUL")
 
     :return da: amplitude distance
     :return dp: phase distance
@@ -282,8 +282,8 @@ Calculate optimum parameterization (warping of q2 to q1)
     :param method: optimization method to find warping, default is
                    Dynamic Programming ("DP"). Other options are
                    Coordinate Descent ("DP2"), Riemannian BFGS
-                   ("LRBFGS"), Simultaneous Alignment ("SIMUL")
-    :param w: Controls LRBFGS (default = 0.01)
+                   ("RBFGS"), Simultaneous Alignment ("SIMUL")
+    :param w: Controls RBFGS (default = 0.01)
     :param f1o: initial value of f1, vector or scalar depending on q1, defaults
                 to zero
     :param f2o: initial value of f2, vector or scalar depending on q1, defaults
@@ -301,8 +301,8 @@ Calculate optimum parameterization (warping of q2 to q1)
     :param method: optimization method to find warping, default is
                    Dynamic Programming ("DP"). Other options are
                    Coordinate Descent ("DP2"), Riemanain BFGS
-                   ("LRBFGS")
-    :param w: Controls LRBFGS (default = 0.01)
+                   ("RBFGS")
+    :param w: Controls RBFGS (default = 0.01)
     :param rotated: calculate rotation (default = true)
     :param isclosed: closed curve (default = false)
 
