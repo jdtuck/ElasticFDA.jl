@@ -3,7 +3,7 @@ Aligns a collection of functions using the elastic square-root slope (srsf)
 framework.
 
     srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
-               optim="SIMUL", MaxItr=20)
+               optim="DP", MaxItr=20)
     :param f: array of shape (M,N) of N functions with M samples
     :param timet: vector of size M describing the sample points
     :param method: (string) calculate Karcher Mean or Median
@@ -30,7 +30,7 @@ framework.
     :return phase_var: Phase Variance
 """
 function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
-                    optim="SIMUL", MaxItr=20)
+                    optim="DP", MaxItr=20)
     M, N = size(f);
     if smooth
         smooth_data!(f, sparam);
