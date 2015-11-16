@@ -967,9 +967,6 @@ function simul_align(f1::Vector,f2::Vector)
     te1 = s1[ext1];
     te2 = s2[ext2];
 
-    fe1 = f1[ext1];
-    fe2 = f2[ext2];
-
     g1, g2 = simul_reparam(te1,te2,mpath);
 
     return s1,s2,g1,g2,ext1,ext2,mpath
@@ -1221,4 +1218,87 @@ function simul_gam(u::Array{Float64,1},g1,g2,t::Array{Float64,1},s1,s2,
     gam = interp1_flat(gt1,gt2,tt);
 
     return gam
+end
+
+
+function old_dp(q1::Vector, q2::Vector,lam)
+    N = length(q1);
+    M = 5*N;
+    spl = Spline1D(collect(1.:N)/N, q2);
+    q2L = spl(collect(1.:M)/M);
+
+    Nbrs = [1 1; 1 2; 2 1; 2 3; 3 2; 1 3; 3 1; 1 4; 3 4; 4 3; 4 1; 1 5; 2 5; 3 5; 4 5; 5 4; 5 3; 5 2; 5 1];
+
+    E = zeros(N,N);
+    E[1,:] = Inf;
+    E[:,1] = Inf;
+    E[1,1] = 0.0;
+    Path = zeros(N,N,2);
+    for i = 2:N
+        for j = 2:N
+            CandE = 100000*ones(size(Nbrs,1));
+            for Num = 1:size(Nbrs,1)
+                k = i - Nbrs[Num,1];
+                l = j - Nbrs[Num,2];
+                if (k>0 && l>0)
+                    CandE[Num] = E[k,l] + cost_fn(q1,q2,q2L,k,l,i,j,N,lam);
+                end
+                E[i,j], idx = findmin(CandE);
+                Path[i,j,1] = i - Nbrs[idx,1];
+                Path[i,j,2] = j - Nbrs[idx,2];
+            end
+        end
+    end
+
+    x = zeros(N);
+    y = zeros(N);
+    x[1] = N;
+    y[1] = N;
+    cnt = 1;
+    while (x[cnt]>1)
+        yi = round(Integer,y[cnt]);
+        xi = round(Integer,x[cnt]);
+        y[cnt+1] = Path[yi,xi,1];
+        x[cnt+1] = Path[yi,xi,2];
+        cnt += 1;
+    end
+    x = x[1:cnt];
+    y = y[1:cnt];
+    idx = sortperm(x);
+    x = x[idx];
+    y = y[idx];
+    yy = zeros(N);
+    for i = 1:N
+        F = abs(i-x);
+        idx = indmin(F);
+        if x[idx] == i
+            yy[i] = y[idx];
+        else
+            if x[idx] > i
+                a = x[idx] - i;
+                b = i - x[idx-1];
+                yy[i] = (a*y[idx-1] + b*y[idx])/(a+b);
+            else
+                a = i - x[idx];
+                b = x[idx+1] - i;
+                yy[i] = (a*y[idx+1] + b*y[idx])/(a+b);
+            end
+        end
+    end
+    gam = yy/N;
+
+    return gam
+end
+
+
+function cost_fn(q1,q2,q2L,k,l,i,j,N,lam)
+    M = length(q2L);
+    x = collect(k:1:i);
+    m = (j-l)/(i-k);
+    y = (x-k)*m + l;
+    idx = round(Integer, y*M/N);
+    vec = sqrt(m)*q2L[idx];
+    E = norm(q1[x]-vec)^2/N;
+
+    return E
 end
