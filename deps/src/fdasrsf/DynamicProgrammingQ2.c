@@ -20,12 +20,12 @@ double *tv1, double *tv2, int n1v, int n2v, double *G, double *T, double *size, 
   dp_all_indexes( T2, n2, tv2, n2v, idxv2 );
 
   /* Compute cost of best path from (0,0) to every other grid point */
-  dp_costs( Q1, T1, n1, Q2, T2, n2, 
+  dp_costs( Q1, T1, n1, Q2, T2, n2,
     m1, tv1, idxv1, n1v, tv2, idxv2, n2v, E, P, lam1 );
 
   /* Reconstruct best path from (0,0) to (1,1) */
   *size = dp_build_gamma( P, tv1, n1v, tv2, n2v, G, T );
-  
+
   // free allocated memory
   free(idxv1); free(idxv2); free(E); free(P);
 }
