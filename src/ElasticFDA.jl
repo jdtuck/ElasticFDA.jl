@@ -42,8 +42,7 @@ export
     resamplecurve,
     reparam_image,
     pair_align_image,
-    @cpp,
-    old_dp
+    @cpp
 
 # load fdasrsf library
 unixpath = "../deps/src/fdasrsf/fdasrsf"
