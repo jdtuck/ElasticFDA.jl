@@ -36,7 +36,6 @@ function reparam_image(It::Array, Im::Array, gam::Array, b::Array;
     gamnew = copy(gamold);
     Inew = copy(Iold);
     iter = 1;
-    H = zeros(itermax+1);
     H[iter] = comp_energy(qt,qm);
     @printf("Iteration %d, energy %f\n",iter-1,H[iter])
 
@@ -49,7 +48,7 @@ function reparam_image(It::Array, Im::Array, gam::Array, b::Array;
             @printf("Possible Crossing!")
             gamnew = copy(gamold);
             stepsize = 0.67*stepsize;
-            H[iter] = H[iter=1];
+            H[iter] = H[iter-1];
             continue
         else
             gamnew = apply_gam_to_gam(gamnew, gaminc);
@@ -169,4 +168,3 @@ function pair_align_image(I1, I2; M=5, ortho=true, basis_type="t", resizei=true,
 
     return I2_new, gam
 end
-
