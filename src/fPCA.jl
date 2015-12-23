@@ -11,7 +11,7 @@ Calculates vertical functional principal component analysis on aligned data
     :return q_pca: srsf principal directions
     :return f_pca: functional principal directions
     :return latent: latent values
-    :return coef: coefficients
+    :return coef: scores
     :return U: eigenvectors
 """
 function vert_fPCA(fn, timet, qn; no=1)
@@ -52,7 +52,7 @@ function vert_fPCA(fn, timet, qn; no=1)
     c = zeros(N2, no);
     for k in 1:no
         for l in 1:N2
-            c[l,k] = sum([qn[:,l]; m_new[l]] .* U[:,k]);
+            c[l,k] = sum(vec((qn2[:,l] - mqn).* U[:,k]));
         end
     end
 
@@ -75,6 +75,7 @@ Calculates horizontal functional principal component analysis on aligned data
     :return psi_pca: srsf functional principal directions
     :return latent: latent values
     :return U: eigenvectors
+    :return coef: scores
     :return gam_mu: mean warping function
 """
 function horiz_fPCA(gam, timet; no=1)
@@ -108,7 +109,15 @@ function horiz_fPCA(gam, timet; no=1)
         end
     end
 
+    N2 = size(gam,2);
+    c = zeros(N2, no);
+    for k in 1:no
+        for l in 1:N2
+            c[l,k] = sum((vec1[:,l]-vm).* U[:,k]);
+        end
+    end
+
     out = Dict("gam_pca" => gam_pca, "psi_pca" => psi_pca, "latent" => s,
-               "U" => U, "gam_mu" => gam_mu);
+               "U" => U, "coef" => c, "gam_mu" => gam_mu);
     return out
 end

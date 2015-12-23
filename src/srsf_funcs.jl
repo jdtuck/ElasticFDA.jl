@@ -750,13 +750,13 @@ function sqrt_mean_inverse(gam::Array)
     vec = zeros(T1-1, n);
     for itr in 1:maxiter
         for k in 1:n
-            dot = trapz(collect(linspace(0,1,T1-1)), mu.*psi[:,k]);
-            if dot > 1
-                dot = 1;
-            elseif dot < (-1)
-                dot = -1;
+            dot1 = trapz(collect(linspace(0,1,T1-1)), mu.*psi[:,k]);
+            if dot1 > 1
+                dot1 = 1;
+            elseif dot1 < (-1)
+                dot1 = -1;
             end
-            leng = acos(dot);
+            leng = acos(dot1);
             if leng > 0.0001
                 vec[:, k] = (leng/sin(leng)) * (psi[:,k] - cos(leng) * mu);
             else
@@ -843,38 +843,35 @@ function sqrt_mean(gam::Array)
     TT, n = size(gam);
     psi = Array(Float64,TT-1,n);
     for k = 1:n
-        psi[:,k] = sqrt(diff(gam[:,k]) * TT);
+        psi[:,k] = sqrt(diff(gam[:,k]) * TT + eps1);
     end
 
     # Find Direction
     mnpsi = mean(psi, 2);
-    d1 = repmat(mnpsi, 1, n);
-    d = (psi - d1).^2;
-    dqq = sqrt(sum(d,1));
-    min_ind = indmin(dqq);
-    mu = psi[:, min_ind];
-    maxiter = 20;
+    w = mean(psi, 2);
+    mu = w./sqrt(sum(w.^2/(TT-1)));
+    maxiter = 500;
     tt = 1;
     lvm = zeros(maxiter);
-    vec = zeros(TT-1, n);
+    vec1 = zeros(TT-1, n);
     for itr in 1:maxiter
         for k in 1:n
-            dot = trapz(collect(linspace(0,1,TT-1)), mu.*psi[:,k]);
-            if dot > 1
-                dot = 1;
-            elseif dot < (-1)
-                dot = -1;
+            dot1 = sum(mu.*psi[:,k]./(TT-1));
+            if dot1 > 1
+                dot1 = 1;
+            elseif dot1 < (-1)
+                dot1 = -1;
             end
-            leng = acos(dot);
+            leng = acos(dot1)
             if leng > 0.0001
-                vec[:, k] = (leng/sin(leng)) * (psi[:,k] - cos(leng) * mu);
+                vec1[:, k] = (leng/sin(leng)) * (psi[:,k] - cos(leng) * mu);
             else
-                vec[:, k] = zeros(TT-1);
+                vec1[:, k] = zeros(TT-1);
             end
         end
-        vm = mean(vec,2);
+        vm = mean(vec1,2);
         vm1 = vm.*vm;
-        lvm[itr] = sqrt(sum(vm1) / TT);
+        lvm[itr] = Enorm(vm[:])/sqrt(TT);
         if lvm[itr] == 0
             break
         end
@@ -887,7 +884,7 @@ function sqrt_mean(gam::Array)
     gam_mu = zeros(TT)
     gam_mu[2:end] = cumsum(tmp)./TT;
     gam_mu = (gam_mu - minimum(gam_mu)) ./ (maximum(gam_mu) - minimum(gam_mu));
-    return mu, gam_mu, psi, vec
+    return mu, gam_mu, psi, vec1
 end
 
 
