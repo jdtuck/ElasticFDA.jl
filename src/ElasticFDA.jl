@@ -42,6 +42,7 @@ export
     resamplecurve,
     reparam_image,
     pair_align_image,
+    bs,
     @cpp
 
 # load fdasrsf library
