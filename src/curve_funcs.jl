@@ -677,7 +677,7 @@ function project_tangent(w, q, basis)
     w = w - innerprod_q2(w, q) * q;
     bo = gram_schmidt(basis);
 
-    wproj = w - innerprod_q2(w, bo[1])*bo[1] - innerprod_q2(w,bo[1])*bo[1];
+    wproj = w - innerprod_q2(w, bo[1])*bo[1] - innerprod_q2(w,bo[2])*bo[2];
 
     return wproj
 end
@@ -878,7 +878,7 @@ Form geodesic between two curves
     :return geod_q: srvf's along geodesic
 """
 function curve_geodesic(beta1::Array{Float64,2}, beta2::Array{Float64,2},
-    
+
                         k::Integer=5)
 
     n, T = size(beta1);
@@ -912,4 +912,3 @@ function curve_geodesic(beta1::Array{Float64,2}, beta2::Array{Float64,2},
 
     return geod, geod_q
 end
-
