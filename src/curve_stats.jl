@@ -74,8 +74,6 @@ function curve_karcher_mean(beta::Array{Float64, 3}; mode='O', maxit=20)
 
     end
 
-    mu = mu[:,:,1];
-
     return (mu, betamean, v, q)
 end
 
@@ -270,15 +268,15 @@ function curve_principal_directions(betamean::Array{Float64, 2}, mu, K;
             pd[m, i] = pd2[N+1-i];
         end
 
-        qarray[m,N] = mu;
+        qarray[m,N+1] = mu;
         centroid1 = -1 * calculatecentroid(betamean);
         beta_scaled, scale = scale_curve(betamean + repmat(centroid1,1, T));
 
         pd[m, N] = beta_scaled;
 
         for i = 1:N;
-            qarray[m,i+N] = qarray1[i];
-            pd[m,i+N] = pd1[i];
+            qarray[m,i+N+1] = qarray1[i];
+            pd[m,i+N+1] = pd1[i];
         end
 
     end
