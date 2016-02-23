@@ -77,6 +77,7 @@ Calculates horizontal functional principal component analysis on aligned data
     :return U: eigenvectors
     :return coef: scores
     :return gam_mu: mean warping function
+    :return vec1: shooting vectors
 """
 function horiz_fPCA(gam, timet; no=1)
     mu, gam_mu, psi, vec1 = sqrt_mean(gam);
@@ -118,6 +119,6 @@ function horiz_fPCA(gam, timet; no=1)
     end
 
     out = Dict("gam_pca" => gam_pca, "psi_pca" => psi_pca, "latent" => s,
-               "U" => U, "coef" => c, "gam_mu" => gam_mu);
+               "U" => U, "coef" => c, "gam_mu" => gam_mu, "vec1" => vec1);
     return out
 end

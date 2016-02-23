@@ -38,6 +38,7 @@ fPCA Functions
     + ``latent`` latent values
     + ``U`` eigenvectors
     + ``gam_mu`` mean warping function
+    + ``vec1`` shooting vectors
 
 .. function:: gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
 
@@ -55,4 +56,3 @@ fPCA Functions
     + ``fs`` random aligned functions
     + ``gams`` random warping functions
     + ``ft`` random functions
-
