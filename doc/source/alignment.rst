@@ -44,7 +44,7 @@ SRSF Functions
     ``x`` is a vector of time samples. ``y`` is the reponse and ``dim`` is the
     dimension to integrate along.
 
-.. function:: optimum_reparam(q1, timet, q2, lam=0.0, method="SIMUL", w=0.01, f1o=0.0, f2o=0.0)
+.. function:: optimum_reparam(q1, timet, q2, lam=0.0, method="DP", w=0.01, f1o=0.0, f2o=0.0)
 
     Calculates the optimum reparamertization (warping) between two srsfs q1 and
     q2.
@@ -53,7 +53,7 @@ SRSF Functions
     is a vector describing the time samples. ``lam`` controls the amount of
     warping. ``method`` is the optimization method to find the warping. The
     default is Simultaneous Alignment ("SIMUL"). Other options are Dynamic
-    Programming ("DP" or "DP2") and Riemannian BFGS ("LRBFGS").
+    Programming ("DP" or "DP2") and Riemannian BFGS ("RBFGS").
 
 .. function:: warp_f_gamma(time::Vector, f::Vector, gam::Vector)
 
@@ -76,7 +76,7 @@ SRSF Functions
 
 Alignment
 ---------
-.. function:: srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0, optim="SIMUL", MaxItr=20)
+.. function:: srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0, optim="DP", MaxItr=20)
 
 
     Aligns a collection of functions using the elastic square-root slope (srsf)
@@ -88,7 +88,7 @@ Alignment
     + ``smooth`` Smooth the data using a box filter (default = false)
     + ``sparam`` Number of times to run smoothing filter (default 10)
     + ``lam`` controls the elasticity (default = 0)
-    + ``optim`` optimization method to find warping, default is Simultaneous Alignment ("SIMUL"). Other options are Dynamic Programming ("DP2"), Riemanain BFGS ("LRBFGS")
+    + ``optim`` optimization method to find warping, default is Simultaneous Alignment ("SIMUL"). Other options are Dynamic Programming ("DP2"), Riemanain BFGS ("RBFGS")
     + ``MaxItr`` maximum number of iterations
 
     Returns Dict containing:

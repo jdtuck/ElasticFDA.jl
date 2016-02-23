@@ -1,17 +1,23 @@
 .PHONY : clean
 
+OS := $(shell uname)
 ERR = $(shell which icpc>/dev/null; echo $$?)
-ifeq "$(ERR)" "0"
-    CXX = icpc
-	CFLAGS =  -fPIC -O3 -g # C flags
-	LDFLAGS = -shared # linking flags
-	LIBS = -lmkl_rt -lpthread
-else
+ifeq "$(OS)" "Darwin"
 	CFLAGS =  -fPIC -std=c++11 -O3 -g  # C flags
-	LDFLAGS = -shared # linking flags
-	LIBS = -lblas -llapack
+        LDFLAGS = -shared # linking flags
+        LIBS = -lblas -llapack
+else
+	ifeq "$(ERR)" "0"
+    		CXX = icpc
+		CFLAGS =  -fPIC -O3 -g # C flags
+		LDFLAGS = -shared # linking flags
+		LIBS = -lmkl_rt -lpthread
+	else
+		CFLAGS =  -fPIC -std=c++11 -O3 -g  # C flags
+		LDFLAGS = -shared # linking flags
+		LIBS = -lblas -llapack
+	endif
 endif
-
 
 LIB=gropt
 SUFFIX=so
