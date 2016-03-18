@@ -58,7 +58,7 @@ Convert curve to square-root velocity function (srvf)
     curve_to_q(beta)
     :param beta: array describing curve (n,T)
 """
-function curve_to_q(beta)
+function curve_to_q(beta, wscale=false)
     n, T = size(beta);
     v = zeros(n,T);
     for i = 1:n
@@ -77,7 +77,9 @@ function curve_to_q(beta)
         end
     end
 
-    q = q./sqrt(innerprod_q2(q, q));
+    if (!wscale){
+        q = q./sqrt(innerprod_q2(q, q));
+    }
 
     return q
 end
@@ -550,11 +552,17 @@ Calculate shooting vector and distance between two curves beta1 and beta2
     inverse_exp_coord(beta1, beta2)
     :param beta1: array (n,T)
     :param beta2: array (n,T)
+    :param method: optimization method to find warping, default is
+                   Dynamic Programming ("DP"). Other options are
+                   Coordinate Descent ("DP2"), Riemannian BFGS
+                   ("RBFGS")
+    :param wscale: keep scale (false)
 
     :return v: shooting vector
     :return dist: shape distance
 """
-function inverse_exp_coord(beta1, beta2)
+function inverse_exp_coord(beta1, beta2; method::AbstractString="DP",
+                           wscale=false)
     T = size(beta1,2);
     centroid1 = calculatecentroid(beta1);
     beta1 -= repmat(centroid1,1,T);
@@ -564,7 +572,7 @@ function inverse_exp_coord(beta1, beta2)
     q1 = curve_to_q(beta1);
 
     # Iteratively optimize over SO(n) x Gamma using old DP
-    gam, R, tau = optimum_reparam(beta1, beta2);
+    gam, R, tau = optimum_reparam(beta1, beta2, method=method);
     beta2 = R * shift_f(beta2, tau);
     gamI = invert_gamma(gam);
     beta2 = group_action_by_gamma_coord(beta2, gamI);
@@ -573,7 +581,11 @@ function inverse_exp_coord(beta1, beta2)
 
     # Compute geodesic distance
     q1dotq2 = innerprod_q2(q1, q2n);
-    dist = acos(q1dotq2);
+    if wscale
+        dist = sqrt(innerprod_q2(q1-q2n, q1-q2n))
+    else
+        dist = acos(q1dotq2);
+    end
 
     # Compute shooting vector
     if q1dotq2 > 1
@@ -585,6 +597,9 @@ function inverse_exp_coord(beta1, beta2)
 
     if normu > 1e-4
         v = u * acos(q1dotq2)/normu;
+        if wscale
+            v = q2n - q1
+        end
     else
         v = zeros(2, T);
     end
@@ -821,10 +836,16 @@ Calculate elastic shape distance between two curves beta1 and beta2
     calc_shape_dist(beta1, beta2)
     :param beta1: array (n,T)
     :param beta2: array (n,T)
+    :param method: optimization method to find warping, default is
+                   Dynamic Programming ("DP"). Other options are
+                   Coordinate Descent ("DP2"), Riemannian BFGS
+                   ("RBFGS")
+    :param wscale: with scale (false)
 """
-function calc_shape_dist(beta1::Array{Float64,2}, beta2::Array{Float64,2})
+function calc_shape_dist(beta1::Array{Float64,2}, beta2::Array{Float64,2};
+                         method::AbstractString="DP", wscale=false)
 
-    v, d = inverse_exp_coord(beta1, beta2)
+    v, d = inverse_exp_coord(beta1, beta2, wscale=wscale)
 
     return d
 end
@@ -872,14 +893,14 @@ Form geodesic between two curves
     :param beta1: array (n,T)
     :param beta2: array (n,T)
     :param k: number of curves along geodesic
+    :param wscale: with scale (false)
 
     Returns
     :return geod: curves along geodesic (n,T,k)
     :return geod_q: srvf's along geodesic
 """
 function curve_geodesic(beta1::Array{Float64,2}, beta2::Array{Float64,2},
-
-                        k::Integer=5)
+                        k::Integer=5; wscale=false)
 
     n, T = size(beta1);
     beta1 = resamplecurve(beta1, T);
@@ -900,7 +921,11 @@ function curve_geodesic(beta1::Array{Float64,2}, beta2::Array{Float64,2},
     q2n = curve_to_q(beta2n);
 
     # form geodesic between the registered curves
-    dist = acos(innerprod_q2(q1,q2n));
+    if wscale
+        dist = sqrt(innerprod_q2(q1-q2n,q1-q2n))
+    else
+        dist = acos(innerprod_q2(q1,q2n));
+    end
     geod = zeros(n,T,k);
     geod_q = zeros(n,T,k);
 

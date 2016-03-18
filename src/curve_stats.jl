@@ -6,17 +6,19 @@ velocity (srvf) framework.
     :param beta: array (n,T,N) for N number of curves
     :param mode: Open ('O') or Closed ('C') curves
     :param maxit: maximum number of iterations
+    :param wscale: with scale (false)
 
     :return mu: mean srvf
     :return betamean: mean curve
     :return v: shooting vectors
     :return q: array of srvfs
 """
-function curve_karcher_mean(beta::Array{Float64, 3}; mode='O', maxit=20)
+function curve_karcher_mean(beta::Array{Float64, 3}; mode='O', maxit=20,
+                            wscale=false)
     n, T, N = size(beta)
     q = zeros(n, T, N);
     for ii = 1:N
-        q[:, :, ii] = curve_to_q(beta[:, :, ii];)
+        q[:, :, ii] = curve_to_q(beta[:, :, ii])
     end
 
     # Initialize mu as one of the shapes
@@ -41,7 +43,8 @@ function curve_karcher_mean(beta::Array{Float64, 3}; mode='O', maxit=20)
 
         # TODO: parallelize
         for i = 1:N
-            v1, d = karcher_calc(beta[:,:,n],q[:,:,n], betamean, mu, mode=mode);
+            v1, d = karcher_calc(beta[:,:,n],q[:,:,n], betamean, mu, mode=mode,
+                                 wscale=wscale);
             v[:,:,i] = v1;
             sumd[itr+1] = sumd[itr+1] + d^2;
         end
@@ -353,17 +356,18 @@ karcher mean calculation function
     :param q: array (n,T)
     :param betamean: array (n,T)
     :param mu: array (n,T)
-    :parma mode: Open ('O') or Closed ('C') curves
+    :param mode: Open ('O') or Closed ('C') curves
+    :param wscale: with scale ('false')
 
     :return v: shooting vector
     :return d: elastic distance
 """
-function karcher_calc(beta, q, betamean, mu; mode='O')
+function karcher_calc(beta, q, betamean, mu; mode='O', wscale=false)
     if mode == 'C'
         basis = find_basis_normal(mu);
     end
     # Compute shooting vector from mu to q_i
-    w, d = inverse_exp_coord(betamean, beta);
+    w, d = inverse_exp_coord(betamean, beta, wscale=wscale);
 
     # Project to tangent space of manifold to obtain v_i
     if mode == 'O'
