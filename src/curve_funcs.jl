@@ -845,6 +845,17 @@ Calculate elastic shape distance between two curves beta1 and beta2
 function calc_shape_dist(beta1::Array{Float64,2}, beta2::Array{Float64,2};
                          method::AbstractString="DP", wscale=false)
 
+    T1 = size(beta1,2)
+    T2 = size(beta2,2)
+
+    if (T1 != T2)
+        if (T1>T2)
+            beta2 = resamplecurve(beta2, T1)
+        else
+            beta1 = resamplecurve(beta1, T2)
+        end
+    end
+
     v, d = inverse_exp_coord(beta1, beta2, wscale=wscale)
 
     return d
