@@ -58,7 +58,7 @@ Convert curve to square-root velocity function (srvf)
     curve_to_q(beta)
     :param beta: array describing curve (n,T)
 """
-function curve_to_q(beta, wscale=false)
+function curve_to_q(beta, wscale::Bool=false)
     n, T = size(beta);
     v = zeros(n,T);
     for i = 1:n
@@ -77,9 +77,9 @@ function curve_to_q(beta, wscale=false)
         end
     end
 
-    if (!wscale){
+    if (!wscale)
         q = q./sqrt(innerprod_q2(q, q));
-    }
+    end
 
     return q
 end
@@ -117,7 +117,7 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
     tau = 0;
     if (method == "DP")
         # Optimze over SO(n) x Gamma
-        q1 = curve_to_q(beta1);
+        q1 = curve_to_q(beta1)
 
         # Optimzie over SO(n)
         beta2, R, tau = find_rotation_seed_coord(beta1, beta2);
