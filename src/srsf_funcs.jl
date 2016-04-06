@@ -862,7 +862,7 @@ function sqrt_mean(gam::Array)
             elseif dot1 < (-1)
                 dot1 = -1;
             end
-            leng = acos(dot1)
+            leng = dot1
             if leng > 0.0001
                 vec1[:, k] = (leng/sin(leng)) * (psi[:,k] - cos(leng) * mu);
             else
