@@ -43,7 +43,7 @@ function curve_karcher_mean(beta::Array{Float64, 3}; mode='O', maxit=20,
 
         # TODO: parallelize
         for i = 1:N
-            v1, d = karcher_calc(beta[:,:,n],q[:,:,n], betamean, mu, mode=mode,
+            v1, d = karcher_calc(beta[:,:,i],q[:,:,i], betamean, mu, mode=mode,
                                  wscale=wscale);
             v[:,:,i] = v1;
             sumd[itr+1] = sumd[itr+1] + d^2;
