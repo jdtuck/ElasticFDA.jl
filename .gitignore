@@ -2,3 +2,4 @@
 *.jl.mem
 *.o
 *.so
+*.DS_Store
