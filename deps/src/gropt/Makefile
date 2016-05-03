@@ -3,9 +3,16 @@
 OS := $(shell uname)
 ERR = $(shell which icpc>/dev/null; echo $$?)
 ifeq "$(OS)" "Darwin"
-	CFLAGS =  -fPIC -std=c++11 -O3 -g  # C flags
-        LDFLAGS = -shared # linking flags
-        LIBS = -lblas -llapack
+	ifeq "$(ERR)" "0"
+		CXX = icpc
+		CFLAGS = -fPIC -std=c++11 -O3 -g -mkl
+		LDFLAGS = -shared
+		LIBS = -lmkl_rt -lpthread
+	else
+		CFLAGS =  -fPIC -std=c++11 -O3 -g  # C flags
+        	LDFLAGS = -shared # linking flags
+        	LIBS = -lblas -llapack
+	endif
 else
 	ifeq "$(ERR)" "0"
     		CXX = icpc

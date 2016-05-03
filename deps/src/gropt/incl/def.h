@@ -346,23 +346,56 @@ extern void dgees_(
 #include <limits>
 #include "Timer.h"
 
-#ifdef __INTEL_COMPILER
-const class {
-public:
-	template<class T> // convertible to any type
-	operator T*(void) const // of null non-member
-	{
-		return 0;
-	} // pointer...
-	template<class C, class T> // or any type of null
-	operator T C::*(void) const // member pointer...
-	{
-		return 0;
-	}
-private:
-	void operator&(void) const; // whose address can't be taken
-} nullptr = {};
-#endif // end of __GNUC__
+#ifdef __APPLE__
+    #include "TargetConditionals.h"
+    #if TARGET_IPHONE_SIMULATOR
+         // iOS Simulator
+    #elif TARGET_OS_IPHONE
+        // iOS device
+    #elif TARGET_OS_MAC
+        // Other kinds of Mac OS
+    #else
+    #   error "Unknown Apple platform"
+    #endif
+#elif __linux__
+    #ifdef __INTEL_COMPILER
+        const class {
+        public:
+            template<class T> // convertible to any type
+            operator T*(void) const // of null non-member
+            {
+                return 0;
+            } // pointer...
+            template<class C, class T> // or any type of null
+            operator T C::*(void) const // member pointer...
+            {
+                return 0;
+            }
+        private:
+            void operator&(void) const; // whose address can't be taken
+        } nullptr = {};
+    #endif // end of __GNUC__
+#elif __unix__ // all unices not caught above
+    #ifdef __INTEL_COMPILER
+        const class {
+        public:
+            template<class T> // convertible to any type
+            operator T*(void) const // of null non-member
+            {
+                return 0;
+            } // pointer...
+            template<class C, class T> // or any type of null
+            operator T C::*(void) const // member pointer...
+            {
+                return 0;
+            }
+        private:
+            void operator&(void) const; // whose address can't be taken
+        } nullptr = {};
+    #endif // end of __GNUC__
+#else
+#   error "Unknown compiler"
+#endif
 
 #include <map>
 #include <string>
