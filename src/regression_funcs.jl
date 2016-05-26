@@ -93,7 +93,7 @@ Calculate logistic loss function
 
     logit_loss(b, X, y)
     :param b: coefficients
-    :param b: matrix
+    :param X: matrix
     :param y: response
 """
 function logit_loss(b, X, y)
@@ -253,4 +253,3 @@ function mlogit_gradient!(b, grad, X, Y)
     grad1 /= -N;
     grad[:] = reshape(grad1, M*m, 1);
 end
-
