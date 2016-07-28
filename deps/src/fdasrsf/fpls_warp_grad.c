@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include "misc_funcs.h"
 
-void fpls_warp_grad(int *m1, int *n1, double *ti, double *gami, double *qf, double *qg, double *wf, double *wg, 
+void fpls_warp_grad(int *m1, int *n1, double *ti, double *gami, double *qf, double *qg, double *wf, double *wg,
 	int *max_itri, double *toli, double *deltai, int *displayi, double *gamout){
-	
-	
+
+
 	// dereference inputs
 	int TT = *m1;
 	int N = *n1, max_itr = *max_itri;
@@ -33,7 +33,7 @@ void fpls_warp_grad(int *m1, int *n1, double *ti, double *gami, double *qf, doub
 	double *qf_tmp_ptr, *qg_tmp_ptr, *qf_tmp_diff_ptr, *qg_tmp_diff_ptr;
 	double *xout_ptr, *tmp_ptr, *tmp1_ptr, *tmpi_ptr, *tmpj_ptr;
 	double *grad_ptr, *rfi_ptr, *rgi_ptr, *gamI_ptr;
-	
+
 	binsize = 0;
 	for (k=0; k<TT-1; k++)
 		binsize += ti[k+1]-ti[k];
@@ -48,7 +48,7 @@ void fpls_warp_grad(int *m1, int *n1, double *ti, double *gami, double *qf, doub
 		psi1[k] = sqrt(fabs(psi1[k])+eps);
 
 	do {
-		qf_ptr = qf; qf_tmp_ptr = qf_tmp; 
+		qf_ptr = qf; qf_tmp_ptr = qf_tmp;
 		qg_ptr = qg; qg_tmp_ptr = qg_tmp;
 		qf_tmp_diff_ptr = qf_tmp_diff; qg_tmp_diff_ptr = qg_tmp_diff;
 		for (k=0; k<N; k++) {
@@ -86,7 +86,7 @@ void fpls_warp_grad(int *m1, int *n1, double *ti, double *gami, double *qf, doub
 
 		psi_ptr = psi_ptr - TT*N;
 		qf_tmp_diff_ptr = qf_tmp_diff; qg_tmp_diff_ptr = qg_tmp_diff;
-		qg_tmp_ptr = qg_tmp; qf_tmp_ptr = qf_tmp; 
+		qg_tmp_ptr = qg_tmp; qf_tmp_ptr = qf_tmp;
 		psi2_ptr = psi2; gam2_ptr = gam2;
 		for (k=0; k<N; k++) {
 			tmp_ptr = tmp;
@@ -136,14 +136,14 @@ void fpls_warp_grad(int *m1, int *n1, double *ti, double *gami, double *qf, doub
 			res_sin = sin(delta*tmpi);
 			for (j=0; j<TT; j++)
 				psi2_ptr[j] = res_cos*psi_ptr[j] + res_sin*(vec[j]/tmpi);
-			
+
 			innerprod_q(m1, ti, psi2_ptr, psi2_ptr, &tmpi);
 			for (j=0; j<TT; j++)
 				psi2_ptr[j] = psi2_ptr[j]/tmpi;
-				
+
 			for (j=0; j<TT; j++)
 				tmp1[j] = psi2_ptr[j]*psi2_ptr[j];
-			
+
 			tmp1_ptr = tmp1;
 			cumtrapz(&TT,ti,tmp1_ptr,gam2_ptr);
 			for (j=0; j<TT; j++)
