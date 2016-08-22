@@ -7,6 +7,9 @@ Optimization function to calculate warping for elastic regression
     :param q: vector describing srsf
     :param y: response value
     :param alpha: intercept
+
+    Returns
+    :return gamma_new: new gamma
 """
 function regression_warp(beta::Vector, timet::Vector, q::Vector, y::Float64,
                          alpha::Float64)
@@ -40,6 +43,9 @@ Calculate warping for logistic regression
     :param timet: time samples
     :param q: srsf
     :param y: response
+
+    Returns
+    :return gamma: new gamma
 """
 function logistic_warp(beta::Vector, timet::Vector, q::Array, y)
     if y == 1
@@ -75,6 +81,9 @@ end
 Logistic function
 
     phi(t)
+
+    Returns
+    :return out: phi(t)
 """
 function phi(t)
     idx = t .> 0;
@@ -95,6 +104,9 @@ Calculate logistic loss function
     :param b: coefficients
     :param X: matrix
     :param y: response
+
+    Returns
+    :return out: loss function
 """
 function logit_loss(b, X, y)
     z = X * b;

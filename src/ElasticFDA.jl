@@ -120,10 +120,10 @@ macro cpp(ex)
     end
     exargs = exargtypes.args
     pstr = ""
-    symtable = (:Void,:Bool,:Cchar,:Char,:ASCIIString,:Int,:Int8,:Uint8,:Int16,:Uint16,:Int32,:Cint,:Uint32,:Int64,:Uint64,:Float32,:Float64)
+    symtable = (:Void,:Bool,:Cchar,:Char,:String,:Int,:Int8,:Uint8,:Int16,:Uint16,:Int32,:Cint,:Uint32,:Int64,:Uint64,:Float32,:Float64)
     # GNU3-4 ABI v.3 and v.4
     ptable =   ('v', 'b', 'c', 'w', "Pc", 'i', 'a', 'h', 's', 't', 'i', 'i', 'j', 'l', 'm', 'f', 'd')
-    msub = ASCIIString[]
+    msub = String[]
     for iarg = 1:length(exargs)
         thisarg = exargs[iarg]
         thisargm = ""
@@ -162,7 +162,7 @@ macro cpp(ex)
             error("@cpp: argument not recognized")
         end
     end
-    ex.args[1].args[1] = Expr(:quote, symbol(string(fstr,pstr)))
+    ex.args[1].args[1] = Expr(:quote, Symbol(string(fstr,pstr)))
     ex.args[1].args[2] = esc(ex.args[1].args[2])
     for ival = 4:length(ex.args)
         ex.args[ival] = esc(ex.args[ival])
@@ -183,8 +183,8 @@ include("mcmc_align.jl")
 include("gauss_model.jl")
 include("group_warping_bayes.jl")
 include("pair_warping_bayes.jl")
-include("regression.jl")
-include("regression_funcs.jl")
+#include("regression.jl")
+#include("regression_funcs.jl")
 include("time_warping.jl")
 include("image_funcs.jl")
 include("image_stats.jl")
