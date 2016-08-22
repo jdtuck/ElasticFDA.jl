@@ -46,19 +46,28 @@ export
     @cpp
 
 # load fdasrsf library
-unixpath = "../deps/src/fdasrsf/fdasrsf"
-winpath = "..\\deps\\fdasrsf"
-const libfdasrsf = joinpath(dirname(@__FILE__), @unix? unixpath : winpath)
+if (@static is_unix())
+    path = "../deps/src/fdasrsf/fdasrsf"
+else
+    path = "..\\deps\\fdasrsf"
+end
+const libfdasrsf = joinpath(dirname(@__FILE__), path)
 
 # load gropt library
-unixpath1 = "../deps/src/gropt/gropt"
-winpath1 = "..\\deps\\gropt"
-const libgropt = joinpath(dirname(@__FILE__), @unix? unixpath1 : winpath1)
+if (@static is_unix())
+    path1 = "../deps/src/gropt/gropt"
+else
+    path1 = "..\\deps\\gropt"
+end
+const libgropt = joinpath(dirname(@__FILE__), path1)
 
 # load fdaqmap library
-unixpath2 = "../deps/src/fdaqmap/fdaqmap"
-winpath2 = "..\\deps\\fdaqmap"
-const libfdaqmap = joinpath(dirname(@__FILE__), @unix? unixpath2 : winpath2)
+if (@static is_unix())
+    path2 = "../deps/src/fdaqmap/fdaqmap"
+else
+    path2 = "..\\deps\\fdaqmap"
+end
+const libfdaqmap = joinpath(dirname(@__FILE__), path2)
 
 
 # Ensure library is available.
