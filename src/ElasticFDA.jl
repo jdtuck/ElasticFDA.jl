@@ -46,7 +46,7 @@ export
     @cpp
 
 # load fdasrsf library
-if (@static is_unix())
+if (is_unix())
     path = "../deps/src/fdasrsf/fdasrsf"
 else
     path = "..\\deps\\fdasrsf"
@@ -54,7 +54,7 @@ end
 const libfdasrsf = joinpath(dirname(@__FILE__), path)
 
 # load gropt library
-if (@static is_unix())
+if (is_unix())
     path1 = "../deps/src/gropt/gropt"
 else
     path1 = "..\\deps\\gropt"
@@ -62,7 +62,7 @@ end
 const libgropt = joinpath(dirname(@__FILE__), path1)
 
 # load fdaqmap library
-if (@static is_unix())
+if (is_unix())
     path2 = "../deps/src/fdaqmap/fdaqmap"
 else
     path2 = "..\\deps\\fdaqmap"
