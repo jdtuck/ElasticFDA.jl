@@ -5,6 +5,8 @@
 [![Build status](https://img.shields.io/appveyor/ci/jdtuck/elasticfda-jl.svg?style=flat-square&label=windows)](https://ci.appveyor.com/project/jdtuck/elasticfda-jl/branch/master)
 [![Coverage Status](http://img.shields.io/coveralls/jdtuck/ElasticFDA.jl.svg?style=flat-square)](https://coveralls.io/r/jdtuck/ElasticFDA.jl?branch=master)
 
+[![ElasticFDA](http://pkg.julialang.org/badges/ElasticFDA_0.4.svg)](http://pkg.julialang.org/?pkg=ElasticFDA)
+[![ElasticFDA](http://pkg.julialang.org/badges/ElasticFDA_0.5.svg)](http://pkg.julialang.org/?pkg=ElasticFDA)
 
 A julia package for functional data analysis using the square root slope framework
 and curves using the square root velocity framework which performs pair-wise and

@@ -1,7 +1,7 @@
 module ElasticFDA
 
 ## Requirements
-using Grid
+using Interpolations
 using Dierckx
 using NLopt
 using ProgressMeter
