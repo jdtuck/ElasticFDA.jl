@@ -664,7 +664,7 @@ Generates random warping functions based on gam
 """
 function random_gamma(gam, num)
     mu, gam_mu, psi, vec1 = sqrt_mean(gam);
-    K = cov(vec1, vardim=2);
+    K = Base.covm(vec1, mean(vec1,2), 2);
 
     U, s, V = svd(K);
     n = 5;

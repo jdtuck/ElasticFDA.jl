@@ -321,7 +321,7 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
         # PCA Step
         a = repmat(mq[:, itr], 1, N);
         qhat_cent = qi[:, :, itr] - a;
-        K = Base.covm(qi[:, :, itr], vardim=2);
+        K = Base.covm(qi[:, :, itr], mean(qi[:, :, itr],2), 2);
         U, s, V = svd(K);
 
         alpha_i = zeros(num_comp, N);

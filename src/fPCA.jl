@@ -24,8 +24,8 @@ function vert_fPCA(fn, timet, qn; no=1)
     mididx = round(Integer, length(timet)/2);
     m_new = sign(fn[mididx, :]) .* sqrt(abs(fn[mididx, :]));
     mqn = [mq_new; mean(m_new)];
-    qn2 = vcat(qn, m_new);
-    K = cov(qn2, vardim=2);
+    qn2 = vcat(qn, m_new');
+    K = Base.covm(qn2, mean(qn2,2), 2);
 
     U, s, V = svd(K);
     stdS = sqrt(s);
@@ -87,7 +87,7 @@ function horiz_fPCA(gam, timet; no=1)
     m = length(mu);
 
     # TFPCA
-    K = cov(vec1, vardim=2);
+    K = Base.covm(vec1, mean(vec1,2), 2);
 
     U, s, V = svd(K);
     vm = mean(vec1, 2);

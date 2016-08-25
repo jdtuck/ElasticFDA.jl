@@ -25,8 +25,8 @@ function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
     mididx = round(Integer, M/2);
     m_new = sign(fn[mididx,:]) .* sqrt(abs(fn[mididx,:]));
     mqn = vec([mq_new; mean(m_new)]);
-    qn2 = vcat(qn, m_new);
-    C = cov(qn2, vardim=2);
+    qn2 = vcat(qn, m_new');
+    C = Base.covm(qn2, mean(qn2,2), 2);
 
     q_s = mvnrand(mqn, C, n);
 

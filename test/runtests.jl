@@ -63,22 +63,22 @@ da, dp = elastic_distance(f1, f1, timet);
 gam = rgam(101,.1,10);
 
 # test elastic_regression
-#include("test_warp_regress.jl")
-#timet = collect(timet);
-#out = elastic_regression(f, y_orig, timet, max_itr=1);
-#out1 = elastic_prediction(f, timet, out, y=y_orig);
+include("test_warp_regress.jl")
+timet = collect(timet);
+out = elastic_regression(f, y_orig, timet, max_itr=1);
+out1 = elastic_prediction(f, timet, out, y=y_orig);
 
 # test elastic logistic regression
-#include("test_warp_logistic.jl")
-#timet = collect(timet);
-#out = elastic_logistic(f, y_orig, timet, max_itr=1);
-#out1 = elastic_prediction(f, timet, out, y=y_orig);
+include("test_warp_logistic.jl")
+timet = collect(timet);
+out = elastic_logistic(f, y_orig, timet, max_itr=1);
+out1 = elastic_prediction(f, timet, out, y=y_orig);
 
 # test elastic m-logistic regression
-#include("test_warp_mlogistic.jl")
-#timet = collect(timet);
-#out = elastic_mlogistic(f, y_orig, timet, max_itr=1);
-#out1 = elastic_prediction(f, timet, out, y=y_orig);
+include("test_warp_mlogistic.jl")
+timet = collect(timet);
+out = elastic_mlogistic(f, y_orig, timet, max_itr=1);
+out1 = elastic_prediction(f, timet, out, y=y_orig);
 
 d = load("beta.jld");
 beta = d["beta"];
