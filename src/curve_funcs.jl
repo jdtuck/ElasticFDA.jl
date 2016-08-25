@@ -136,7 +136,7 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
             q1i, timet, n1, M, M, timet, timet, M, M, G, T, sizei, lam)
         G = G[1:round(Integer,sizei[1])];
         T = T[1:round(Integer,sizei[1])];
-        yi = InterpIrregular(T, G, BCnil, InterpLinear);
+        yi = interpolate((T,), G, Gridded(Linear()))
         gam = yi[timet];
 
     elseif (method == "DP2")
