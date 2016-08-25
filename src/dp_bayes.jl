@@ -23,7 +23,7 @@ function dp_bayes(q1, q1L, q2L, times, cut)
     q2LL_time = (temp_span2*(1/timesf))+1;
     q2L_time1 = collect(1:colnum);
     q2L_time2 = float(q2L_time1);
-    q2LL_i = InterpGrid(q2L, BCnil, InterpLinear);
+    q2LL_i = interpolate((collect(1:length(q2L)),), q2L, Gridded(Linear()))
     q2LL = q2LL_i[q2LL_time];
     ID = zeros(rownum+1, colnum+1);
     S = zeros(ID);
@@ -179,8 +179,7 @@ function DP_mean(f, times=5)
             MatchIn2, NDist, q2LL = dp_bayes(mu_5[row], mu_5, qt_matrix[:, j],
                                              times, cut);
             match = [MatchIn2; m+1];
-            f_i = InterpIrregular([row; m+1], float(match), BCnearest,
-                                  InterpLinear);
+            f_i = interpolate(([row; m+1],), float(match), Gridded(Linear()))
             idy = round(Integer, f_i[1:m]);
             idy[idy .> m] = m;
             scale1 = sqrt(diff(match)*(1/times));
@@ -204,13 +203,13 @@ function DP_mean(f, times=5)
     invidy, revscalevec = findkarcherinv(match_matrix, times);
     invidy = invidy[1:m];
     invidy[invidy .>= m] = m;
-    f_i = InterpIrregular(collect(1:m), vec(mu_5), BCnearest, InterpLinear);
+    f_i = interpolate((collect(1:m),), vec(mu_5), Gridded(Linear()))
     mu_5 = revscalevec.*f_i[invidy];
     rescale = sqrt(m/sum(mu_5.^2));
     estimator = rescale.*copy(mu_5);
     reg_curve = zeros(m+1, n);
     for j = 1:n
-        f_i = InterpIrregular(collect(0:m), f[:, j], BCnearest, InterpLinear);
+        f_i = interpolate((collect(0:m),), f[:, j], Gridded(Linear()))
         tmp = f_i[linspace(0, m, times*(m+1)-1)];
         reg_curve[:, j] = tmp[round(Integer, (rtmatrix[:,j] - 1)*times+1)];
     end

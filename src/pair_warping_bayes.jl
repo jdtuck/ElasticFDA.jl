@@ -60,7 +60,7 @@ function pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1)
     best_match = copy(match);
     dist = NaN;
     dist_collect = zeros(iter+1);
-    f_i = InterpIrregular([row; p+1], float(match), BCnearest, InterpLinear);
+    f_i = interpolate(([row;p+1],), float(match), Gridded(Linear()))
     idy = round(Integer, f_i[1:p]);
     idy[idy .> p] = p;
     scale1 = sqrt(diff(match)*(1/times));
@@ -78,7 +78,7 @@ function pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1)
     log_posterior = res["log_posterior"];
     dist_collect = res["dist_collect"];
     kappafamily = res["kappafamily"];
-    f_i = InterpIrregular([row; p+1], float(best_match), BCnearest, InterpLinear);
+    f_i = interpolate(([row; p+1],), float(best_match), Gridded(Linear()))
     bestidy = f_i[1:p];
     bestidy[bestidy .> p] = p;
     push!(bestidy,p+1);
@@ -93,12 +93,12 @@ function pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1)
         MeanP[i] = mean(match_collect[burnin:idx_sub,i]);
     end
 
-    f_i = InterpIrregular([row; p+1], float(MeanP), BCnearest, InterpLinear);
+    f_i = interpolate(([row; p+1],), float(MeanP), Gridded(Linear()))
     Meanidy = f_i[1:p];
     Meanidy[Meanidy .> p] = p;
     push!(Meanidy,p+1);
 
-    f_i = InterpIrregular(collect(1:p), f2, BCnil, InterpLinear);
+    f_i = interpolate((collect(1:p),), f2, Gridded(Linear()))
     reg_q = f_i[linspace(1,p,times*(p+1)-1)];
     reg_q = reg_q[round(Integer, (bestidy-1)*times+1)];
     reg_a = f_i[linspace(1,p,times*(p+1)-1)];

@@ -200,7 +200,7 @@ function interp1_flat(x,y,xx)
     n = length(flat);
 
     if n==0
-        tmp = InterpIrregular(x,y,BCnil,InterpLinear);
+        tmp = interpolate((x,), y, Gridded(Linear()))
         yy = tmp[xx];
     else
         yy = zeros(size(xx));
@@ -212,7 +212,7 @@ function interp1_flat(x,y,xx)
         else
             i2 = flat[1];
             j = (xx.>=x[i1]) & (xx.<=x[i2]);
-            tmp = InterpIrregular(x[i1:i2],y[i1:i2],BCnil,InterpLinear);
+            tmp = interpolate((x[i1:i2],), y[i1:i2], Gridded(Linear()))
             yy[j] = tmp[xx[j]];
             i1 = copy(i2);
         end
@@ -220,7 +220,7 @@ function interp1_flat(x,y,xx)
             i2 = flat[k];
             if i2 > i1+1
                 j = (xx.>=x[i1]) & (xx.<=x[i2]);
-                tmp = InterpIrregular(x[i1+1:i2],y[i1+1:i2],BCnil,InterpLinear);
+                yi = interpolate((x[i1+1:i2],), y[i1+1:i2], Gridded(Linear()))
                 yy[j] = tmp[xx[j]];
             end
             j = xx.==x[i2];
@@ -232,11 +232,10 @@ function interp1_flat(x,y,xx)
         if i1+1 == i2
             yy[j] = y[i2];
         else
-            tmp = InterpIrregular(x[i1+1:i2],y[i1+1:i2],BCnil,InterpLinear);
+            tmp = interpolate((x[i1+1:i2],), y[i1+1:i2], Gridded(Linear()))
             yy[j] = tmp[xx[j]];
         end
     end
 
     return yy
 end
-

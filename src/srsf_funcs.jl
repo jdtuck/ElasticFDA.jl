@@ -210,7 +210,7 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
             n1, M, M, timet, timet, M, M, G, T, sizei, lam)
         G = G[1:round(Integer,sizei[1])];
         T = T[1:round(Integer,sizei[1])];
-        yi = InterpIrregular(T, G, BCnil, InterpLinear);
+        yi = interpolate((T,), G, Gridded(Linear()))
         gam = yi[timet];
     elseif (method == "SIMUL")
         s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1,c2);
@@ -339,7 +339,7 @@ function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
             n1, M1, M2, time1, time2, M1, M2, G, T, sizei, lam)
         G = G[1:round(Integer,sizei[1])];
         T = T[1:round(Integer,sizei[1])];
-        yi = InterpIrregular(T, G, BCnil, InterpLinear);
+        yi = interpolate((T,), G, Gridded(Linear()))
         gam = yi[time1];
     elseif (method == "SIMUL")
         s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1,c2);
@@ -427,7 +427,7 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
               qi, timet, n1, M, M, timet, timet, M, M, G, T, sizei, lam)
             G = G[1:round(Integer,sizei[1])];
             T = T[1:round(Integer,sizei[1])];
-            yi = InterpIrregular(T, G, BCnil, InterpLinear);
+            yi = interpolate((T,), G, Gridded(Linear()))
             gam0 = yi[timet];
         elseif (method == "SIMUL")
             s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1,ci);
@@ -516,7 +516,7 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
               q2i, timet, n1, M, M, timet, timet, M, M, G, T, sizei, lam)
             G = G[1:round(Integer,sizei[1])];
             T = T[1:round(Integer,sizei[1])];
-            yi = InterpIrregular(T, G, BCnil, InterpLinear);
+            yi = interpolate((T,), G, Gridded(Linear()))
             gam0 = yi[timet];
             sizei = Cdouble[0];
         elseif (method == "SIMUL")
@@ -589,7 +589,7 @@ Warp srsf by gamma
 function warp_q_gamma(time::Vector, q::Vector, gam::Vector)
     M = length(gam);
     gam_dev = gradient(gam, 1/(M-1));
-    tmp = InterpIrregular(time, q, BCnil, InterpLinear);
+    tmp = interpolate((time,), q, Gridded(Linear()))
     xout = (time[end] - time[1]) .* gam + time[1];
     q_temp = tmp[xout] .* sqrt(gam_dev);
 
@@ -607,7 +607,7 @@ Warp function by gamma
 """
 function warp_f_gamma(time::Vector, f::Vector, gam::Vector)
     M = length(gam);
-    tmp = InterpIrregular(time, f, BCnil, InterpLinear);
+    tmp = interpolate((time,), f, Gridded(Linear()))
     xout = (time[end] - time[1]) .* gam + time[1];
     f_temp = tmp[xout];
 
@@ -917,9 +917,9 @@ function findkarcherinv(warps, times, roundi=false)
             mupsi_update = cos(0.01*check)*mupsi;
         end
     end
-    karcher_s = 1 + [0; cumsum(mupsi_update.^2)*times];
-    f_i = InterpIrregular(vec(karcher_s), float(collect(1:times:(m-1)*times+1)),
-                          BCnil, InterpLinear);
+    karcher_s = 1 + [0; cumsum(mupsi_update.^2)*times]
+    f_i = interpolate((vec(karcher_s),), float(collect(1:times:(m-1)*times+1)),
+                      Gridded(Linear()))
     if (roundi)
         invidy = [round(f_i[1:((m-1)*times)]); (m-1)*times+1];
     else

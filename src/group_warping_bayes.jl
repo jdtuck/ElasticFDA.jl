@@ -101,12 +101,12 @@ function group_warping_bayes(f; iter=20000, times=5, powera=1)
     f_q = zeros(m+1, n);
 
     for t = 1:n
-         f_i = InterpIrregular([row; m+1], best_match_matrix[:, t], BCnearest, InterpLinear);
+         f_i = interpolate(([row;m+1],), best_match_matrix[:,t], Gridded(Linear()))
          gam_q[:, t] = f_i[1:(m+1)];
-         f_o = InterpGrid(f[:, t], BCnil, InterpCubic);
+         f_o = interpolate((collect(1:size(f,1)),), f[:,t], Gridded(Linear()))
          tmp = f_o[linspace(1,m,times*(m+1)-1)];
          f_q[:, t] = tmp[round(Integer, (gam_q[:, t]-1)*times+1)];
-         f_i = InterpIrregular([row; m+1], bayes_warps[:, t], BCnearest, InterpLinear);
+         f_i = interpolate(([row;m+1],), bayes_warps[:,t], Gridded(Linear()))
          gam_a[:, t] = f_i[1:(m+1)];
          f_a[:, t] = tmp[round(Integer, (gam_a[:, t]-1)*times+1)];
     end
