@@ -43,6 +43,7 @@ export
     reparam_image,
     pair_align_image,
     bs,
+    project_curve,
     @cpp
 
 # load fdasrsf library
