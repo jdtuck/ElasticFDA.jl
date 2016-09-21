@@ -1,4 +1,4 @@
-@static if is_unix() begin
+if is_unix()
     cd(joinpath(dirname(@__FILE__), "src", "fdasrsf"))
     suffix = @osx? "dylib" : "so"
     run(`make clean`)
@@ -9,9 +9,7 @@
     cd(joinpath(dirname(@__FILE__), "src", "fdaqmap"))
     run(`make clean`)
     run(`make SUFFIX=$suffix`)
-end
-
-@windows_only begin
+else # Windows
     using BinDeps
     # these binaries were cross-compiled from Cygwin for x86_64 only using
     # the Makefile_win in the corresponding src directories and the windows bin
