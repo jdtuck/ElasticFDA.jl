@@ -1,4 +1,4 @@
-@unix_only begin
+@static if is_unix() begin
     cd(joinpath(dirname(@__FILE__), "src", "fdasrsf"))
     suffix = @osx? "dylib" : "so"
     run(`make clean`)
@@ -12,6 +12,7 @@
 end
 
 @windows_only begin
+    using BinDeps
     # these binaries were cross-compiled from Cygwin for x86_64 only using
     # the Makefile_win in the corresponding src directories and the windows bin
     # release of openblas
