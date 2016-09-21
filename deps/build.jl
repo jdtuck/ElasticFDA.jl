@@ -17,7 +17,7 @@ end
     # release of openblas
     BinDeps.download_cmd("https://github.com/jdtuck/ElasticFDA.jl/releases/download/v0.4.0/fdaqmap.7z")
     BinDeps.download_cmd("https://github.com/jdtuck/ElasticFDA.jl/releases/download/v0.4.0/fdasrsf.7z")
-    BinDeps.download_cmd("https://github.com/jdtuck/ElasticFDA.jl/releases/download/v0.3.0/fdaqmap.7z")
+    BinDeps.download_cmd("https://github.com/jdtuck/ElasticFDA.jl/releases/download/v0.4.0/gropt.7z")
     run(`7z x -y fdasrsf.7z`)
     run(`7z x -y gropt.7z`)
     run(`7z x -y fdaqmap.7z`)
