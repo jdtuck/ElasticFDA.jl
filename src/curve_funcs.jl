@@ -569,7 +569,7 @@ function inverse_exp_coord(beta1, beta2; method::AbstractString="DP",
     centroid2 = calculatecentroid(beta2);
     beta2 -= repmat(centroid2,1,T);
 
-    q1 = curve_to_q(beta1);
+    q1 = curve_to_q(beta1, wscale);
 
     # Iteratively optimize over SO(n) x Gamma using old DP
     gam, R, tau = optimum_reparam(beta1, beta2, method=method);
@@ -577,7 +577,7 @@ function inverse_exp_coord(beta1, beta2; method::AbstractString="DP",
     gamI = invert_gamma(gam);
     beta2 = group_action_by_gamma_coord(beta2, gamI);
     beta2, R, tau = find_rotation_seed_coord(beta1, beta2);
-    q2n = curve_to_q(beta2);
+    q2n = curve_to_q(beta2, wscale);
 
     # Compute geodesic distance
     q1dotq2 = innerprod_q2(q1, q2n);
