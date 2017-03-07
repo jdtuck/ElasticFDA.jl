@@ -34,8 +34,12 @@ function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
     fs = zeros(M, n);
     for k in 1:n
         fs[:, k] = cumtrapzmid(timet, q_s[1:M,k].*abs(q_s[1:M,k]),
-                               sign(q_s[M+1,k])*(q_s[M+1,k]^2));
+                               sign(q_s[M+1,k])*(q_s[M+1,k]^2), mididx);
     end
+    fbar = mean(fn,2)
+    fsbar = mean(fs,2)
+    err = repmat(fbar-fsbar,1,n)
+    f_s = f_s + err
 
     # random warping generation
     rgam = random_gamma(gam, n);

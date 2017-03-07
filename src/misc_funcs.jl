@@ -148,10 +148,10 @@ Cumulative Trapezoidal Integration using midpoint
     :param x: time samples
     :param y: resposne samples
     :param c: midpoint
+    :param mid: midpoint location
 """
-function cumtrapzmid(x, y, c)
+function cumtrapzmid(x, y, c, mid)
     a = length(x);
-    mid = round(Integer, a/2);
 
     # case < mid
     fn = zeros(a);

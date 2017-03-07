@@ -44,7 +44,8 @@ function vert_fPCA(fn, timet, qn; no=1)
         for l in 1:Nstd
             f_pca[:, l, k] = cumtrapzmid(timet, q_pca[1:N,l,k].*
                                          abs(q_pca[1:N,l,k]),
-                                         sign(q_pca[N+1,l,k]*q_pca[N,l,k]^2));
+                                         sign(q_pca[N+1,l,k]*q_pca[N,l,k]^2),
+                                         mididx);
         end
     end
 
