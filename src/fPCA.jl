@@ -47,6 +47,10 @@ function vert_fPCA(fn, timet, qn; no=1)
                                          sign(q_pca[N+1,l,k]*q_pca[N,l,k]^2),
                                          mididx);
         end
+        fbar = mean(fn,2)
+        fsbar = mean(f_pca[:, :, k],2)
+        err = repmat(fbar-fsbar,1,n)
+        f_pca[:, :, k] = f_pca[:, :, k] + err
     end
 
     N2 = size(qn,2);
