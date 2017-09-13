@@ -46,6 +46,7 @@ export
     project_curve,
     inverse_exp_coord,
     inverse_exp,
+    project_tangent
     @cpp
 
 # load fdasrsf library
