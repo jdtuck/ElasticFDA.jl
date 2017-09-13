@@ -44,6 +44,8 @@ export
     pair_align_image,
     bs,
     project_curve,
+    inverse_exp_coord,
+    inverse_exp,
     @cpp
 
 # load fdasrsf library
