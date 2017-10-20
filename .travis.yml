@@ -21,6 +21,8 @@ addons:
   apt:
     packages:
     - gfortran
+    - libblas-dev 
+    - liblapack-dev
 
 before_install:
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
