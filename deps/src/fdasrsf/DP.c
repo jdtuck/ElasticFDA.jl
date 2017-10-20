@@ -32,7 +32,7 @@ const int Nbrs[NNBRS][2] = {
 int xycompare(const void *x1, const void *x2);
 double CostFn2(const double *q1L, const double *q2L, int k, int l, int i, int j, int n, int scl, double lam);
 void thomas(double *x, const double *a, const double *b, double *c, int n);
-void spline(double *D, const double *y, int n);
+static void spline(double *D, const double *y, int n);
 void lookupspline(double *t, int *k, double dist, double len, int n);
 double evalspline(double t, const double D[2], const double y[2]);
 
