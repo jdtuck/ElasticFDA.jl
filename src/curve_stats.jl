@@ -210,7 +210,7 @@ function curve_principal_directions(betamean::Array{Float64, 2}, mu, K;
         princDir = [U[1:T,m]'; U[T+1:2*T,m]'];
         v = sqrt(s[m])*princDir;
         q1 = copy(mu);
-        epsilon = 2./N;
+        epsilon = 2.0/N;
 
         # Forward direction from mean
         for i = 1:N
@@ -311,7 +311,7 @@ function sample_shapes(mu::Array{Float64,2}, K; mode='O', no=3, numSamp=10)
         N = 10;
     end
 
-    epsilon = 1./(N-1);
+    epsilon = 1.0/(N-1);
 
     q1 = copy(mu);
     q2 = copy(mu);

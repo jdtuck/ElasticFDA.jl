@@ -115,7 +115,7 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
     skipm = 4;
     auto = 2;
     tau = 0;
-    if (method == "DP")
+    if (method == "DP2")
         # Optimze over SO(n) x Gamma
         q1 = curve_to_q(beta1)
 
@@ -129,7 +129,7 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
         G = zeros(M);
         T = zeros(M);
         sizei = Cdouble[0];
-        ccall((:DynamicProgrammingQ2, libfdasrsf), Void,
+        ccall((:DynamicProgrammingQ2, "libfdasrsf"), Cvoid,
             (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32,
             Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32,
             Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Float64), q2i, timet,
@@ -139,57 +139,23 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
         yi = interpolate((T,), G, Gridded(Linear()))
         gam = yi[timet];
 
-    elseif (method == "DP2")
-        c1 = vec(reshape(beta1', M*n1, 1));
-        c2 = vec(reshape(beta2', M*n1, 1));
-        opt = zeros(M+n1*n1+1);
-        swap = false;
-        fopts = zeros(5);
-        comtime = zeros(5);
-        @cpp ccall((:optimum_reparam, libgropt), Void,
-                   (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                    Bool, Bool, Int32, Int32, Ptr{Float64}, Bool,
-                    Ptr{Float64}, Ptr{Float64}), c1, c2, M, n1, 0.0, true,
-                    rotated, isclosed, skipm, auto, opt, swap, fopts,
-                    comtime)
-
-        gam = opt[1:end-5];
-        R = reshape(opt[end-4:end-1],2,2);
-
-        if swap
-            gam = invertGamma(gam);
-            R = R';
-        end
-
     else
-        c1 = vec(reshape(beta1', M*n1, 1));
-        c2 = vec(reshape(beta2', M*n1, 1));
-        opt = zeros(M+n1*n1+1);
-        swap = false;
-        fopts = zeros(5);
-        comtime = zeros(5);
-        @cpp ccall((:optimum_reparam, libgropt), Void,
-                   (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                    Ptr{Float64}, Bool, Bool, Bool, Int32, Int32, Ptr{Float64},
-                    Ptr{Float64}), c1, c2, M, n1, w, false, rotated, isclosed,
-                    skipm, auto, opt, swap, fopts, comtime)
+        # Optimze over SO(n) x Gamma
+        q1 = curve_to_q(beta1)
 
-        if fopts[1] == 1000
-            @cpp ccall((:optimum_reparam, libgropt), Void,
-                       (Ptr{Float64}, Ptr{Float64}, Int32, Int32, Float64, Bool,
-                        Ptr{Float64}, Bool, Bool, Bool, Int32, Int32,
-                        Ptr{Float64}, Ptr{Float64}), c1, c2, M, n1, 0.0, true,
-                        rotated, isclosed, skipm, auto, opt, swap, fopts,
-                        comtime)
-        end
+        # Optimzie over SO(n)
+        beta2, R, tau = find_rotation_seed_coord(beta1, beta2);
+        q2 = curve_to_q(beta2);
 
-        gam = opt[1:end-5];
-        R = reshape(opt[end-4:end-1],2,2);
+        # Optimzie over Gamma
+        q1i = vec(reshape(q1, M*n1, 1));
+        q2i = vec(reshape(q2, M*n1, 1));
+        gam = zeros(M);
+        gam = zeros(M);
+        ccall((:DP, libfdasrsf), Cvoid,
+            (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}, Ptr{Float64},
+            Ptr{Int32}, Ptr{Float64}), q1, q2, n1, M, lam, 0, gam)
 
-        if swap
-            gam = invertGamma(gam);
-            R = R';
-        end
     end
 
     gam = (gam-gam[1]) ./ (gam[end] - gam[1]);
