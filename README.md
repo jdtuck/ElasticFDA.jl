@@ -5,10 +5,10 @@
 [![Build status](https://img.shields.io/appveyor/ci/jdtuck/elasticfda-jl.svg?style=flat-square&label=windows)](https://ci.appveyor.com/project/jdtuck/elasticfda-jl/branch/master)
 [![Coverage Status](http://img.shields.io/coveralls/jdtuck/ElasticFDA.jl.svg?style=flat-square)](https://coveralls.io/r/jdtuck/ElasticFDA.jl?branch=master)
 
-[![ElasticFDA](http://pkg.julialang.org/badges/ElasticFDA_0.4.svg)](http://pkg.julialang.org/?pkg=ElasticFDA)
-[![ElasticFDA](http://pkg.julialang.org/badges/ElasticFDA_0.5.svg)](http://pkg.julialang.org/?pkg=ElasticFDA)
+[![ElasticFDA](http://pkg.julialang.org/badges/ElasticFDA_0.7.svg)](http://pkg.julialang.org/?pkg=ElasticFDA)
+[![ElasticFDA](http://pkg.julialang.org/badges/ElasticFDA_1.0.svg)](http://pkg.julialang.org/?pkg=ElasticFDA)
 
-A julia package for functional data analysis using the square root slope framework
+A Julia package for functional data analysis using the square root slope framework
 and curves using the square root velocity framework which performs pair-wise and
 group-wise alignment as well as modeling using functional component analysis and
 regression.
@@ -16,7 +16,7 @@ regression.
 ### Installation
 This package can be installed using and is only currently supported on linux
 
-    Pkg.add("ElasticFDA")
+    (v1.0) add ElasticFDA
 
 This package relies on two c/cpp optimization routines which will either compile
 with icc or g++. One of the libraries relies LAPACK and BLAS. The makefile will
@@ -73,5 +73,5 @@ Q. Xie, S. Kurtek, E. Klassen, G. E. Christensen and A. Srivastava. Metric-based
 pairwise and multiple image registration. IEEE European Conference on Computer
 Vision (ECCV), September, 2014
 
-Cheng, W., Dryden, I. L., & Huang, X. (2016). Bayesian registration of functions 
-and curves. Bayesian Analysis, 11(2), 447–475. 
+Cheng, W., Dryden, I. L., & Huang, X. (2016). Bayesian registration of functions
+and curves. Bayesian Analysis, 11(2), 447–475.
