@@ -1,6 +1,6 @@
-if is_unix()
+if Sys.isunix()
     cd(joinpath(dirname(@__FILE__), "src", "fdasrsf"))
-    suffix = is_apple() ? "dylib" : "so"
+    suffix = Sys.isapple() ? "dylib" : "so"
     run(`make clean`)
     run(`make SUFFIX=$suffix`)
     cd(joinpath(dirname(@__FILE__), "src", "gropt"))
