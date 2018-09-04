@@ -1,38 +1,51 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define NNBRS	23
+// #define NNBRS	23
+
+// const int Nbrs[NNBRS][2] = {
+// 	{ 1, 1 },
+// 	{ 1, 2 },
+// 	{ 2, 1 },
+// 	{ 2, 3 },
+// 	{ 3, 2 },
+// 	{ 1, 3 },
+// 	{ 3, 1 },
+// 	{ 1, 4 },
+// 	{ 3, 4 },
+// 	{ 4, 3 },
+// 	{ 4, 1 },
+// 	{ 1, 5 },
+// 	{ 2, 5 },
+// 	{ 3, 5 },
+// 	{ 4, 5 },
+// 	{ 5, 4 },
+// 	{ 5, 3 },
+// 	{ 5, 2 },
+// 	{ 5, 1 },
+// 	{ 1, 6 },
+// 	{ 5, 6 },
+// 	{ 6, 5 },
+// 	{ 6, 1 }
+// };
+
+
+#define NNBRS	63
 
 const int Nbrs[NNBRS][2] = {
-	{ 1, 1 },
-	{ 1, 2 },
-	{ 2, 1 },
-	{ 2, 3 },
-	{ 3, 2 },
-	{ 1, 3 },
-	{ 3, 1 },
-	{ 1, 4 },
-	{ 3, 4 },
-	{ 4, 3 },
-	{ 4, 1 },
-	{ 1, 5 },
-	{ 2, 5 },
-	{ 3, 5 },
-	{ 4, 5 },
-	{ 5, 4 },
-	{ 5, 3 },
-	{ 5, 2 },
-	{ 5, 1 },
-	{ 1, 6 },
-	{ 5, 6 },
-	{ 6, 5 },
-	{ 6, 1 }
+	{  1,  1 }, {  1,  2 }, {  1,  3 }, {  1,  4 }, {  1,  5 }, {  1,  6 }, {  1,  7 }, {  1,  8 }, {  1,  9 }, {  1, 10 },
+	{  2,  1 }, {  2,  3 }, {  2,  5 }, {  2,  7 }, {  2,  9 }, {  3,  1 }, {  3,  2 }, {  3,  4 }, {  3,  5 }, {  3,  7 },
+	{  3,  8 }, {  3, 10 }, {  4,  1 }, {  4,  3 }, {  4,  5 }, {  4,  7 }, {  4,  9 }, {  5,  1 }, {  5,  2 }, {  5,  3 },
+	{  5,  4 }, {  5,  6 }, {  5,  7 }, {  5,  8 }, {  5,  9 }, {  6,  1 }, {  6,  5 }, {  6,  7 }, {  7,  1 }, {  7,  2 },
+	{  7,  3 }, {  7,  4 }, {  7,  5 }, {  7,  6 }, {  7,  8 }, {  7,  9 }, {  7, 10 }, {  8,  1 }, {  8,  3 }, {  8,  5 },
+	{  8,  7 }, {  8,  9 }, {  9,  1 }, {  9,  2 }, {  9,  4 }, {  9,  5 }, {  9,  7 }, {  9,  8 }, {  9, 10 }, { 10,  1 },
+	{ 10,  3 }, { 10,  7 }, { 10,  9 }
 };
 
 int xycompare(const void *x1, const void *x2);
 double CostFn2(const double *q1L, const double *q2L, int k, int l, int i, int j, int n, int scl, double lam);
 void thomas(double *x, const double *a, const double *b, double *c, int n);
-static void spline(double *D, const double *y, int n);
+void spline1(double *D, const double *y, int n);
 void lookupspline(double *t, int *k, double dist, double len, int n);
 double evalspline(double t, const double D[2], const double y[2]);
 
@@ -47,10 +60,10 @@ void DP(double *q1, double *q2, int *n1, int *N1, double *lam1, int *Disp, doubl
 
 	M = scl*(N-1)+1;
 
-	q1L = malloc(n*M*sizeof(double));
-	q2L = malloc(n*M*sizeof(double));
+	q1L = (double*)malloc(n*M*sizeof(double));
+	q2L = (double*)malloc(n*M*sizeof(double));
 
-	D1 = malloc(4*N*sizeof(double));
+	D1 = (double*)malloc(4*N*sizeof(double));
 	tmp1 = D1 + N;
 	D2 = D1 + 2*N;
 	tmp2 = D2 + N;
@@ -62,8 +75,8 @@ void DP(double *q1, double *q2, int *n1, int *N1, double *lam1, int *Disp, doubl
 			tmp2[j] = q2[n*j + i];
 		}
 
-		spline(D1, tmp1, N);
-		spline(D2, tmp2, N);
+		spline1(D1, tmp1, N);
+		spline1(D2, tmp2, N);
 
 		// for each point in fine discretization
 		for (j = 0; j < M; ++j) {
@@ -75,8 +88,8 @@ void DP(double *q1, double *q2, int *n1, int *N1, double *lam1, int *Disp, doubl
 
 	free(D1);
 
-	E = calloc(N*N, sizeof(double));
-	Path = malloc(2*N*N*sizeof(int));
+	E = (double*)calloc(N*N, sizeof(double));
+	Path = (int*)malloc(2*N*N*sizeof(int));
 
 	for (i = 0; i < N; ++i) {
 		E[N*i + 0] = 50000000000;
@@ -116,7 +129,7 @@ void DP(double *q1, double *q2, int *n1, int *N1, double *lam1, int *Disp, doubl
 	free(E);
 	free(q2L);
 
-	xy = malloc(2*N*sizeof(int));
+	xy = (int*)malloc(2*N*sizeof(int));
 	xy[2*0 + 0] = N-1;
 	xy[2*0 + 1] = N-1;
 
@@ -214,11 +227,11 @@ void thomas(double *x, const double *a, const double *b, double *c, int n) {
 
 // input:  y is array to interpolate, n is array length
 // output: D will be array of spline data
-void spline(double *D, const double *y, int n) {
+void spline1(double *D, const double *y, int n) {
 	int i;
 	double *a, *b, *c;
 
-	a = malloc(3*n*sizeof(double));
+	a = (double*)malloc(3*n*sizeof(double));
 	b = a + n;
 	c = b + n;
 
