@@ -223,11 +223,11 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
     else
         gam = zeros(M);
         ccall((:DP, libfdasrsf), Cvoid,
-            (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}, Ptr{Float64},
-            Ptr{Int32}, Ptr{Float64}), q2, q1, n1, M, lam, 0, gam)
+            (Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}, Ref{Float64},
+            Ref{Int32}, Ptr{Float64}), q2, q1, n1, M, lam, 0, gam)
     end
 
-    gam = (gam-gam[1]) ./ (gam[end] - gam[1]);
+    gam = (gam.-gam[1]) ./ (gam[end] - gam[1]);
 
     return gam
 end
@@ -315,11 +315,11 @@ function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
     else
         gam = zeros(M1);
         ccall((:DP, libfdasrsf), Cvoid,
-            (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}, Ptr{Float64},
-            Ptr{Int32}, Ptr{Float64}), q2, q1, n1, M1, lam, 0, gam)
+            (Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}, Ref{Float64},
+            Ref{Int32}, Ptr{Float64}), q2, q1, n1, M1, lam, 0, gam)
     end
 
-    gam = (gam-gam[1]) ./ (gam[end] - gam[1]);
+    gam = (gam.-gam[1]) ./ (gam[end] - gam[1]);
 
     return gam
 end
@@ -366,11 +366,11 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
         else
             gam0 = zeros(M1);
             ccall((:DP, libfdasrsf), Cvoid,
-                (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}, Ptr{Float64},
-                Ptr{Int32}, Ptr{Float64}), qi, q1, n1, M, lam, 0, gam0)
+                (Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}, Ref{Float64},
+                Ref{Int32}, Ptr{Float64}), qi, q1, n1, M, lam, 0, gam0)
         end
 
-        gam[:, ii] = (gam0-gam0[1]) ./ (gam0[end] - gam0[1]);
+        gam[:, ii] = (gam0.-gam0[1]) ./ (gam0[end] - gam0[1]);
     end
 
     return gam
@@ -419,11 +419,11 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
         else
             gam0 = zeros(M1);
             ccall((:DP, libfdasrsf), Cvoid,
-                (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}, Ptr{Float64},
-                Ptr{Int32}, Ptr{Float64}), q2i, q1i, n1, M, lam, 0, gam0)
+                (Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}, Ref{Float64},
+                Ref{Int32}, Ptr{Float64}), q2i, q1i, n1, M, lam, 0, gam0)
         end
 
-        gam[:, ii] = (gam0-gam0[1]) ./ (gam0[end] - gam0[1]);
+        gam[:, ii] = (gam0.-gam0[1]) ./ (gam0[end] - gam0[1]);
     end
 
     return gam

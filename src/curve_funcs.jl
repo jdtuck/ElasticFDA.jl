@@ -153,12 +153,12 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
         gam = zeros(M);
         gam = zeros(M);
         ccall((:DP, libfdasrsf), Cvoid,
-            (Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}, Ptr{Float64},
-            Ptr{Int32}, Ptr{Float64}), q1, q2, n1, M, lam, 0, gam)
+            (Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}, Ref{Float64},
+            Ref{Int32}, Ptr{Float64}), q1, q2, n1, M, lam, 0, gam)
 
     end
 
-    gam = (gam-gam[1]) ./ (gam[end] - gam[1]);
+    gam = (gam.-gam[1]) ./ (gam[end] - gam[1]);
 
     return gam, R, tau
 end
