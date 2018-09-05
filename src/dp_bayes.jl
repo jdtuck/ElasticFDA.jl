@@ -161,7 +161,7 @@ function DP_mean(f, times=5)
     for j = 1:n
         search[j] = Enorm(vec(qt_matrix[:, j] - meanq));
     end
-    position = indmin(search);
+    position = argmin(search);
 
     mu_5 = qt_matrix[:, position];
     mu_curve = zeros(iter, m+1);

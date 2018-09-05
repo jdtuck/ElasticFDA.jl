@@ -53,7 +53,7 @@ function elastic_regression(f::Array, y::Vector, timet::Vector; B=Union{}, lambd
 
     q = f_to_srsf(f, timet, smooth);
 
-    gamma = repmat(linspace(0,1,M), 1, N);
+    gamma = repeat(linspace(0,1,M), 1, N);
     fn = zeros(M, N);
     qn = zeros(M, N);
 
@@ -193,7 +193,7 @@ function elastic_logistic(f, y, timet; B=Union{}, df=20, max_itr=20,
 
     q = f_to_srsf(f, timet, smooth);
 
-    gamma = repmat(linspace(0,1,M), 1, N);
+    gamma = repeat(linspace(0,1,M), 1, N);
     fn = zeros(M, N);
     qn = zeros(M, N);
 
@@ -319,7 +319,7 @@ function elastic_mlogistic(f, y, timet; B=Union{}, df=20, max_itr=20,
 
     q = f_to_srsf(f, timet, smooth);
 
-    gamma = repmat(linspace(0,1,M), 1, N);
+    gamma = repeat(linspace(0,1,M), 1, N);
     fn = zeros(M, N);
     qn = zeros(M, N);
 
@@ -423,10 +423,10 @@ function elastic_prediction(f, timet, model::Dict; y=Union{}, smooth=false)
     end
 
     for ii in 1:n
-        diff = model["q"] - repmat(q[:, ii], 1, size(model["q"], 2));
+        diff = model["q"] - repeat(q[:, ii], 1, size(model["q"], 2));
         dist = sum(abs(diff).^2, 1).^(1/2);
         q_tmp = warp_q_gamma(timet, q[:, ii],
-                             model["gamma"][:, indmin(dist)]);
+                             model["gamma"][:, argmin(dist)]);
         if model["type"] == "linear"
             y_pred[ii] = model["alpha"] + trapz(timet, q_tmp.*model["beta"]);
         elseif model["type"] == "logistic"

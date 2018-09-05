@@ -157,7 +157,7 @@ function cumtrapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Integer=1)
         dt = diff(x)/2.0;
         z = [0; cumsum(dt.*(y[1:(m-1)] + y[2:m]))];
     else
-        dt = repmat(diff(x)/2.0,1,n);
+        dt = repeat(diff(x)/2.0,1,n);
         z = [zeros(1,n); cumsum(dt.*(y[1:(m-1), :] + y[2:m, :]),1)];
         z = ipermutedims(z, perm);
     end
@@ -207,7 +207,7 @@ function mvnrand(mu, C, n)
     R = Array(R);
     R = R[:, tmp.piv];
     retval = randn(n, size(R,1)) * R;
-    retval += transpose(repmat(mu, 1, n));
+    retval += transpose(repeat(mu, 1, n));
     return transpose(retval)
 end
 

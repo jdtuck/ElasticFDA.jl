@@ -68,7 +68,7 @@ function curve_karcher_mean(beta::Array{Float64, 3}; mode='O', maxit=20,
 
             x = q_to_curve(mu);
             a = -1 * calculatecentroid(x);
-            betamean = x + repmat(a,1,T);
+            betamean = x + repeat(a,1,T);
         else
             break
         end
@@ -104,14 +104,14 @@ function curve_srvf_align(beta::Array{Float64, 3}; mode='O', maxit=20)
     qn = zeros(n,T,N);
     betan = zeros(n,T,N);
     centroid2 = calculatecentroid(betamean);
-    betamean -= repmat(centroid2, 1, T);
+    betamean -= repeat(centroid2, 1, T);
     q_mu = curve_to_q(betamean);
 
     # align to mean
     for ii = 1:N
         beta1 = beta[:,:,ii];
         centroid1 = calculatecentroid(beta1);
-        beta1 -= repmat(centroid1, 1, T);
+        beta1 -= repeat(centroid1, 1, T);
 
         # Iteratively optimzie over SO(n) x Gamma
         # Optimize over SO(n) x Gamma
@@ -228,7 +228,7 @@ function curve_principal_directions(betamean::Array{Float64, 2}, mu, K;
             qarray1[i] = q2;
             p = q_to_curve(q2);
             centroid1 = -1 * calculatecentroid(p);
-            beta_scaled, scale = scale_curve(p + repmat(centroid1,1, T));
+            beta_scaled, scale = scale_curve(p + repeat(centroid1,1, T));
             pd1[i] = beta_scaled;
 
             # Parallel translate tangent vector
@@ -256,7 +256,7 @@ function curve_principal_directions(betamean::Array{Float64, 2}, mu, K;
             qarray2[i] = q2;
             p = q_to_curve(q2);
             centroid1 = -1*calculatecentroid(p);
-            beta_scaled, scale = scale_curve(p + repmat(centroid1, 1, T));
+            beta_scaled, scale = scale_curve(p + repeat(centroid1, 1, T));
             pd2[i] = beta_scaled;
 
             # parallel translate tangent vector
@@ -273,7 +273,7 @@ function curve_principal_directions(betamean::Array{Float64, 2}, mu, K;
 
         qarray[m,N+1] = mu;
         centroid1 = -1 * calculatecentroid(betamean);
-        beta_scaled, scale = scale_curve(betamean + repmat(centroid1,1, T));
+        beta_scaled, scale = scale_curve(betamean + repeat(centroid1,1, T));
 
         pd[m, N] = beta_scaled;
 

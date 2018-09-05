@@ -38,7 +38,7 @@ function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
     end
     fbar = mean(fn,2)
     fsbar = mean(fs,2)
-    err = repmat(fbar-fsbar,1,n)
+    err = repeat(fbar-fsbar,1,n)
     f_s = f_s + err
 
     # random warping generation

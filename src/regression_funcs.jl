@@ -226,10 +226,10 @@ function mlogit_loss(b, X, Y)
     M = size(X,2);   # n_features
     B = reshape(b, M, m);
     Yhat = X * B;
-    Yhat -= repmat(minimum(Yhat, 2),1,size(Yhat,2));
+    Yhat -= repeat(minimum(Yhat, 2),1,size(Yhat,2));
     Yhat = exp(-1.0*Yhat);
     # l1-normalize
-    Yhat = Yhat./repmat(sum(Yhat, 2),1,size(Yhat,2));
+    Yhat = Yhat./repeat(sum(Yhat, 2),1,size(Yhat,2));
 
     Yhat = Yhat .* Y;
     nll = sum(log(sum(Yhat,2)));
@@ -253,13 +253,13 @@ function mlogit_gradient!(b, grad, X, Y)
     M = size(X,2); # n_features
     B = reshape(b, M, m);
     Yhat = X * B;
-    Yhat -= repmat(minimum(Yhat, 2),1,size(Yhat,2));
+    Yhat -= repeat(minimum(Yhat, 2),1,size(Yhat,2));
     Yhat = exp(-1.0*Yhat);
     # l1-normalize
-    Yhat = Yhat./repmat(sum(Yhat, 2),1,size(Yhat,2));
+    Yhat = Yhat./repeat(sum(Yhat, 2),1,size(Yhat,2));
 
     _Yhat = Yhat .* Y;
-    _Yhat = _Yhat./repmat(sum(_Yhat,2),1,size(_Yhat,2));
+    _Yhat = _Yhat./repeat(sum(_Yhat,2),1,size(_Yhat,2));
     Yhat -= _Yhat;
     grad1 = transpose(X) * Yhat;
     grad1 /= -N;

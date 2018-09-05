@@ -364,7 +364,7 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
             timet2 = (timet2-tmin)/(tmax-tmin);
             gam0 = simul_gam(collect(u),g1,g2,timet2,s1,s2,timet2);
         else
-            gam0 = zeros(M1);
+            gam0 = zeros(M);
             ccall((:DP, libfdasrsf), Cvoid,
                 (Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}, Ref{Float64},
                 Ref{Int32}, Ptr{Float64}), qi, q1, n1, M, lam, 0, gam0)
@@ -442,8 +442,8 @@ function warp_q_gamma(time::Vector, q::Vector, gam::Vector)
     M = length(gam);
     gam_dev = gradient(gam, 1/(M-1));
     tmp = interpolate((time,), q, Gridded(Linear()))
-    xout = (time[end] - time[1]) .* gam + time[1];
-    q_temp = tmp[xout] .* sqrt(gam_dev);
+    xout = (time[end] - time[1]) .* gam .+ time[1];
+    q_temp = tmp[xout] .* sqrt.(gam_dev);
 
     return q_temp
 end
@@ -460,7 +460,7 @@ Warp function by gamma
 function warp_f_gamma(time::Vector, f::Vector, gam::Vector)
     M = length(gam);
     tmp = interpolate((time,), f, Gridded(Linear()))
-    xout = (time[end] - time[1]) .* gam + time[1];
+    xout = (time[end] - time[1]) .* gam .+ time[1];
     f_temp = tmp[xout];
 
     return f_temp
@@ -591,10 +591,10 @@ function sqrt_mean_inverse(gam::Array)
 
     # Find Direction
     mnpsi = mean(psi, 2);
-    d1 = repmat(mnpsi, 1, n);
+    d1 = repeat(mnpsi, 1, n);
     d = (psi - d1).^2;
     dqq = sqrt(sum(d,1));
-    min_ind = indmin(dqq);
+    min_ind = argmin(dqq);
     mu = psi[:, min_ind];
     maxiter = 20;
     tt = 1;
@@ -1119,7 +1119,7 @@ function old_dp(q1::Vector, q2::Vector,lam)
     yy = zeros(N);
     for i = 1:N
         F = abs(i-x);
-        idx = indmin(F);
+        idx = argmin(F);
         if x[idx] == i
             yy[i] = y[idx];
         else

@@ -62,17 +62,17 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
 
     # Compute SRSF
     binsize = mean(diff(timet));
-    q = Array(Float64, M, N);
+    q = Array{Float64}(undef, (M, N));
     for ii in 1:N
         q[:, ii] = f_to_srsf(f[:, ii], timet);
     end
     fo = vec(f[1,:]);
     println("Initializing...")
-    mnq = mean(q,2);
-    d1 = repmat(mnq,1,N);
+    mnq = mean(q,dims=2);
+    d1 = repeat(mnq,1,N);
     d = (q - d1).^2;
-    dqq = sqrt(sum(d,1));
-    min_ind = indmax(dqq);
+    dqq = sqrt.(sum(d,dims=1));
+    min_ind = argmax(vec(dqq));
     mq = q[:, min_ind];
     mf = f[:, min_ind];
 
@@ -141,7 +141,7 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
         end
 
         mqt = mq[:, r];
-        a = repmat(mqt,1,N);
+        a = repeat(mqt,1,N);
         d = (q[:, :, r+1] - a).^2;
         if method == "mean"
             d1 = sum(trapz(timet, d));
@@ -152,8 +152,8 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
             # Minimization Step
             # compute the mean of the matched function
             qtemp = q[:, :, r+1];
-            mq[:, r+1] = mean(qtemp, 2);
-            mf[:, r+1] = mean(f[:, :, r+1], 2);
+            mq[:, r+1] = mean(qtemp, dims=2);
+            mf[:, r+1] = mean(f[:, :, r+1], dims=2);
 
             qun[r] = norm(mq[:,r+1] - mq[:,r])/norm(mq[:,r]);
         end
@@ -212,10 +212,10 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
     fn = f[:, :, r];
     qn = q[:, :, r];
     q0 = q[:, :, 1];
-    mean_f0 = mean(f0, 2);
-    std_f0 = std(f0, 2);
-    mean_fn = mean(fn, 2);
-    std_fn = std(fn, 2);
+    mean_f0 = mean(f0, dims=2);
+    std_f0 = std(f0, dims=2);
+    mean_fn = mean(fn, dims=2);
+    std_fn = std(fn, dims=2);
     mqn = mq[:, r];
     fmean = mean(f0[1,:]) + cumtrapz(timet, mqn .* abs(mqn));
 
@@ -294,10 +294,10 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
     end
     println("Initializing...")
     mnq = mean(q,2);
-    d1 = repmat(mnq,1,N);
+    d1 = repeat(mnq,1,N);
     d = (q - d1).^2;
     dqq = sqrt(sum(d,1));
-    min_ind = indmax(dqq);
+    min_ind = argmax(dqq);
     @printf("Compute %d functions in SRSF space to %d fPCA components..\n",N,num_comp)
 
     # Compute Karcher Mean
@@ -319,7 +319,7 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
         end
 
         # PCA Step
-        a = repmat(mq[:, itr], 1, N);
+        a = repeat(mq[:, itr], 1, N);
         qhat_cent = qi[:, :, itr] - a;
         K = Base.covm(qi[:, :, itr], mean(qi[:, :, itr],2), 2);
         U, s, V = svd(K);

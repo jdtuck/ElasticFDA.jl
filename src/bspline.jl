@@ -67,7 +67,7 @@ function bs(x::Vector, df, norder, nderiv=0)
 
     # initialize the b array.
     temp = transpose([1; zeros(km1)]);
-    b = repmat(temp, nd*nx, 1);
+    b = repeat(temp, nd*nx, 1);
     nxs = nd.*collect(1:nx);
 
     # run the recurrence simultaneously for all x(i)

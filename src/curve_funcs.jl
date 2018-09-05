@@ -228,7 +228,7 @@ Calculate psi
 """
 function psi(x, a, q)
     T = size(q,2);
-    covmat = calculate_variance(x+repmat(a,1,T));
+    covmat = calculate_variance(x+repeat(a,1,T));
     psi1 = covmat[1,1] - covmat[2,2];
     psi2 = covmat[1,2];
     psi3 = x[1,end];
@@ -344,7 +344,7 @@ function find_rotation_seed_coord(beta1,beta2)
         Rlist[:,:,ctr] = R;
     end
 
-    tau = indmin(Ltwo);
+    tau = argmin(Ltwo);
     O_hat = Rlist[:,:,tau];
     beta2new = shift_f(beta2, tau);
     beta2new = O_hat * beta2new;
@@ -375,7 +375,7 @@ function find_rotation_and_seed_q(q1,q2)
         Rlist[:, :, ctr] = R;
     end
 
-    tau = indmin(Ltwo);
+    tau = argmin(Ltwo);
     O_hat = Rlist[:,:,tau];
     q2new = shift_f(q2,tau);
     q2new = O_hat * q2new;
@@ -467,7 +467,7 @@ function project_curve(q)
         beta_new = q_to_curve(q);
         x = copy(beta_new);
         a = -1 * calculatecentroid(x);
-        beta_new = x + repmat(a,1,T);
+        beta_new = x + repeat(a,1,T);
 
         # calculate the new value of psi
         psi1, psi2, psi3, psi4 = psi(x,a,q);
@@ -505,7 +505,7 @@ function pre_proc_curve(beta, T=100)
     qnew = project_curve(q);
     x = q_to_curve(qnew);
     a = -1 * calculatecentroid(x);
-    betanew = x + repmat(a,1,T);
+    betanew = x + repeat(a,1,T);
     A = eye(2)
 
     return betanew, qnew, A
@@ -531,9 +531,9 @@ function inverse_exp_coord(beta1, beta2; method::AbstractString="DP",
                            wscale=false)
     T = size(beta1,2);
     centroid1 = calculatecentroid(beta1);
-    beta1 -= repmat(centroid1,1,T);
+    beta1 -= repeat(centroid1,1,T);
     centroid2 = calculatecentroid(beta2);
-    beta2 -= repmat(centroid2,1,T);
+    beta2 -= repeat(centroid2,1,T);
 
     q1 = curve_to_q(beta1, wscale);
 
@@ -587,7 +587,7 @@ Calculate shooting vector between two srvfs q1 and q2
 function inverse_exp(q1, q2, beta2)
     T = size(q1,2);
     centroid1 = calculatecentroid(beta2);
-    beta2 -= repmat(centroid1,1,T);
+    beta2 -= repeat(centroid1,1,T);
 
     # Optimize over SO(n) x Gamma
     beta1 = q_to_curve(q1);
@@ -845,9 +845,9 @@ function curve_pair_align(beta1::Array{Float64,2}, beta2::Array{Float64,2})
 
     T = size(beta1,2);
     centroid1 = calculatecentroid(beta1);
-    beta1 -= repmat(centroid1,1,T);
+    beta1 -= repeat(centroid1,1,T);
     centroid2 = calculatecentroid(beta2);
-    beta2 -= repmat(centroid2,1,T);
+    beta2 -= repeat(centroid2,1,T);
 
     q1 = curve_to_q(beta1);
 
@@ -883,9 +883,9 @@ function curve_geodesic(beta1::Array{Float64,2}, beta2::Array{Float64,2},
     beta1 = resamplecurve(beta1, T);
     beta2 = resamplecurve(beta2, T);
     centroid1 = calculatecentroid(beta1);
-    beta1 -= repmat(centroid1,1,T);
+    beta1 -= repeat(centroid1,1,T);
     centroid2 = calculatecentroid(beta2);
-    beta2 -= repmat(centroid2,1,T);
+    beta2 -= repeat(centroid2,1,T);
 
     q1 = curve_to_q(beta1);
 

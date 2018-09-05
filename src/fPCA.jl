@@ -49,7 +49,7 @@ function vert_fPCA(fn, timet, qn; no=1)
         end
         fbar = mean(fn,2)
         fsbar = mean(f_pca[:, :, k],2)
-        err = repmat(fbar-fsbar,1,n)
+        err = repeat(fbar-fsbar,1,n)
         f_pca[:, :, k] = f_pca[:, :, k] + err
     end
 
