@@ -78,8 +78,8 @@ function gradient_spline(timet::Vector, f, smooth=false)
     if ndims(f) > 1
         N = size(f,2);
         f0 = zeros(M, N);
-        g = zeros(f0);
-        g2 = zeros(f0);
+        g = zeros(M, N);
+        g2 = zeros(M, N);
         for k in 1:N
             if smooth
                 spar = length(timet) * (0.25 * abs(maximum(f[:,k])))^2;
