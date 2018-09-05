@@ -1,6 +1,7 @@
 using ElasticFDA
 using Distributions
 using JLD2
+using LinearAlgebra
 using Test
 
 @load "simu_data.jld2"
@@ -24,7 +25,7 @@ f1a = srsf_to_f(q1,timet,f1[1]);
 
 # test optimum reparam
 gam = optimum_reparam(q1,timet,q1,f1o=f1[1],f2o=f2[1]);
-@test norm(gam-linspace(0,1,101)) < 1e-10
+@test norm(gam-LinRange(0,1,101)) < 1e-10
 
 # test warping functions
 qw = warp_q_gamma(timet, q1, gam);

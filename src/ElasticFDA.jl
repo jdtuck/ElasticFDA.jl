@@ -32,6 +32,7 @@ export
     srsf_align,
     align_fPCA,
     trapz,
+    gradient,
     rgam,
     curve_karcher_mean,
     curve_srvf_align,

@@ -1,4 +1,29 @@
 """
+1-D Gradient
+
+    gradient(a::Array, dx::Float64=1)
+    :param f: Vector
+    :param dx: stepsize
+
+    :return g: gradient
+"""
+function gradient(f::Array{Float64, 1}, dx::Float64=1.)
+    n = length(f)
+    g = zeros(n)
+    h = dx*(1:n)
+    # Take forward differences on left and right edges
+    g[1] = (f[2] - f[1])/(h[2]-h[1])
+    g[n] = (f[n] - f[n-1])/(h[end]-h[end-1])
+
+    # Take centered differences on interior points
+    h = h[3:n]-h[1:(n-2)]
+    g[2:(n-1)] = (f[3:n]-f[1:(n-2)])/h[1]
+
+    return g
+end
+
+
+"""
 2-D Gradient
 
     gradient2(a::Array, dx::Float64=1, dy::Float=1)
