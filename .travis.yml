@@ -20,16 +20,12 @@ addons:
   apt:
     packages:
     - gfortran
-    - libblas-dev 
+    - libblas-dev
     - liblapack-dev
 
 before_install:
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gcc; fi
-
-script:
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e 'Pkg.clone(pwd()); Pkg.build("ElasticFDA"); Pkg.test("ElasticFDA"; coverage=true)'
 
 after_success:
   - julia -e 'cd(Pkg.dir("ElasticFDA")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
