@@ -4,7 +4,7 @@ Calculate normal Energy on an Array
     Enorm(x::Array{Float64,1})
 """
 function Enorm(x::Array{Float64,1})
-    n = sqrt(sum(diagm(x'*x)));
+    n = sqrt(sum(diagm(transpose(x)*x)));
     n = n[1];
     return n
 end
@@ -166,7 +166,7 @@ Calculate elastic distance between two functions
     :return dp: phase distance
 """
 function elastic_distance(f1::Vector, f2::Vector, timet::Vector,
-                          method::AbstractString="SIMUL")
+                          method::AbstractString="DP")
     q1 = f_to_srsf(f1, timet);
     q2 = f_to_srsf(f2, timet);
 
@@ -177,7 +177,7 @@ function elastic_distance(f1::Vector, f2::Vector, timet::Vector,
     da = sqrt(sum(trapz(timet, (q1-q2a).^2)));
 
     M = length(gam);
-    psi = sqrt(diff(gam)*(M-1));
+    psi = sqrt.(diff(gam)*(M-1));
     mu = ones(M-1);
     dp = real(acos(sum(mu.*psi)/(M-1)));
 
@@ -417,7 +417,7 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
             timet2 = (timet2-tmin)/(tmax-tmin);
             gam0 = simul_gam(collect(u),g1,g2,timet2,s1,s2,timet2);
         else
-            gam0 = zeros(M1);
+            gam0 = zeros(M);
             ccall((:DP, libfdasrsf), Cvoid,
                 (Ptr{Float64}, Ptr{Float64}, Ref{Int32}, Ref{Int32}, Ref{Float64},
                 Ref{Int32}, Ptr{Float64}), q2i, q1i, n1, M, lam, 0, gam0)
@@ -479,8 +479,8 @@ function rgam(N, sigma, num)
     gam = zeros(N, num);
 
     TT = N-1;
-    timet = linspace(0,1,TT);
-    mu = sqrt(ones(N-1)*TT/(N-1));
+    timet = LinRange(0,1,TT);
+    mu = sqrt.(ones(N-1)*TT/(N-1));
     omega = (2*pi)/TT;
     for k in 1:num
         alpha_i = randn(1)*sigma;
@@ -489,10 +489,10 @@ function rgam(N, sigma, num)
         for l in 2:10
             alpha_i = randn(1)*sigma;
             if (mod(l,2) != 0)
-                v = v+alpha_i.*sqrt(2).*cos(cnt*omega*timet);
+                v = v+alpha_i.*sqrt(2).*cos.(cnt*omega*timet);
                 cnt += 1;
             elseif (mod(l,2) == 0)
-                v = v+alpha_i.*sqrt(2).*sin(cnt*omega*timet);
+                v = v+alpha_i.*sqrt(2).*sin.(cnt*omega*timet);
             end
         end
 
@@ -500,7 +500,7 @@ function rgam(N, sigma, num)
         vn = norm(v)/sqrt(TT);
         psi = cos(vn)*mu + sin(vn) * v/vn;
         gam[2:end, k] = cumsum(psi.*psi)./TT;
-        gam[:, k] = (gam[:,k] - gam[1,k]) ./ (gam[end,k] - gam[1,k]);
+        gam[:, k] = (gam[:,k] .- gam[1,k]) ./ (gam[end,k] - gam[1,k]);
     end
 
     return gam
@@ -516,12 +516,12 @@ Generates random warping functions based on gam
 """
 function random_gamma(gam, num)
     mu, gam_mu, psi, vec1 = sqrt_mean(gam);
-    K = Base.covm(vec1, mean(vec1,2), 2);
+    K = Statistics.covm(vec1, mean(vec1,dims=2), 2);
 
     U, s, V = svd(K);
     n = 5;
     TT = size(vec1, 1) + 1;
-    vm = mean(vec1, 2);
+    vm = mean(vec1, dims=2);
     rgam = zeros(TT, num);
     for k in 1:num
         a = randn(n)
@@ -533,8 +533,8 @@ function random_gamma(gam, num)
         vn = norm(v) / sqrt(TT);
         psi = cos(vn) .* mu + sin(vn) .* v./vn;
         tmp = zeros(TT);
-        tmp[2:TT] = cumsum(psi.*psi)/TT;
-        rgam[:, k] = (tmp - tmp[1]) ./ (tmp[end] - tmp[1]);
+        tmp[2:TT] = cumsum(vec(psi.*psi))/TT;
+        rgam[:, k] = (tmp .- tmp[1]) ./ (tmp[end] - tmp[1]);
     end
     return rgam
 end
@@ -550,7 +550,7 @@ function invert_gamma(gam::Vector)
     N = length(gam);
     x = collect(1:N)/N;
     gamI = approx(gam,x,x);
-    gamI = (gamI - gamI[1]) ./ (gamI[end] - gamI[1]);
+    gamI = (gamI .- gamI[1]) ./ (gamI[end] - gamI[1]);
     return gamI
 end
 
@@ -584,25 +584,25 @@ function sqrt_mean_inverse(gam::Array)
     eps1 = eps(Float64);
     T1, n = size(gam);
     dt = 1.0/(T1-1);
-    psi = Array(Float64,T1-1,n);
+    psi = Array{Float64}(undef,(T1-1,n));
     for k = 1:n
-        psi[:,k] = sqrt(diff(gam[:,k]) / dt + eps1);
+        psi[:,k] = sqrt.(diff(gam[:,k]) / dt .+ eps1);
     end
 
     # Find Direction
-    mnpsi = mean(psi, 2);
+    mnpsi = mean(psi, dims=2);
     d1 = repeat(mnpsi, 1, n);
     d = (psi - d1).^2;
-    dqq = sqrt(sum(d,1));
-    min_ind = argmin(dqq);
+    dqq = sqrt.(sum(d,dims=1));
+    min_ind = argmin(dqq)[2];
     mu = psi[:, min_ind];
     maxiter = 20;
     tt = 1;
     lvm = zeros(maxiter);
-    vec = zeros(T1-1, n);
+    vec1 = zeros(T1-1, n);
     for itr in 1:maxiter
         for k in 1:n
-            dot1 = trapz(collect(linspace(0,1,T1-1)), mu.*psi[:,k]);
+            dot1 = trapz(collect(LinRange(0,1,T1-1)), mu.*psi[:,k]);
             if dot1 > 1
                 dot1 = 1;
             elseif dot1 < (-1)
@@ -610,12 +610,12 @@ function sqrt_mean_inverse(gam::Array)
             end
             leng = acos(dot1);
             if leng > 0.0001
-                vec[:, k] = (leng/sin(leng)) * (psi[:,k] - cos(leng) * mu);
+                vec1[:, k] = (leng/sin(leng)) * (psi[:,k] - cos(leng) * mu);
             else
-                vec[:, k] = zeros(T1-1);
+                vec1[:, k] = zeros(T1-1);
             end
         end
-        vm = mean(vec,2);
+        vm = mean(vec1,dims=2);
         vm1 = vm.*vm;
         lvm[itr] = sqrt(sum(vm1) * dt);
         if lvm[itr] == 0
@@ -628,8 +628,8 @@ function sqrt_mean_inverse(gam::Array)
     end
     tmp = mu .* mu;
     gam_mu = zeros(T1)
-    gam_mu[2:end] = cumsum(tmp)./T1;
-    gam_mu = (gam_mu - minimum(gam_mu)) ./ (maximum(gam_mu) - minimum(gam_mu));
+    gam_mu[2:end] = cumsum(vec(tmp))./T1;
+    gam_mu = (gam_mu .- minimum(gam_mu)) ./ (maximum(gam_mu) - minimum(gam_mu));
     gamI = invert_gamma(gam_mu);
     return gamI
 end
@@ -693,14 +693,15 @@ Calculate sqrt mean of warping functions
 function sqrt_mean(gam::Array)
     eps1 = eps(Float64);
     TT, n = size(gam);
-    psi = Array(Float64,TT-1,n);
+    dt = 1.0/(TT-1);
+    psi = Array{Float64}(undef,(TT-1,n));
     for k = 1:n
-        psi[:,k] = sqrt(diff(gam[:,k]) * TT + eps1);
+        psi[:,k] = sqrt.(diff(gam[:,k]) / dt .+ eps1);
     end
 
     # Find Direction
-    mnpsi = mean(psi, 2);
-    w = mean(psi, 2);
+    mnpsi = mean(psi, dims=2);
+    w = mean(psi, dims=2);
     mu = w./sqrt(sum(w.^2/(TT-1)));
     maxiter = 500;
     tt = 1;
@@ -721,9 +722,9 @@ function sqrt_mean(gam::Array)
                 vec1[:, k] = zeros(TT-1);
             end
         end
-        vm = mean(vec1,2);
+        vm = mean(vec1,dims=2);
         vm1 = vm.*vm;
-        lvm[itr] = Enorm(vm[:])/sqrt(TT);
+        lvm[itr] = sqrt(sum(vm1) * dt);
         if lvm[itr] == 0
             break
         end
@@ -734,8 +735,8 @@ function sqrt_mean(gam::Array)
     end
     tmp = mu .* mu;
     gam_mu = zeros(TT)
-    gam_mu[2:end] = cumsum(tmp)./TT;
-    gam_mu = (gam_mu - minimum(gam_mu)) ./ (maximum(gam_mu) - minimum(gam_mu));
+    gam_mu[2:end] = cumsum(vec(tmp))./TT;
+    gam_mu = (gam_mu .- minimum(gam_mu)) ./ (maximum(gam_mu) - minimum(gam_mu));
     return mu, gam_mu, psi, vec1
 end
 

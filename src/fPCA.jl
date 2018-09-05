@@ -19,19 +19,19 @@ function vert_fPCA(fn, timet, qn; no=1)
     Nstd = length(coef);
 
     # fPCA
-    mq_new = mean(qn, 2);
+    mq_new = mean(qn, dims=2);
     N = length(mq_new);
     mididx = round(Integer, length(timet)/2);
-    m_new = sign(fn[mididx, :]) .* sqrt(abs(fn[mididx, :]));
+    m_new = sign.(fn[mididx, :]) .* sqrt.(abs.(fn[mididx, :]));
     mqn = [mq_new; mean(m_new)];
     qn2 = vcat(qn, m_new');
-    K = Base.covm(qn2, mean(qn2,2), 2);
+    K = Statistics.covm(qn2, mean(qn2,dims=2), 2);
 
     U, s, V = svd(K);
-    stdS = sqrt(s);
+    stdS = sqrt.(s);
 
     # compute the PCA in the q domain
-    q_pca = Array(Float64, N+1, Nstd, no);
+    q_pca = Array{Float64}(undef, (N+1, Nstd, no));
     for k in 1:no
         for l in 1:Nstd
             q_pca[:, l, k] = mqn + coef[l] * stdS[k] * U[:, k];
@@ -39,17 +39,17 @@ function vert_fPCA(fn, timet, qn; no=1)
     end
 
     # compute the correspondence in the f domain
-    f_pca = Array(Float64, N, Nstd, no);
+    f_pca = Array{Float64}(undef, (N, Nstd, no));
     for k in 1:no
         for l in 1:Nstd
             f_pca[:, l, k] = cumtrapzmid(timet, q_pca[1:N,l,k].*
-                                         abs(q_pca[1:N,l,k]),
-                                         sign(q_pca[N+1,l,k]*q_pca[N,l,k]^2),
+                                         abs.(q_pca[1:N,l,k]),
+                                         sign.(q_pca[N+1,l,k]*q_pca[N,l,k]^2),
                                          mididx);
         end
-        fbar = mean(fn,2)
-        fsbar = mean(f_pca[:, :, k],2)
-        err = repeat(fbar-fsbar,1,n)
+        fbar = mean(fn,dims=2)
+        fsbar = mean(f_pca[:, :, k],dims=2)
+        err = repeat(fbar-fsbar,1,Nstd)
         f_pca[:, :, k] = f_pca[:, :, k] + err
     end
 
@@ -92,16 +92,16 @@ function horiz_fPCA(gam, timet; no=1)
     m = length(mu);
 
     # TFPCA
-    K = Base.covm(vec1, mean(vec1,2), 2);
+    K = Statistics.covm(vec1, mean(vec1,dims=2), 2);
 
     U, s, V = svd(K);
-    vm = mean(vec1, 2);
+    vm = mean(vec1, dims=2);
 
-    gam_pca = Array(Float64, n, m+1, no);
-    psi_pca = Array(Float64, n, m, no);
+    gam_pca = Array{Float64}(undef, (n, m+1, no));
+    psi_pca = Array{Float64}(undef, (n, m, no));
     for j in 1:no
         for k in tau
-            v = (k-3)*sqrt(s[j])*U[:,j];
+            v = (k-3)*sqrt(s[j]).*U[:,j];
             vn = norm(v) / sqrt(TT);
             if vn < 0.0001
                 psi_pca[k, :, j] = mu;
@@ -110,8 +110,8 @@ function horiz_fPCA(gam, timet; no=1)
             end
 
             tmp = zeros(TT);
-            tmp[2:TT] = cumsum(psi_pca[k,:,j] .* psi_pca[k,:,j],2);
-            gam_pca[k,:,j] = (tmp - tmp[1]) ./ (tmp[end] - tmp[1]);
+            tmp[2:TT] = cumsum(psi_pca[k,:,j] .* psi_pca[k,:,j],dims=2);
+            gam_pca[k,:,j] = (tmp .- tmp[1]) ./ (tmp[end] - tmp[1]);
         end
     end
 

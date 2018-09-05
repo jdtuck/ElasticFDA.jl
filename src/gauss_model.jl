@@ -21,25 +21,32 @@ function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
     M = length(timet);
 
     # compute mean and covariance in q-domain
-    mq_new = mean(qn,2);
+    mq_new = mean(qn,dims=2);
     mididx = round(Integer, M/2);
-    m_new = sign(fn[mididx,:]) .* sqrt(abs(fn[mididx,:]));
+    m_new = sign.(fn[mididx,:]) .* sqrt.(abs.(fn[mididx,:]));
     mqn = vec([mq_new; mean(m_new)]);
     qn2 = vcat(qn, m_new');
-    C = Base.covm(qn2, mean(qn2,2), 2);
+    C = Statistics.covm(qn2, mean(qn2,dims=2), 2);
 
-    q_s = mvnrand(mqn, C, n);
+    tmp = cholesky(C,check=false)
+    if (!issuccess(tmp))
+        for i = 1:M+1
+            C[i,i] = C[i,i] + 1e-7
+        end
+    end
+    di = MvNormal(mqn, C);
+    q_s = rand(di, n);
 
     # compute the correspondence to the orignal function domain
     fs = zeros(M, n);
     for k in 1:n
-        fs[:, k] = cumtrapzmid(timet, q_s[1:M,k].*abs(q_s[1:M,k]),
+        fs[:, k] = cumtrapzmid(timet, q_s[1:M,k].*abs.(q_s[1:M,k]),
                                sign(q_s[M+1,k])*(q_s[M+1,k]^2), mididx);
     end
-    fbar = mean(fn,2)
-    fsbar = mean(fs,2)
+    fbar = mean(fn,dims=2)
+    fsbar = mean(fs,dims=2)
     err = repeat(fbar-fsbar,1,n)
-    f_s = f_s + err
+    fs = fs + err
 
     # random warping generation
     rgam = random_gamma(gam, n);
@@ -88,7 +95,7 @@ function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
         time0 = collect(0:(M-1))./(M-1);
         for k in 1:n
             ft[:,k] = approx(time0, fs[:,k], gams[:,k]);
-            tmp = isnan(ft[:, k]);
+            tmp = isnan.(ft[:, k]);
             while any(tmp)
                 rgam2 = random_gamma(gam, 1);
                 gam_tmp = invert_gamma(rgam2);

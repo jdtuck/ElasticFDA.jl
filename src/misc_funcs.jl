@@ -123,9 +123,9 @@ function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Integer=1)
         out = transpose(diff(x)) * (y[1:m-1,:] + y[2:m,:])/2.0;
         siz = size(y); siz = collect(siz); siz[1] = 1;
         out = reshape(out, tuple(siz...));
-        out = ipermutedims(out, perm);
-        ind = find(collect(size(out)).==1);
-        out = squeeze(out,ind[1]);
+        out = permutedims(out, invperm(perm));
+        ind = findall(collect(size(out)).==1);
+        out = dropdims(out,dims=ind[1]);
         if length(out) == 1;
             out = out[1];
         end
@@ -182,11 +182,11 @@ function cumtrapzmid(x, y, c, mid)
     fn = zeros(a);
     tmpx = x[(mid-1):-1:1];
     tmpy = y[(mid-1):-1:1];
-    tmp = c + cumtrapz(tmpx, tmpy);
+    tmp = c .+ cumtrapz(tmpx, tmpy);
     fn[1:(mid-1)] = reverse(tmp);
 
     # case >= mid
-    fn[mid:a] = c + cumtrapz(x[mid:a],y[mid:a]);
+    fn[mid:a] = c .+ cumtrapz(x[mid:a],y[mid:a]);
 
     return fn
 
@@ -202,7 +202,7 @@ Multivariate Normal random number generation
     :param n: number of samples
 """
 function mvnrand(mu, C, n)
-    tmp = cholfact(C, :U, Val{true});
+    tmp = cholesky(C, :U, Val{true});
     R = tmp[:U];
     R = Array(R);
     R = R[:, tmp.piv];

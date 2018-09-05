@@ -87,7 +87,7 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
     end
 
     gamI = sqrt_mean_inverse(gam);
-    xout = (timet[end] -timet[1]) .* gamI + timet[1];
+    xout = (timet[end] -timet[1]) .* gamI .+ timet[1];
     mf = approx(timet, mf, xout);
     mq = f_to_srsf(mf ,timet);
 
@@ -134,7 +134,7 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
 
         gam_dev = zeros(M,N);
         for k in 1:N
-            xout = (timet[end]-timet[1]) .* gam[:, k] + timet[1];
+            xout = (timet[end]-timet[1]) .* gam[:, k] .+ timet[1];
             f[:, k, r+1] = approx(timet, f[:, k, 1], xout);
             q[:, k, r+1] = f_to_srsf(f[:, k, r+1], timet);
             gam_dev = gradient(gam[:, k], 1/(M-1));
@@ -145,7 +145,7 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
         d = (q[:, :, r+1] - a).^2;
         if method == "mean"
             d1 = sum(trapz(timet, d));
-            d2 = sum(trapz(timet, (1-sqrt(gam_dev)).^2));
+            d2 = sum(trapz(timet, (1 .-sqrt.(gam_dev)).^2));
             ds_tmp = d1 + lam * d2;
             ds[r+1] = ds_tmp;
 
@@ -160,7 +160,7 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
 
         if method == "median"
             d1 = sqrt(sum(trapz(timet, d)));
-            d2 = sum(trapz(timet, (1-sqrt(gam_dev)).^2));
+            d2 = sum(trapz(timet, (1 .-sqrt.(gam_dev)).^2));
             ds_tmp = d1 * lam * d2;
             ds[r+1] = ds_tmp;
 
@@ -199,11 +199,11 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
 
     gamI = sqrt_mean_inverse(gam);
     gamI_dev = gradient(gamI, 1/(M-1));
-    timet0 = (timet[end]-timet[1]) .* gamI  + timet[1];
-    mq[:, r+1] = approx(timet, mq[:, r], timet0) .* sqrt(gamI_dev);
+    timet0 = (timet[end]-timet[1]) .* gamI  .+ timet[1];
+    mq[:, r+1] = approx(timet, mq[:, r], timet0) .* sqrt.(gamI_dev);
 
     for k in 1:N
-        q[:, k, r+1] = approx(timet, q[:, k, r+1], timet0) .* sqrt(gamI_dev);
+        q[:, k, r+1] = approx(timet, q[:, k, r+1], timet0) .* sqrt.(gamI_dev);
         f[:, k, r+1] = approx(timet, f[:, k, r+1], timet0);
         gam[:, k] = approx(timet, gam[:, k], timet0);
     end
@@ -217,14 +217,14 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
     mean_fn = mean(fn, dims=2);
     std_fn = std(fn, dims=2);
     mqn = mq[:, r];
-    fmean = mean(f0[1,:]) + cumtrapz(timet, mqn .* abs(mqn));
+    fmean = mean(f0[1,:]) .+ cumtrapz(timet, mqn .* abs.(mqn));
 
     fgam = zeros(M, N);
     for ii in 1:N
-        xout = (timet[end] -timet[1]) .* gam[:, ii] + timet[1];
+        xout = (timet[end] -timet[1]) .* gam[:, ii] .+ timet[1];
         fgam[:, ii] = approx(timet, fmean, xout);
     end
-    var_fgam = var(fgam,2);
+    var_fgam = var(fgam,dims=2);
 
     orig_var = trapz(timet, std_f0.^2);
     amp_var = trapz(timet, std_fn.^2);
@@ -288,16 +288,16 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
 
     # Compute SRSF
     binsize = mean(diff(timet));
-    q = Array(Float64, M, N);
+    q = Array{Float64}(undef, (M, N));
     for ii in 1:N
         q[:, ii] = f_to_srsf(f[:, ii], timet);
     end
     println("Initializing...")
-    mnq = mean(q,2);
+    mnq = mean(q,dims=2);
     d1 = repeat(mnq,1,N);
     d = (q - d1).^2;
-    dqq = sqrt(sum(d,1));
-    min_ind = argmax(dqq);
+    dqq = sqrt.(sum(d,dims=1));
+    min_ind = argmax(vec(dqq));
     @printf("Compute %d functions in SRSF space to %d fPCA components..\n",N,num_comp)
 
     # Compute Karcher Mean
@@ -321,7 +321,8 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
         # PCA Step
         a = repeat(mq[:, itr], 1, N);
         qhat_cent = qi[:, :, itr] - a;
-        K = Base.covm(qi[:, :, itr], mean(qi[:, :, itr],2), 2);
+        xmean = vec(mean(qi[:, :, itr],dims=2));
+        K = Statistics.covm(qi[:, :, itr], xmean, 2);
         U, s, V = svd(K);
 
         alpha_i = zeros(num_comp, N);
@@ -339,22 +340,22 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
         if parallel
             gam_t = @distributed (hcat) for i=1:N
                 optimum_reparam(qhat[:,i], timet, qi[:,i,itr], lam,
-                                method="DP2");
+                                method="DP");
             end
             gam[:, :, itr] = gam_t;
         else
             gam[:, :, itr] = optimum_reparam(qhat, timet, qi[:,:,itr], lam,
-                                             method="DP2");
+                                             method="DP");
         end
 
         for k in 1:N
-            xout = (timet[end] -timet[1]) .* gam[:, k] + timet[1];
+            xout = (timet[end] -timet[1]) .* gam[:, k, itr] .+ timet[1];
             fi[:, k, itr+1] = approx(timet, fi[:, k, itr], xout);
             qi[:, k, itr+1] = f_to_srsf(fi[:, k, itr+1], timet);
         end
 
         qtemp = qi[:, :, itr+1];
-        mq[:, itr+1] = mean(qtemp, 2);
+        mq[:, itr+1] = mean(qtemp, dims=2);
 
         cost_temp = zeros(N);
         for ii in 1:N
@@ -382,14 +383,14 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
     fn = fi[:, :, itrf];
     qn = qi[:, :, itrf];
     q0 = qi[:, :, 1];
-    mean_f0 = mean(f0, 2);
-    std_f0 = std(f0, 2);
+    mean_f0 = mean(f0, dims=2);
+    std_f0 = std(f0, dims=2);
     mqn = mq[:, itrf];
     gamf = gam[:, :, 1];
     for k in 1:itrf-1
         gam_k = gam[:, :, k];
         for l in 1:N
-            time0 = (timet[end]-timet[1]) .* gam_k[:, l] + timet[1];
+            time0 = (timet[end]-timet[1]) .* gam_k[:, l] .+ timet[1];
             gamf[:,l] = approx(timet, gamf[:,l], time0);
         end
     end
@@ -397,15 +398,15 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
     # Center Mean
     gamI = sqrt_mean_inverse(gamf);
     gamI_dev = gradient(gamI, 1/(M-1));
-    timet0 = (timet[end] -timet[1]) .* gamI  + timet[1];
-    mqn = approx(timet, mqn, timet0) .* sqrt(gamI_dev);
+    timet0 = (timet[end] -timet[1]) .* gamI  .+ timet[1];
+    mqn = approx(timet, mqn, timet0) .* sqrt.(gamI_dev);
     for k in 1:N
-        qn[:, k] = approx(timet, qn[:, k], timet0) .* sqrt(gamI_dev);
+        qn[:, k] = approx(timet, qn[:, k], timet0) .* sqrt.(gamI_dev);
         fn[:, k] = approx(timet, fn[:, k], timet0);
         gamf[:, k] = approx(timet, gamf[:, k], timet0);
     end
-    mean_fn = mean(fn, 2);
-    std_fn = std(fn, 2);
+    mean_fn = mean(fn, dims=2);
+    std_fn = std(fn, dims=2);
 
     # Get Final PCA
     out = vert_fPCA(fn, timet, qn, no=num_comp);
@@ -414,10 +415,10 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
 
     fgam = zeros(M, N);
     for ii in 1:N
-        xout = (timet[end] -timet[1]) .* gamf[:, ii] + timet[1];
+        xout = (timet[end] - timet[1]) .* gamf[:, ii] .+ timet[1];
         fgam[:, ii] = approx(timet, fmean, xout);
     end
-    var_fgam = var(fgam,2);
+    var_fgam = var(fgam,dims=2);
 
     orig_var = trapz(timet, std_f0.^2);
     amp_var = trapz(timet, std_fn.^2);
