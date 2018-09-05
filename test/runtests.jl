@@ -1,10 +1,10 @@
 using ElasticFDA
 using Distributions
 using JLD2
-using Base.Test
+using Test
 
 @load "simu_data.jld2"
-timet = collect(linspace(0,1,size(f,1)));
+timet = collect(LinRange(0,1,size(f,1)));
 f1 = f[:,1];
 f2 = f[:,2];
 
@@ -16,7 +16,7 @@ smooth_data!(f1,1);
 
 # test trapz
 d = trapz(timet, timet);
-@test_approx_eq(d,0.5)
+@test d ≈ 0.5
 
 # test f_to_srsf
 q1 = f_to_srsf(f1, timet);

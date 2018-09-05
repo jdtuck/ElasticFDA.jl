@@ -8,6 +8,7 @@ using ProgressMeter
 using Distributions
 using Printf
 using Distributed
+using LinearAlgebra
 using Libdl
 
 export

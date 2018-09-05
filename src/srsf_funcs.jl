@@ -117,7 +117,7 @@ function f_to_srsf(f::Array, timet=0, smooth=false)
         timet = collect(linspace(0,1,length(f)));
     end
     f0, g, g2 = gradient_spline(timet, f, smooth);
-    q = g ./ sqrt(abs(g)+eps(Float64));
+    q = g ./ sqrt.(abs.(g).+eps(Float64));
     return q
 end
 
@@ -141,8 +141,8 @@ function srsf_to_f(q::Array, time, f0=0.0)
             f[:,i] = f0[i] + cumtrapz(time, integrand);
         end
     else
-        integrand = q.*abs(q);
-        f = f0+cumtrapz(time, integrand);
+        integrand = q.*abs.(q);
+        f = f0.+cumtrapz(time, integrand);
     end
 
     return f
