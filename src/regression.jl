@@ -87,9 +87,9 @@ function elastic_regression(f::Array, y::Vector, timet::Vector; B=Union{}, lambd
             end
         end
 
-        xx = Phi.' * Phi;
+        xx = transpose(Phi) * Phi;
         inv_xx = inv(xx + lambda * R);
-        xy = Phi.' * y;
+        xy = transpose(Phi) * y;
         b = inv_xx * xy;
 
         alpha = b[1];
@@ -106,7 +106,7 @@ function elastic_regression(f::Array, y::Vector, timet::Vector; B=Union{}, lambd
         # find gamma
         gamma_new = zeros(M, N);
         if parallel
-            gamma_new = @parallel (hcat) for i=1:N
+            gamma_new = @distributed (hcat) for i=1:N
                 regression_warp(beta, timet, q[:, i], y[i], alpha);
             end
         else
@@ -238,7 +238,7 @@ function elastic_logistic(f, y, timet; B=Union{}, df=20, max_itr=20,
         # find gamma
         gamma_new = zeros(M, N);
         if parallel
-            gamma_new = @parallel (hcat) for i=1:N
+            gamma_new = @distributed (hcat) for i=1:N
                 logistic_warp(beta, timet, q[:, i], y[i]);
             end
         else
@@ -368,7 +368,7 @@ function elastic_mlogistic(f, y, timet; B=Union{}, df=20, max_itr=20,
         # find gamma
         gamma_new = zeros(M, N);
         if parallel
-            gamma_new = @parallel (hcat) for i=1:N
+            gamma_new = @distributed (hcat) for i=1:N
                 mlogit_warp_grad(alpha, beta, timet, q[:, i], Y[i, :],
                                  delta=delta);
             end

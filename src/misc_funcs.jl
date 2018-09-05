@@ -95,7 +95,7 @@ function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Integer=1)
         M = length(y);
         out = sum(diff(x).*(y[1:M-1] + y[2:M])/2.0);
     else
-        out = diff(x).' * (y[1:m-1,:] + y[2:m,:])/2.0;
+        out = transpose(diff(x)) * (y[1:m-1,:] + y[2:m,:])/2.0;
         siz = size(y); siz = collect(siz); siz[1] = 1;
         out = reshape(out, tuple(siz...));
         out = ipermutedims(out, perm);

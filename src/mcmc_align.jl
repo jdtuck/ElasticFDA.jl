@@ -53,7 +53,7 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
                 increment = rand(Normal(0, tau));
                 increment_int = round(Integer,round(increment));
                 if (increment_int == 0)
-                    increment_int = (increment>0)?(1):(-1);
+                    increment_int = (increment>0) ? 1 : -1;
                 end
                 newj = match[i] + increment_int;
                 if (newj < match[i+1] && newj > match[i-1])
@@ -80,10 +80,10 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
                     for ll = 1:2*times
                         tempx = round(Integer, interx[ll]);
                         qt1_5_interx[ll] = q1[tempx+1];
-                        internew[ll] = (internew[ll]>(p-1))?(p-1):(internew[ll]);
+                        internew[ll] = (internew[ll]>(p-1)) ? (p-1) : internew[ll];
                         tempnew = round(Integer, times*internew[ll]+1);
                         qt2_5_internew[ll] = q2LL[tempnew]*sqrt(diff_ynew[ll]);
-                        interold[ll] = (interold[ll]>(p-1))?(p-1):(interold[ll]);
+                        interold[ll] = (interold[ll]>(p-1)) ? (p-1) : interold[ll];
                         tempold = round(Integer, times*interold[ll]+1);
                         qt2_5_interold[ll] = q2LL[tempold]*sqrt(diff_yold[ll]);
                     end
@@ -94,9 +94,9 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
                     adjustcon = exp((powera-1)*(sum(log(pnewvec))-
                                     sum(log(poldvec))));
                     ratio = adjustcon*exp(kappa*o_dist-kappa*n_dist);
-                    prob = (ratio < 1)?(ratio):(1);
+                    prob = (ratio < 1) ? ratio : 1;
                     u = rand(Uniform(0,1));
-                    match[i] = (u<prob)?(newj):(match[i]);
+                    match[i] = (u<prob) ? newj : match[i];
                 end
             end
         end
@@ -108,7 +108,7 @@ function simuiter(iter, p, q1, q2, L, tau, times, kappa, alpha, beta,
             scale1[ii] = sqrt((match[ii+1]-match[ii])/times);
         end
         for kk = 1:p
-            idy[kk] = (idy[kk]<p)?(idy[kk]):(p-1);
+            idy[kk] = (idy[kk]<p) ? idy[kk] : (p-1);
             scalevec[kk] = scale1[ceil(Integer,kk/times)];
             qt_5_fitted[kk] = scalevec[kk]*q2[round(Integer,idy[kk])+1];
         end
@@ -244,14 +244,14 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
                         for ll = 1:2*times
                             tempx = round(Integer, interx[ll]);
                             mu_5_interx[ll] = mu_5[tempx+1];
-                            internew[ll] = (internew[ll]>(m-1))?(m-1):(internew[ll]);
+                            internew[ll] = (internew[ll]>(m-1)) ? (m-1) : internew[ll];
                             tempnew = round(Integer, times*internew[ll]+1);
-                            tempnew = (tempnew > q2LLlen)?(q2LLlen):(tempnew);
+                            tempnew = (tempnew > q2LLlen) ? q2LLlen : tempnew;
                             qt2_5_internew[ll] = q2LL_mat[tempnew, t] *
                                 sqrt(diff_ynew[ll]);
-                            interold[ll] = (interold[ll]>(m-1))?(m-1):(interold[ll]);
+                            interold[ll] = (interold[ll]>(m-1)) ? (m-1) : interold[ll];
                             tempold = round(Integer, times*interold[ll]+1);
-                            tempold = (tempold > q2LLlen)?(q2LLlen):(tempold);
+                            tempold = (tempold > q2LLlen) ? q2LLlen : tempold;
                             qt2_5_interold[ll] = q2LL_mat[tempold, t] *
                                 sqrt(diff_yold[ll]);
                         end
@@ -262,9 +262,9 @@ function itermatch(iter, n, m, mu_5, match_matrix, qt_matrix,
                         adjustcon = exp((powera-1)*(sum(log(pnewvec))-
                                         sum(log(poldvec))));
                         ratio = adjustcon*exp(kappa*o_dist-kappa*n_dist);
-                        prob = (ratio < 1)?(ratio):(1);
+                        prob = (ratio < 1) ? ratio : 1;
                         u = rand(Uniform(0,1));
-                        match[i] = (u<prob)?(newj):(match[i]);
+                        match[i] = (u<prob) ? newj : match[i];
                     end
                 end
             end

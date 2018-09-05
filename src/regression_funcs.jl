@@ -17,7 +17,7 @@ function regression_warp(beta::Vector, timet::Vector, q::Vector, y::Float64,
     qM = warp_q_gamma(timet, q, gam_M);
     y_M = trapz(timet, qM.*beta);
 
-    gam_m = optimum_reparam(-1.*beta, timet, q, method="DP2");
+    gam_m = optimum_reparam(-1.0*beta, timet, q, method="DP2");
     qm = warp_q_gamma(timet, q, gam_m);
     y_m = trapz(timet, qm.*beta);
 
@@ -51,7 +51,7 @@ function logistic_warp(beta::Vector, timet::Vector, q::Array, y)
     if y == 1
         gamma = optimum_reparam(beta, timet, q, method="DP2");
     elseif y == -1
-        gamma = optimum_reparam(-1.*beta, timet, q, method="DP2");
+        gamma = optimum_reparam(-1.0*beta, timet, q, method="DP2");
     end
 
     return gamma
@@ -89,7 +89,7 @@ function phi(t)
     idx = t .> 0;
     out = Array(Float64, size(t));
     if sum(idx) > 0
-        out[idx] = 1./(1+exp(-1*t[idx]));
+        out[idx] = 1.0/(1+exp(-1*t[idx]));
     end
     exp_t = exp(t[~idx]);
     out[~idx] = exp_t ./ (1 + exp_t);
@@ -113,7 +113,7 @@ function logit_loss(b, X, y)
     yz = y .* z;
     idx = yz .> 0;
     out = zeros(yz);
-    out[idx] = log(1+exp(-1.*yz[idx]));
+    out[idx] = log(1+exp(-1.0*yz[idx]));
     out[~idx] = (-yz[~idx] + log(1+exp(yz[~idx])));
     out = sum(out);
     return out
@@ -133,7 +133,7 @@ function logit_gradient!(b, grad, X, y)
     z = X * b;
     z = phi(y.*z);
     z0 = (z-1) .* y;
-    grad[:] = X.' * z0;
+    grad[:] = transpose(X) * z0;
 end
 
 
@@ -151,7 +151,7 @@ function logit_hessian(s, b, X, y)
     z = phi(y.*z);
     d = z*(1-z);
     wa = d.*(X * s);
-    Hs = X.' * wa;
+    Hs = transpose(X) * wa;
     return Hs
 end
 
@@ -184,12 +184,12 @@ function mlogit_warp_grad(alpha, beta, timet, q, y; max_itr=8000,
     gamout = zeros(m1);
     beta1 = reshape(beta, m1*m, 1);
 
-    ccall((:mlogit_warp_grad, libfdasrsf), Void,
-          (Ptr{Int32}, Ptr{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64},
-          Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32}, Ptr{Float64},
-          Ptr{Float64},  Ptr{Int32}, Ptr{Float64}),
-          &m1, &m, alpha, beta1, timet, gam1, q, y, &max_itr, &tol, &delt,
-          &display, gamout)
+    ccall((:mlogit_warp_grad, libfdasrsf), Cvoid,
+          (Ref{Int32}, Ref{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64},
+          Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Ref{Int32}, Ref{Float64},
+          Ref{Float64},  Ref{Int32}, Ptr{Float64}),
+          m1, m, alpha, beta1, timet, gam1, q, y, max_itr, tol, delt,
+          display, gamout)
 
     return gamout
 end
@@ -227,7 +227,7 @@ function mlogit_loss(b, X, Y)
     B = reshape(b, M, m);
     Yhat = X * B;
     Yhat -= repmat(minimum(Yhat, 2),1,size(Yhat,2));
-    Yhat = exp(-1.*Yhat);
+    Yhat = exp(-1.0*Yhat);
     # l1-normalize
     Yhat = Yhat./repmat(sum(Yhat, 2),1,size(Yhat,2));
 
@@ -254,14 +254,14 @@ function mlogit_gradient!(b, grad, X, Y)
     B = reshape(b, M, m);
     Yhat = X * B;
     Yhat -= repmat(minimum(Yhat, 2),1,size(Yhat,2));
-    Yhat = exp(-1.*Yhat);
+    Yhat = exp(-1.0*Yhat);
     # l1-normalize
     Yhat = Yhat./repmat(sum(Yhat, 2),1,size(Yhat,2));
 
     _Yhat = Yhat .* Y;
     _Yhat = _Yhat./repmat(sum(_Yhat,2),1,size(_Yhat,2));
     Yhat -= _Yhat;
-    grad1 = X.' * Yhat;
+    grad1 = transpose(X) * Yhat;
     grad1 /= -N;
     grad[:] = reshape(grad1, M*m, 1);
 end

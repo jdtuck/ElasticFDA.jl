@@ -59,7 +59,7 @@ function group_warping_bayes(f; iter=20000, times=5, powera=1)
 
     MAP = copy(mu_5);
     best_match_matrix = copy(match_matrix);
-    dist_vec = 100.*ones(n);
+    dist_vec = 100.0*ones(n);
     best_vec = copy(dist_vec);
     sumdist = zeros(iter);
     kappa_collect = zeros(iter);

@@ -7,6 +7,8 @@ using NLopt
 using ProgressMeter
 using Distributions
 using Printf
+using Distributed
+using Libdl
 
 export
     smooth_data!,
@@ -41,8 +43,6 @@ export
     curve_pair_align,
     curve_geodesic,
     resamplecurve,
-    reparam_image,
-    pair_align_image,
     bs,
     project_curve,
     inverse_exp_coord,
@@ -76,15 +76,15 @@ const libfdaqmap = joinpath(dirname(@__FILE__), path2)
 
 # Ensure library is available.
 function __init__()
-    if (Libdl.dlopen_e(libfdasrsf) == C_NULL)
+    if (dlopen_e(libfdasrsf) == C_NULL)
         error("libfdasrsf not properly installed. Run build(\"ElasticFDA\")")
     end
 
-    if (Libdl.dlopen_e(libgropt) == C_NULL)
+    if (dlopen_e(libgropt) == C_NULL)
         error("libgropt not properly installed. Run build(\"ElasticFDA\")")
     end
 
-    if (Libdl.dlopen_e(libfdaqmap) == C_NULL)
+    if (dlopen_e(libfdaqmap) == C_NULL)
         error("libfdaqmap not properly installed. Run build(\"ElasticFDA\")")
     end
 
@@ -105,7 +105,7 @@ include("pair_warping_bayes.jl")
 include("regression.jl")
 include("regression_funcs.jl")
 include("time_warping.jl")
-include("image_funcs.jl")
-include("image_stats.jl")
+#include("image_funcs.jl")
+#include("image_stats.jl")
 
 end # module

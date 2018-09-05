@@ -114,7 +114,7 @@ function bs(x::Vector, df, norder, nderiv=0)
         for r in j:-1:1
             leftpr = left + r;
             temp = ones(nd-jj) * (knots[leftpr] - knots[leftpr-j])/j;
-            b[nxs,r] = -1.*b[nxs,r]./temp;
+            b[nxs,r] = -1*b[nxs,r]./temp;
             b[nxs,r+1] = b[nxs,r+1] - b[nxs,r];
         end
     end
@@ -131,12 +131,12 @@ function bs(x::Vector, df, norder, nderiv=0)
     # set up output matrix bsplinemat
     width = maximum([ns, nbasis]) + km1 + km1;
     cc = zeros(nx*width);
-    index = collect((1-nx):0)*onenb.' + nx * (left*onenb.' + onenx*collect(-km1:0).');
+    index = collect((1-nx):0)*transpose(onenb) + nx * (left*transpose(onenb) + onenx*transpose(collect(-km1:0)));
     index = round(Integer, index);
     cc[index] = b[nd*collect(1:nx), :];
     # (This uses the fact that for a column vector v and a matrix A,
     #  v(A)(i,j) = v(A(i,j)), all i, j.)
-    index2 = round(Integer, collect((1-nx):0)*onens.' + nx * onenx*collect(1:ns).');
+    index2 = round(Integer, collect((1-nx):0)*transpose(onens) + nx * onenx*transpose(collect(1:ns)));
     bsplinemat = reshape(cc[index2],nx,ns);
 
     if sortwrd

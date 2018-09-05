@@ -77,7 +77,7 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
     mf = f[:, min_ind];
 
     if parallel
-        gam = @parallel (hcat) for i=1:N
+        gam = @distributed (hcat) for i=1:N
             optimum_reparam(mq, timet, q[:, i], lam, method=optim,
                             f1o=mf[1], f2o=fo[i]);
         end
@@ -123,7 +123,7 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
 
         # Matching Step
         if parallel
-            gam = @parallel (hcat) for i=1:N
+            gam = @distributed (hcat) for i=1:N
                 optimum_reparam(mq[:,r], timet, q[:, i, 1], lam, method=optim,
                                 f1o=mf[1,r], f2o=fo[i]);
             end
@@ -183,7 +183,7 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
     # Last Step with Centering of gam
     r = r1 + 1;
     if parallel
-        gam = @parallel (hcat) for i=1:N
+        gam = @distributed (hcat) for i=1:N
             optimum_reparam(mq[:,r], timet, q[:, i, 1], lam, method=optim,
                             f1o=mf[1,r], f2o=fo[i]);
         end
@@ -337,7 +337,7 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
 
         # Matching Step
         if parallel
-            gam_t = @parallel (hcat) for i=1:N
+            gam_t = @distributed (hcat) for i=1:N
                 optimum_reparam(qhat[:,i], timet, qi[:,i,itr], lam,
                                 method="DP2");
             end
