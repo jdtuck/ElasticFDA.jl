@@ -58,20 +58,20 @@ end
 const libfdasrsf = joinpath(dirname(@__FILE__), path)
 
 # load gropt library
-if (Sys.isunix())
-    path1 = "../deps/src/gropt/gropt"
-else
-    path1 = "..\\deps\\gropt"
-end
-const libgropt = joinpath(dirname(@__FILE__), path1)
+# if (Sys.isunix())
+#     path1 = "../deps/src/gropt/gropt"
+# else
+#     path1 = "..\\deps\\gropt"
+# end
+# const libgropt = joinpath(dirname(@__FILE__), path1)
 
 # load fdaqmap library
-if (Sys.isunix())
-    path2 = "../deps/src/fdaqmap/fdaqmap"
-else
-    path2 = "..\\deps\\fdaqmap"
-end
-const libfdaqmap = joinpath(dirname(@__FILE__), path2)
+# if (Sys.isunix())
+#     path2 = "../deps/src/fdaqmap/fdaqmap"
+# else
+#     path2 = "..\\deps\\fdaqmap"
+# end
+# const libfdaqmap = joinpath(dirname(@__FILE__), path2)
 
 
 # Ensure library is available.
@@ -80,13 +80,13 @@ function __init__()
         error("libfdasrsf not properly installed. Run build(\"ElasticFDA\")")
     end
 
-    if (dlopen_e(libgropt) == C_NULL)
-        error("libgropt not properly installed. Run build(\"ElasticFDA\")")
-    end
+  #  if (dlopen_e(libgropt) == C_NULL)
+  #       error("libgropt not properly installed. Run build(\"ElasticFDA\")")
+  #   end
 
-    if (dlopen_e(libfdaqmap) == C_NULL)
-        error("libfdaqmap not properly installed. Run build(\"ElasticFDA\")")
-    end
+  #  if (dlopen_e(libfdaqmap) == C_NULL)
+  #      error("libfdaqmap not properly installed. Run build(\"ElasticFDA\")")
+  #  end
 
 end
 

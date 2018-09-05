@@ -1,6 +1,6 @@
 using ElasticFDA
 using Distributions
-using JLD
+using JLD2
 using Base.Test
 
 d = load("simu_data.jld");
@@ -112,7 +112,7 @@ pd = curve_principal_directions(betamean, mu, K, mode='C');
 s = sample_shapes(mu, K, mode='C');
 
 # test image functions
-vars = load("image.jld");
-I1 = vars["I1"];
-I2 = vars["I2"];
-Inew, gam = pair_align_image(I1,I2,itermax=1);
+# vars = load("image.jld");
+# I1 = vars["I1"];
+# I2 = vars["I2"];
+# Inew, gam = pair_align_image(I1,I2,itermax=1);
