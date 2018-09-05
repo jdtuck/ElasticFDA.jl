@@ -3,8 +3,7 @@ using Distributions
 using JLD2
 using Base.Test
 
-d = load("simu_data.jld");
-f = d["f"];
+@load "simu_data.jld2"
 timet = collect(linspace(0,1,size(f,1)));
 f1 = f[:,1];
 f2 = f[:,2];
@@ -80,8 +79,7 @@ timet = collect(timet);
 out = elastic_mlogistic(f, y_orig, timet, max_itr=1);
 out1 = elastic_prediction(f, timet, out, y=y_orig);
 
-d = load("beta.jld");
-beta = d["beta"];
+@load "beta.jld2";
 
 # test curve_to_q
 q1 = curve_to_q(beta[:,:,1]);
