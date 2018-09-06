@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'ElasticFDA.jl'
-copyright = '2015, J. Derek Tucker'
+copyright = '2018, J. Derek Tucker'
 author = 'J. Derek Tucker'
 
 # The version info for the project you're documenting, acts as replacement for
