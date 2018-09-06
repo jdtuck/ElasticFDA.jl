@@ -411,7 +411,7 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
     # Get Final PCA
     out = vert_fPCA(fn, timet, qn, no=num_comp);
 
-    fmean = mean(f0[1,:]) + cumtrapz(timet, mqn .* abs(mqn));
+    fmean = mean(f0[1,:]) .+ cumtrapz(timet, mqn .* abs.(mqn));
 
     fgam = zeros(M, N);
     for ii in 1:N
