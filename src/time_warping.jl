@@ -116,6 +116,8 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
     r1 = 0;
 
     for r in 1:MaxItr
+        global r1
+        global r
         @printf("updating step: r=%d\n", r)
         if r == MaxItr
             println("maximal number of iterations reached")
