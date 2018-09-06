@@ -114,9 +114,9 @@ Convert function to square-root slope function (srsf)
 """
 function f_to_srsf(f::Array, timet=0, smooth=false)
     if (timet == 0)
-        timet = collect(linspace(0,1,length(f)));
+        timet = LinRange(0,1,length(f));
     end
-    f0, g, g2 = gradient_spline(timet, f, smooth);
+    f0, g, g2 = gradient_spline(collect(timet), f, smooth);
     q = g ./ sqrt.(abs.(g).+eps(Float64));
     return q
 end
@@ -214,7 +214,7 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
         gam = yi[timet];
     elseif (method == "SIMUL")
         s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1,c2);
-        u = linspace(0,1,length(g1));
+        u = LinRange(0,1,length(g1));
         tmin = minimum(timet);
         tmax = maximum(timet);
         timet2 = copy(timet);
@@ -306,7 +306,7 @@ function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
         gam = yi[time1];
     elseif (method == "SIMUL")
         s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1,c2);
-        u = linspace(0,1,length(g1));
+        u = LinRange(0,1,length(g1));
         tmin = minimum(time1);
         tmax = maximum(time1);
         timet1 = copy(time1);
@@ -357,7 +357,7 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
             gam0 = yi[timet];
         elseif (method == "SIMUL")
             s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1,ci);
-            u = linspace(0,1,length(g1));
+            u = LinRange(0,1,length(g1));
             tmin = minimum(timet);
             tmax = maximum(timet);
             timet2 = copy(timet);
@@ -410,7 +410,7 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
             sizei = Cdouble[0];
         elseif (method == "SIMUL")
             s1,s2,g1,g2,ext1,ext2,mpath = simul_align(c1i,c2i);
-            u = linspace(0,1,length(g1));
+            u = LinRange(0,1,length(g1));
             tmin = minimum(timet);
             tmax = maximum(timet);
             timet2 = copy(timet);
@@ -563,7 +563,7 @@ Bayesian qtocurve function
 function qtocurve(q, timet=0)
     m = length(q);
     if (timet == 0)
-        timet = linspace(0, 1, m+1);
+        timet = LinRange(0, 1, m+1);
     end
     curve = zeros(m+1);
     for i = 2:(m+1)

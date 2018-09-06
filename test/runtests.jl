@@ -75,10 +75,10 @@ out = elastic_logistic(f, y_orig, timet, max_itr=1);
 out1 = elastic_prediction(f, timet, out, y=y_orig);
 
 # test elastic m-logistic regression
-include("test_warp_mlogistic.jl")
-timet = collect(timet);
-out = elastic_mlogistic(f, y_orig, timet, max_itr=1);
-out1 = elastic_prediction(f, timet, out, y=y_orig);
+# include("test_warp_mlogistic.jl")
+# timet = collect(timet);
+# out = elastic_mlogistic(f, y_orig, timet, max_itr=1);
+# out1 = elastic_prediction(f, timet, out, y=y_orig);
 
 @load "beta.jld2";
 

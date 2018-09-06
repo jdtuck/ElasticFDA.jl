@@ -49,9 +49,9 @@ Calculate warping for logistic regression
 """
 function logistic_warp(beta::Vector, timet::Vector, q::Array, y)
     if y == 1
-        gamma = optimum_reparam(beta, timet, q, method="DP2");
+        gamma = optimum_reparam(beta, timet, q, method="DP");
     elseif y == -1
-        gamma = optimum_reparam(-1.0*beta, timet, q, method="DP2");
+        gamma = optimum_reparam(-1.0*beta, timet, q, method="DP");
     end
 
     return gamma
@@ -87,12 +87,12 @@ Logistic function
 """
 function phi(t)
     idx = t .> 0;
-    out = Array(Float64, size(t));
+    out = Array{Float64}(undef, size(t));
     if sum(idx) > 0
-        out[idx] = 1.0/(1+exp(-1*t[idx]));
+        out[idx] = 1.0/(1 .+ exp(-1*t[idx]));
     end
-    exp_t = exp(t[~idx]);
-    out[~idx] = exp_t ./ (1 + exp_t);
+    exp_t = exp.(t[.~idx]);
+    out[.~idx] = exp_t ./ (1 .+ exp_t);
     return out
 end
 
@@ -112,9 +112,9 @@ function logit_loss(b, X, y)
     z = X * b;
     yz = y .* z;
     idx = yz .> 0;
-    out = zeros(yz);
-    out[idx] = log(1+exp(-1.0*yz[idx]));
-    out[~idx] = (-yz[~idx] + log(1+exp(yz[~idx])));
+    out = zeros(size(yz));
+    out[idx] = log.(1 .+ exp.(-1.0*yz[idx]));
+    out[.~idx] = (-yz[.~idx] + log.(1 .+ exp.(yz[.~idx])));
     out = sum(out);
     return out
 end
@@ -180,7 +180,7 @@ function mlogit_warp_grad(alpha, beta, timet, q, y; max_itr=8000,
     for i in 1:m
         beta[:, i] = beta[:, i] / norm(beta[:, i]);
     end
-    gam1 = collect(linspace(0, 1, m1));
+    gam1 = collect(LinRange(0, 1, m1));
     gamout = zeros(m1);
     beta1 = reshape(beta, m1*m, 1);
 
@@ -226,13 +226,13 @@ function mlogit_loss(b, X, Y)
     M = size(X,2);   # n_features
     B = reshape(b, M, m);
     Yhat = X * B;
-    Yhat -= repeat(minimum(Yhat, 2),1,size(Yhat,2));
-    Yhat = exp(-1.0*Yhat);
+    Yhat -= repeat(minimum(Yhat, dims=2),1,size(Yhat,2));
+    Yhat = exp.(-1.0*Yhat);
     # l1-normalize
-    Yhat = Yhat./repeat(sum(Yhat, 2),1,size(Yhat,2));
+    Yhat = Yhat./repeat(sum(Yhat, dims=2),1,size(Yhat,2));
 
     Yhat = Yhat .* Y;
-    nll = sum(log(sum(Yhat,2)));
+    nll = sum(log.(sum(Yhat,dims=2)));
     nll /= -N;
 
     return nll

@@ -16,7 +16,7 @@ function resamplecurve(x, N=100)
     end
 
     cumdel = cumsum(delta)/sum(delta);
-    newdel = linspace(0,1,N);
+    newdel = LinRange(0,1,N);
 
     for r in 1:n
         s = Spline1D(cumdel,vec(x[r,:]));
@@ -45,8 +45,8 @@ function calculatecentroid(beta)
         normbetadot[i] = norm(betadot[:,i]);
         integrand[:,i] = beta[:,i]*normbetadot[i];
     end
-    scale = trapz(collect(linspace(0,1,T)), normbetadot);
-    centroid = trapz(collect(linspace(0,1,T)), integrand, 2)./scale;
+    scale = trapz(collect(LinRange(0,1,T)), normbetadot);
+    centroid = trapz(collect(LinRange(0,1,T)), integrand, 2)./scale;
 
     return centroid
 end
@@ -111,7 +111,7 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
                          lam::Float64=0.0; method::String="DP", w=0.01,
                          rotated::Bool=true, isclosed::Bool=false)
     n1, M = size(beta2);
-    timet = collect(linspace(0,1,M));
+    timet = collect(LinRange(0,1,M));
     skipm = 4;
     auto = 2;
     tau = 0;
@@ -129,7 +129,7 @@ function optimum_reparam(beta1::Array{Float64,2}, beta2::Array{Float64,2},
         G = zeros(M);
         T = zeros(M);
         sizei = Cdouble[0];
-        ccall((:DynamicProgrammingQ2, "libfdasrsf"), Cvoid,
+        ccall((:DynamicProgrammingQ2, libfdasrsf), Cvoid,
             (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Int32,
             Int32, Int32, Ptr{Float64},Ptr{Float64}, Int32, Int32,
             Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Float64), q2i, timet,
@@ -177,9 +177,9 @@ function find_best_rotation(q1, q2)
     A = q1*q2';
     U, S, V = svd(A);
     if (abs(det(U) * det(V) - 1) < 10 * epsilon)
-        S = eye(n)
+        S = Matrix(1.0I, n, n)
     else
-        S = eye(n)
+        S = Matrix(1.0I, n, n)
         S[:,end] = -S[:,end];
     end
     R = U*S*V';
@@ -204,7 +204,7 @@ function calculate_variance(beta)
     normbetadot = zeros(T);
     centroid = calculatecentroid(beta);
     integrand = zeros(n, n, T);
-    t = collect(linspace(0,1,T));
+    t = collect(LinRange(0,1,T));
     for i = 1:T
         normbetadot[i] = norm(betadot[:,i]);
         a1 = beta[:,i] - centroid;
@@ -261,10 +261,10 @@ function find_basis_normal(q)
         integrandb3[i] = (q[:,i]'*h3[:,i])[1];
         integrandb4[i] = (q[:,i]'*h4[:,i])[1];
     end
-    b3 = h3 - q*trapz(collect(linspace(0,1,T)),integrandb3);
-    b4 = h4 - q*trapz(collect(linspace(0,1,T)),integrandb4);
+    b3 = h3 - q*trapz(collect(LinRange(0,1,T)),integrandb3);
+    b4 = h4 - q*trapz(collect(LinRange(0,1,T)),integrandb4);
 
-    basis = Array(Any,2);
+    basis = Array{Any}(undef,2);
     basis[1] = b3;
     basis[2] = b4;
 
@@ -294,9 +294,9 @@ function calc_j(basis)
     end
 
     j = zeros(2,2);
-    j[1,1] = trapz(collect(linspace(0,1,T)), integrand11);
-    j[1,2] = trapz(collect(linspace(0,1,T)), integrand12);
-    j[2,2] = trapz(collect(linspace(0,1,T)), integrand22);
+    j[1,1] = trapz(collect(LinRange(0,1,T)), integrand11);
+    j[1,2] = trapz(collect(LinRange(0,1,T)), integrand12);
+    j[2,2] = trapz(collect(LinRange(0,1,T)), integrand22);
     j[2,1] = j[1,2];
 
     return j
@@ -395,7 +395,7 @@ function group_action_by_gamma(q, gamma)
     n, T = size(q);
     gammadot = gradient(gamma, 1.0/T);
     qn = zeros(n, T);
-    timet = collect(linspace(0, 1, T));
+    timet = collect(LinRange(0, 1, T));
 
     for j = 1:n
         s = Spline1D(timet, vec(q[j, :]));
@@ -418,7 +418,7 @@ Warp curve f by gamma
 function group_action_by_gamma_coord(f, gamma)
     n, T = size(f);
     fn = zeros(n,T);
-    timet = collect(linspace(0,1,T));
+    timet = collect(LinRange(0,1,T));
 
     for j = 1:n
         s = Spline1D(timet, vec(f[j, :]));
@@ -638,7 +638,7 @@ function gram_schmidt(basis)
     b2 = b2 - innerprod_q2(basis1,b2)*basis1;
     basis2 = b2 / sqrt(innerprod_q2(b2, b2));
 
-    basis_o = Array(Any,2);
+    basis_o = Array{Any}(undef,2);
     basis_o[1] = basis1;
     basis_o[2] = basis2;
 
@@ -680,7 +680,7 @@ function scale_curve(beta)
     for i = 1:T
         normbetadot[i] = norm(betadot[:,i]);
     end
-    scale = trapz(collect(linspace(0,1,T)), normbetadot);
+    scale = trapz(collect(LinRange(0,1,T)), normbetadot);
     beta_scaled = beta / scale;
 
     return beta_scaled, scale

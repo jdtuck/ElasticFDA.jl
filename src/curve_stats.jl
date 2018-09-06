@@ -199,12 +199,12 @@ function curve_principal_directions(betamean::Array{Float64, 2}, mu, K;
     n, T = size(betamean);
     U, s, V = svd(K);
 
-    qarray = Array(Any, no, 2*N+1);
-    qarray1 = Array(Any, N);
-    qarray2 = Array(Any, N);
-    pd = Array(Any, no, 2*N+1);
-    pd1 = Array(Any, N);
-    pd2 = Array(Any, N);
+    qarray = Array{Any}(undef, (no, 2*N+1));
+    qarray1 = Array{Any}(undef, N);
+    qarray2 = Array{Any}(undef, N);
+    pd = Array{Any}(undef, no, 2*N+1);
+    pd1 = Array{Any}(undef, N);
+    pd2 = Array{Any}(undef, N);
 
     for m = 1:no
         princDir = [U[1:T,m]'; U[T+1:2*T,m]'];
@@ -315,7 +315,7 @@ function sample_shapes(mu::Array{Float64,2}, K; mode='O', no=3, numSamp=10)
 
     q1 = copy(mu);
     q2 = copy(mu);
-    samples = Array(Any, numSamp);
+    samples = Array{Any}(undef, numSamp);
     for i = 1:numSamp
         v = zeros(2,T);
         for m = 1:no

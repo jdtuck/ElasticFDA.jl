@@ -10,7 +10,7 @@ function bs(x::Vector, df, norder, nderiv=0)
     n = length(x);
 
     nbreaks = df - norder + 2;
-    breaks = linspace(minimum(x), maximum(x), nbreaks);
+    breaks = LinRange(minimum(x), maximum(x), nbreaks);
     # Check Inputs
     if df <= 0
         error("Degrees of freedom <= 0.")
@@ -60,8 +60,8 @@ function bs(x::Vector, df, norder, nderiv=0)
 
     knotslower = knots[1:nbasis];
     index = sortperm([knotslower; x]);
-    point = find(index .> nbasis) - collect(1:length(x));
-    left = maximum(hcat(point, k*onenx),2);
+    point = findall(index .> nbasis) - collect(1:length(x));
+    left = maximum(hcat(point, k*onenx),dims=2);
 
     # compute bspline values and derivatives, if needed:
 
@@ -77,9 +77,9 @@ function bs(x::Vector, df, norder, nderiv=0)
     for j in 1:(k-nd)
         saved = zeros(nx);
         for r in 1:j
-            leftpr = round(Integer, left + r);
+            leftpr = round.(Integer, left .+ r);
             tr = knots[leftpr] - x;
-            tl = x - knots[leftpr-j];
+            tl = x .- knots[leftpr.-j];
             term = b[nxs,r]./(tr+tl);
             b[nxs,r] = saved + tr.*term;
             saved = tl.*term;
@@ -122,7 +122,7 @@ function bs(x::Vector, df, norder, nderiv=0)
     # Finally, zero out all rows of b corresponding to x outside the basic
     # interval, [breaks[1] ... breaks[nb]]
 
-    index = find((x.<breaks[1]) | (x .> breaks[nb]));
+    index = findall((x.<breaks[1]) .| (x .> breaks[nb]));
     if !isempty(index)
         temp = [(1-nd):0].*ones(length(index))+nd*ones(nd).*index;
         b[temp, :] = zeros(nd*length(index),k);
@@ -132,11 +132,11 @@ function bs(x::Vector, df, norder, nderiv=0)
     width = maximum([ns, nbasis]) + km1 + km1;
     cc = zeros(nx*width);
     index = collect((1-nx):0)*transpose(onenb) + nx * (left*transpose(onenb) + onenx*transpose(collect(-km1:0)));
-    index = round(Integer, index);
+    index = round.(Integer, index);
     cc[index] = b[nd*collect(1:nx), :];
     # (This uses the fact that for a column vector v and a matrix A,
     #  v(A)(i,j) = v(A(i,j)), all i, j.)
-    index2 = round(Integer, collect((1-nx):0)*transpose(onens) + nx * onenx*transpose(collect(1:ns)));
+    index2 = round.(Integer, collect((1-nx):0)*transpose(onens) + nx * onenx*transpose(collect(1:ns)));
     bsplinemat = reshape(cc[index2],nx,ns);
 
     if sortwrd

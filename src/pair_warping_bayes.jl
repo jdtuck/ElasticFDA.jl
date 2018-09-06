@@ -99,9 +99,9 @@ function pair_warping_bayes(f1, f2; iter=15000, times=5, powera=1)
     push!(Meanidy,p+1);
 
     f_i = interpolate((collect(1:p),), f2, Gridded(Linear()))
-    reg_q = f_i[linspace(1,p,times*(p+1)-1)];
+    reg_q = f_i[LinRange(1,p,times*(p+1)-1)];
     reg_q = reg_q[round(Integer, (bestidy-1)*times+1)];
-    reg_a = f_i[linspace(1,p,times*(p+1)-1)];
+    reg_a = f_i[LinRange(1,p,times*(p+1)-1)];
     reg_a = reg_a[floor(Integer, (Meanidy-1)*times+1)];
 
     out = Dict("f1" => f1, "f2_q" => reg_q, "gam_q" => (bestidy-1)/p,

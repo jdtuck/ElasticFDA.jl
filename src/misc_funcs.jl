@@ -120,7 +120,7 @@ function trapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Integer=1)
         M = length(y);
         out = sum(diff(x).*(y[1:M-1] + y[2:M])/2.0);
     else
-        out = transpose(diff(x)) * (y[1:m-1,:] + y[2:m,:])/2.0;
+        out = transpose(diff(x)) * (reshape(y,Val(2))[1:m-1,:] + reshape(y,Val(2))[2:m,:])/2.0;
         siz = size(y); siz = collect(siz); siz[1] = 1;
         out = reshape(out, tuple(siz...));
         out = permutedims(out, invperm(perm));
@@ -158,8 +158,8 @@ function cumtrapz(x::Array{Float64, 1}, y::Array{Float64}, dim::Integer=1)
         z = [0; cumsum(dt.*(y[1:(m-1)] + y[2:m]))];
     else
         dt = repeat(diff(x)/2.0,1,n);
-        z = [zeros(1,n); cumsum(dt.*(y[1:(m-1), :] + y[2:m, :]),1)];
-        z = ipermutedims(z, perm);
+        z = [zeros(1,n); cumsum(dt.*(y[1:(m-1), :] + y[2:m, :]),dims=1)];
+        z = permutedims(z, invperm(perm));
     end
 
     return z

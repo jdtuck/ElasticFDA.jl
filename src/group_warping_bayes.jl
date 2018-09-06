@@ -36,7 +36,7 @@ function group_warping_bayes(f; iter=20000, times=5, powera=1)
     if mod(m, times) != 0
         error(@sprintf("Number of points on q function = %d is not a mulitple of times = %d", m, times))
     end
-    timet = collect(linspace(0, 1, m+1));
+    timet = collect(LinRange(0, 1, m+1));
     n = size(f, 2)
     qt_matrix = zeros(m, n);
     qt_fitted_matrix = zeros(m, n);
@@ -104,7 +104,7 @@ function group_warping_bayes(f; iter=20000, times=5, powera=1)
          f_i = interpolate(([row;m+1],), best_match_matrix[:,t], Gridded(Linear()))
          gam_q[:, t] = f_i[1:(m+1)];
          f_o = interpolate((collect(1:size(f,1)),), f[:,t], Gridded(Linear()))
-         tmp = f_o[linspace(1,m,times*(m+1)-1)];
+         tmp = f_o[LinRange(1,m,times*(m+1)-1)];
          f_q[:, t] = tmp[round(Integer, (gam_q[:, t]-1)*times+1)];
          f_i = interpolate(([row;m+1],), bayes_warps[:,t], Gridded(Linear()))
          gam_a[:, t] = f_i[1:(m+1)];

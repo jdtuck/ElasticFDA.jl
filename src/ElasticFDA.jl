@@ -28,7 +28,6 @@ export
     elastic_distance,
     elastic_regression,
     elastic_logistic,
-    elastic_mlogistic,
     elastic_prediction,
     srsf_align,
     align_fPCA,

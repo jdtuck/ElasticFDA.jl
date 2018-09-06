@@ -142,7 +142,7 @@ Calculate mean function using Bayesian Dynamic Programming
 function DP_mean(f, times=5)
     cut = 5*times;
     iter = 20;
-    timet = linspace(0,1,size(f,1));
+    timet = LinRange(0,1,size(f,1));
     group = collect(1:size(f, 2));
     m = length(timet) - 1;
     n = size(f, 2);
@@ -210,7 +210,7 @@ function DP_mean(f, times=5)
     reg_curve = zeros(m+1, n);
     for j = 1:n
         f_i = interpolate((collect(0:m),), f[:, j], Gridded(Linear()))
-        tmp = f_i[linspace(0, m, times*(m+1)-1)];
+        tmp = f_i[LinRange(0, m, times*(m+1)-1)];
         reg_curve[:, j] = tmp[round(Integer, (rtmatrix[:,j] - 1)*times+1)];
     end
     crossmean = mean(reg_curve, 2);

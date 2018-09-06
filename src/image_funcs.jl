@@ -11,10 +11,10 @@ function apply_gam_to_gam(gamnew::Array, gam::Array)
     md = 8;
     mt = md*m;
     nt = md*n;
-    U = linspace(0,1,m);
-    V = linspace(0,1,n);
-    Ut = linspace(0,1,mt);
-    Vt = linspace(0,1,nt);
+    U = LinRange(0,1,m);
+    V = LinRange(0,1,n);
+    Ut = LinRange(0,1,mt);
+    Vt = LinRange(0,1,nt);
     gam_tmp = zeros(mt, nt, D);
     gam_new_tmp = zeros(mt, nt, D);
     for i = 1:D
@@ -59,8 +59,8 @@ function apply_gam_to_imag(img::Array, gam::Array)
         img_new = zeros(m,n);
     end
 
-    U = linspace(0,1,m);
-    V = linspace(0,1,n);
+    U = LinRange(0,1,m);
+    V = LinRange(0,1,n);
 
     if d == 1
         spl = Spline2D(U,V,img);
@@ -89,8 +89,8 @@ Compose Image Reparameterization with Identity
 """
 function apply_gam_gamid(gamid::Array,gaminc::Array)
     m,n,d = size(gamid);
-    U = linspace(0,1,m);
-    V = linspace(0,1,n);
+    U = LinRange(0,1,m);
+    V = LinRange(0,1,n);
 
     gam_cum = zeros(m,n,d);
     for j = 1:d
@@ -209,7 +209,7 @@ Form identity image warping
 function makediffeoid(nrow::Integer,ncol::Integer)
     D = 2;
     gamid = zeros(nrow,ncol,D);
-    U, V = meshgrid(linspace(0,1,ncol),linspace(0,1,nrow));
+    U, V = meshgrid(LinRange(0,1,ncol),LinRange(0,1,nrow));
 
     gamid[:,:,1] = U;
     gamid[:,:,2] = V;
@@ -378,7 +378,7 @@ Compute Basis Tid
     :param basis_type: type of basis (options are "t","s","o","i")
 """
 function formbasisTid(M,m,n;basis_type="t")
-    U, V = meshgrid(linspace(0,1,n), linspace(0,1,m));
+    U, V = meshgrid(LinRange(0,1,n), LinRange(0,1,m));
 
     idx = 1;
 

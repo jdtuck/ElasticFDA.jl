@@ -41,7 +41,7 @@ function elastic_regression(f::Array, y::Vector, timet::Vector; B=Union{}, lambd
 
     # Create B-spline basis if none provided
     if B == Union{}
-        B = bs(timet, df, 4);
+        B = bs(collect(timet), df, 4);
     end
     Nb = size(B,2);
 
@@ -53,7 +53,7 @@ function elastic_regression(f::Array, y::Vector, timet::Vector; B=Union{}, lambd
 
     q = f_to_srsf(f, timet, smooth);
 
-    gamma = repeat(linspace(0,1,M), 1, N);
+    gamma = repeat(LinRange(0,1,M), 1, N);
     fn = zeros(M, N);
     qn = zeros(M, N);
 
@@ -67,7 +67,7 @@ function elastic_regression(f::Array, y::Vector, timet::Vector; B=Union{}, lambd
         fn = zeros(M, N);
         qn = zeros(M, N);
         for ii in 1:N
-            xout = (timet[end] - timet[1]) * gamma[:, ii] + timet[1];
+            xout = (timet[end] - timet[1]) * gamma[:, ii] .+ timet[1];
             fn[:,ii] = approx(timet, f[:, ii], xout);
             qn[:,ii] = warp_q_gamma(timet, q[:,ii], gamma[:,ii]);
         end
@@ -101,7 +101,7 @@ function elastic_regression(f::Array, y::Vector, timet::Vector; B=Union{}, lambd
             int_X[ii] = trapz(timet, qn[:,ii].*beta);
         end
 
-        SSE[itr] = sum((y-alpha-int_X).^2);
+        SSE[itr] = sum((y.-alpha.-int_X).^2);
 
         # find gamma
         gamma_new = zeros(M, N);
@@ -129,11 +129,11 @@ function elastic_regression(f::Array, y::Vector, timet::Vector; B=Union{}, lambd
     # Last step with centering of gam
     gamI = sqrt_mean_inverse(gamma);
     gamI_dev = gradient(gamI, 1/(M-1));
-    timet0 = (timet[end] -timet[1]) .* gamI  + timet[1];
-    beta = approx(timet, beta, timet0) .* sqrt(gamI_dev);
+    timet0 = (timet[end] -timet[1]) .* gamI  .+ timet[1];
+    beta = approx(timet, beta, timet0) .* sqrt.(gamI_dev);
 
     for k in 1:N
-        qn[:, k] = approx(timet, qn[:, k], timet0) .* sqrt(gamI_dev);
+        qn[:, k] = approx(timet, qn[:, k], timet0) .* sqrt.(gamI_dev);
         fn[:, k] = approx(timet, fn[:, k], timet0);
         gamma[:, k] = approx(timet, gamma[:, k], timet0);
     end
@@ -174,6 +174,7 @@ function elastic_logistic(f, y, timet; B=Union{}, df=20, max_itr=20,
                           smooth=false)
 
     M, N = size(f);
+    timet = collect(timet)
 
     if M > 500
         parallel = true;
@@ -187,13 +188,13 @@ function elastic_logistic(f, y, timet; B=Union{}, df=20, max_itr=20,
 
     # Create B-spline basis if none provided
     if B == Union{}
-        B = bs(timet, df, 4);
+        B = bs(collect(timet), df, 4);
     end
     Nb = size(B,2);
 
     q = f_to_srsf(f, timet, smooth);
 
-    gamma = repeat(linspace(0,1,M), 1, N);
+    gamma = repeat(LinRange(0,1,M), 1, N);
     fn = zeros(M, N);
     qn = zeros(M, N);
 
@@ -208,7 +209,7 @@ function elastic_logistic(f, y, timet; B=Union{}, df=20, max_itr=20,
         fn = zeros(M, N);
         qn = zeros(M, N);
         for ii in 1:N
-            xout = (timet[end] - timet[1]) * gamma[:, ii] + timet[1];
+            xout = (timet[end] - timet[1]) * gamma[:, ii] .+ timet[1];
             fn[:,ii] = approx(timet, f[:, ii], xout);
             qn[:,ii] = warp_q_gamma(timet, q[:,ii], gamma[:,ii]);
         end
@@ -319,7 +320,7 @@ function elastic_mlogistic(f, y, timet; B=Union{}, df=20, max_itr=20,
 
     q = f_to_srsf(f, timet, smooth);
 
-    gamma = repeat(linspace(0,1,M), 1, N);
+    gamma = repeat(LinRange(0,1,M), 1, N);
     fn = zeros(M, N);
     qn = zeros(M, N);
 
@@ -334,7 +335,7 @@ function elastic_mlogistic(f, y, timet; B=Union{}, df=20, max_itr=20,
         fn = zeros(M, N);
         qn = zeros(M, N);
         for ii in 1:N
-            xout = (timet[end] - timet[1]) * gamma[:, ii] + timet[1];
+            xout = (timet[end] - timet[1]) * gamma[:, ii] .+ timet[1];
             fn[:,ii] = approx(timet, f[:, ii], xout);
             qn[:,ii] = warp_q_gamma(timet, q[:,ii], gamma[:,ii]);
         end
@@ -412,6 +413,7 @@ Prediction from elastic regression model
     :return Perf: Performance metric if truth is supplied
 """
 function elastic_prediction(f, timet, model::Dict; y=Union{}, smooth=false)
+    timet = collect(timet)
     q = f_to_srsf(f, timet, smooth);
     n = size(q, 2);
 
@@ -424,9 +426,9 @@ function elastic_prediction(f, timet, model::Dict; y=Union{}, smooth=false)
 
     for ii in 1:n
         diff = model["q"] - repeat(q[:, ii], 1, size(model["q"], 2));
-        dist = sum(abs(diff).^2, 1).^(1/2);
+        dist = sum(abs.(diff).^2, dims=1).^(1/2);
         q_tmp = warp_q_gamma(timet, q[:, ii],
-                             model["gamma"][:, argmin(dist)]);
+                             model["gamma"][:, argmin(vec(dist))]);
         if model["type"] == "linear"
             y_pred[ii] = model["alpha"] + trapz(timet, q_tmp.*model["beta"]);
         elseif model["type"] == "logistic"
@@ -441,26 +443,27 @@ function elastic_prediction(f, timet, model::Dict; y=Union{}, smooth=false)
     if y==Union{}
         if model["type"] == "linear"
             Perf = Union{};
-            y_labels =  Array(Integer, 0);
+            y_labels =  Array{Integer}(undef, 0);
         elseif model["type"] == "logistic"
             y_pred = phi(y_pred);
             y_labels = ones(n);
-            y_labels[y_pred .< 0.5] = -1;
+            y_labels[y_pred .< 0.5] .= -1;
             Perf = Union{};
         elseif model["type"] == "mlogisistic"
             y_pred = phi(reshape(y_pred,n*m,1));
             y_pred = reshpae(y_pred,n,m);
-            max_val, y_labels = findmax(y_pred, 2);
+            max_val, y_labels = findmax(y_pred, dims=2);
             Perf = Union{};
         end
     else
         if model["type"] == "linear"
             Perf = sum((y-y_pred).^2);
-            y_labels = Array(Integer, 0);
+            y_labels = Array{Integer}(undef, 0);
         elseif model["type"] == "logistic"
             y_pred = phi(y_pred);
+            y_pred = y_pred[:];
             y_labels = ones(n);
-            y_labels[y_pred .< 0.5] = -1;
+            y_labels[y_pred .< 0.5] .= -1;
             TP = sum(y[y_labels .== 1] .== 1);
             FP = sum(y[y_labels .== -1] .== 1);
             TN = sum(y[y_labels .== -1] .== -1);
@@ -469,8 +472,8 @@ function elastic_prediction(f, timet, model::Dict; y=Union{}, smooth=false)
         elseif model["type"] == "mlogistic"
             y_pred = phi(reshape(y_pred,n*m,1));
             y_pred = reshape(y_pred,n,m);
-            max_val, y_labels = findmax(y_pred, 2);
-            temp = ind2sub((n,m),vec(y_labels));
+            max_val, y_labels = findmax(y_pred, dims=2);
+            temp = Tuple(CartesianIndices((n,m))[vec(y_labels)])
             y_labels = temp[2];
             Perf = zeros(m);
             cls_set = collect(1:m+1);
