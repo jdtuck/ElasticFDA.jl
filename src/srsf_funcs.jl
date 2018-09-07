@@ -181,7 +181,7 @@ function elastic_distance(f1::Vector, f2::Vector, timet::Vector,
     binsize = mean(diff(time1))
     psi = sqrt(gradient(gam, binsize))
     v = inv_exp_map(ones(length(gam)),psi)
-    dp = sqrt(trapz(time1, v.^2)) 
+    dp = sqrt(trapz(time1, v.^2))
 
     return da, dp
 end
@@ -695,49 +695,39 @@ Calculate sqrt mean of warping functions
 function sqrt_mean(gam::Array)
     eps1 = eps(Float64);
     TT, n = size(gam);
-    dt = 1.0/(TT-1);
+    timet = collect(LinRange(0,1,TT))
+    binsize = mean(diff(time))
     psi = Array{Float64}(undef,(TT-1,n));
     for k = 1:n
-        psi[:,k] = sqrt.(diff(gam[:,k]) / dt .+ eps1);
+        psi[:,k] = sqrt.(gradient(gam[:,k], binsize));
     end
 
     # Find Direction
     mnpsi = mean(psi, dims=2);
-    w = mean(psi, dims=2);
-    mu = w./sqrt(sum(w.^2/(TT-1)));
-    maxiter = 500;
-    tt = 1;
+    stp = 3
+    maxiter = 501
+    vec1 = zeros(TT, n);
     lvm = zeros(maxiter);
-    vec1 = zeros(TT-1, n);
-    for itr in 1:maxiter
-        for k in 1:n
-            dot1 = sum(mu.*psi[:,k]./(TT-1));
-            if dot1 > 1
-                dot1 = 1;
-            elseif dot1 < (-1)
-                dot1 = -1;
-            end
-            leng = dot1
-            if leng > 0.0001
-                vec1[:, k] = (leng/sin(leng)) * (psi[:,k] - cos(leng) * mu);
-            else
-                vec1[:, k] = zeros(TT-1);
-            end
-        end
-        vm = mean(vec1,dims=2);
-        vm1 = vm.*vm;
-        lvm[itr] = sqrt(sum(vm1) * dt);
-        if lvm[itr] == 0
-            break
-        end
-        mu = cos(tt * lvm[itr]) * mu + (sin(tt * lvm[itr])/lvm[itr]) * vm;
-        if (lvm[itr] < 1e-6) | (itr >= maxiter)
-            break
-        end
+    iter = 1
+
+    for i in 1:n
+        vec1[:,i] = inv_exp_map(mu, psi[:,i])
     end
-    tmp = mu .* mu;
-    gam_mu = zeros(TT)
-    gam_mu[2:end] = cumsum(vec(tmp))./TT;
+    vbar = mean(vec1, dims=2)
+    lvm[iter] = l2_norm(vbar)
+
+    while (lvm[iter]>0.00000001 & iter<maxiter)
+        global iter
+        mu = exp_map(mu, stp*vbar)
+        iter += 1
+        for i in 1:n
+            vec1[:,i] = inv_exp_map(mu, psi[:,i])
+        end
+        vbar = mean(vec1, dims=2)
+        lvm[iter] = l2_norm(vbar)
+    end
+
+    gam_mu = cumtrapz(timet, mu .* mu)
     gam_mu = (gam_mu .- minimum(gam_mu)) ./ (maximum(gam_mu) - minimum(gam_mu));
     return mu, gam_mu, psi, vec1
 end
