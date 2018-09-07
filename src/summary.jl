@@ -1,4 +1,4 @@
-function summary(io::IO, x::warp_data)
+function summary(io::IO, x::fdawarp)
     @printf("-------------------------------------\n")
     @printf("Number of Functions: %d\n", size(x.f,2))
     @printf("Number of time points: %d\n", size(x.f,1))

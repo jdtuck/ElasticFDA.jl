@@ -17,7 +17,7 @@ framework.
                   ("RBFGS")
     :param MaxItr: Maximum number of iterations
 
-    Returns warp_data type containing
+    Returns fdawarp type containing
     :return fn: aligned functions - array of shape (M,N) of N
                 functions with M samples
     :return qn: aligned srsfs - similar structure to fn
@@ -230,9 +230,11 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
     amp_var = trapz(timet, std_fn.^2);
     phase_var = trapz(timet, var_fgam);
 
-    out = warp_data(f0, timet, fn, qn, q0, fmean, mqn, gam,
-                    orig_var, amp_var, phase_var, qun, lam,
-                    method, optim, gamI, false)
+    out = fdawarp(f0, timet, fn, qn, q0, fmean, mqn, gam,
+                  orig_var, amp_var, phase_var, qun, lam,
+                  method, optim, gamI, false, Array{Float64}(undef,0),
+                  Array{Float64}(undef,0), Array{Float64}(undef,0),
+                  Array{Float64}(undef,0))
     return out
 end
 
@@ -394,6 +396,7 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
             gamf[:,l] = approx(timet, gamf[:,l], time0);
         end
     end
+    fmean = mean(f0[1,:]) .+ cumtrapz(timet, mqn .* abs.(mqn));
 
     # Center Mean
     gamI = sqrt_mean_inverse(gamf);
@@ -408,26 +411,31 @@ function align_fPCA(f, timet; num_comp=3, smooth=false, sparam=10, MaxItr=50)
     mean_fn = mean(fn, dims=2);
     std_fn = std(fn, dims=2);
 
-    # Get Final PCA
-    out = vert_fPCA(fn, timet, qn, no=num_comp);
-
-    fmean = mean(f0[1,:]) .+ cumtrapz(timet, mqn .* abs.(mqn));
-
     fgam = zeros(M, N);
     for ii in 1:N
         xout = (timet[end] - timet[1]) .* gamf[:, ii] .+ timet[1];
         fgam[:, ii] = approx(timet, fmean, xout);
     end
-    var_fgam = var(fgam,dims=2);
 
+    var_fgam = var(fgam,dims=2);
     orig_var = trapz(timet, std_f0.^2);
     amp_var = trapz(timet, std_fn.^2);
     phase_var = trapz(timet, var_fgam);
 
+    # Get Final PCA
+    out_warp = fdawarp(f0, timet, fn, qn, q0, fmean, mqn, gamf,
+                       orig_var, amp_var, phase_var, cost, lam,
+                       "PCA", "DP", gamI, false, Array{Float64}(undef,0),
+                       Array{Float64}(undef,0), Array{Float64}(undef,0),
+                       Array{Float64}(undef,0))
+
+    out = vert_fPCA(out_warp, no=num_comp);
+
     out2 = Dict("fn" => fn, "qn" => qn, "q0" => q0, "fmean" => fmean,
-                "mqn" => mqn, "gam" => gamf, "q_pca" => out["q_pca"],
-                "f_pca" => out["f_pca"], "latent" => out["latent"],
-                "coef" => out["coef"], "U" => out["U"], "orig_var" => orig_var,
+                "mqn" => mqn, "gam" => gamf, "q_pca" => out.q_pca,
+                "f_pca" => out.f_pca, "latent" => out.latent,
+                "coef" => out.coef, "U" => out.U, "orig_var" => orig_var,
                 "amp_var" => amp_var, "phase_var" => phase_var);
+                
     return out2
 end

@@ -1,4 +1,4 @@
-struct warp_data
+struct fdawarp
     f::Array{Float64}
     time::Vector{Float64}
     fn::Array{Float64}
@@ -16,6 +16,10 @@ struct warp_data
     omethod::String
     gamI::Vector{Float64}
     rsamps::Bool
+    fs::Array{Float64}
+    gams::Array{Float64}
+    ft::Array{Float64}
+    qs::Array{Float64}
 end
 
 struct vfpca

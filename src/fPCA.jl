@@ -2,7 +2,7 @@
 Calculates vertical functional principal component analysis on aligned data
 
     vert_fPCA(warp_data, qn; no=1)
-    :param warp_data: warp_data type from srsf_align of aligned data
+    :param warp_data: fdawarp type from srsf_align of aligned data
     :param no: number of components to extract (default = 1)
 
     Returns vfpca type containing
@@ -13,7 +13,7 @@ Calculates vertical functional principal component analysis on aligned data
     :return U: eigenvectors
     :return id: point used for f(0)
 """
-function vert_fPCA(warp_data::warp_data; no=1)
+function vert_fPCA(warp_data::fdawarp; no=1)
     qn = warp_data.qn
     fn = warp_data.fn
     timet = warp_data.time
@@ -63,7 +63,7 @@ function vert_fPCA(warp_data::warp_data; no=1)
         end
     end
 
-    out = vfpca(q_pca, f_pca, s[1:no], c, U[:,1:no], mididx, mqn, timet);
+    out = vfpca(q_pca, f_pca, s[1:no], c, U[:,1:no], mididx, mqn[:], timet);
 
     return out
 end
@@ -73,7 +73,7 @@ end
 Calculates horizontal functional principal component analysis on aligned data
 
     horiz_fPCA(warp_data; no=1)
-    :param warp_data: warp_data type from srsf_align of aligned data
+    :param warp_data: fdawarp type from srsf_align of aligned data
     :param no: number of components to extract (default = 1)
 
     Returns hfpca containing
@@ -85,13 +85,13 @@ Calculates horizontal functional principal component analysis on aligned data
     :return vec: shooting vectors
     :return gam_mu: mean warping function
 """
-function horiz_fPCA(warp_data::warp_data; no=1)
+function horiz_fPCA(warp_data::fdawarp; no=1)
     gam = warp_data.gam;
     mu, gam_mu, psi, vec1 = sqrt_mean(gam);
     tau = collect(1:6);
-    TT = length(timet);
-    n = length(tau);
     m = length(mu);
+    n = length(tau);
+    TT = size(vec1,1)+1
 
     # TFPCA
     K = Statistics.covm(vec1, mean(vec1,dims=2), 2);

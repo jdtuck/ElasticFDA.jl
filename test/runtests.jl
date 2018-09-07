@@ -46,7 +46,7 @@ out1 = vert_fPCA(out);
 out1 = horiz_fPCA(out);
 
 # test gauss_model
-out1 = gauss_model(out["fn"], timet, out["qn"], out["gam"]);
+out1 = gauss_model(out);
 
 # test pair_warping_bayes
 # out1 = pair_warping_bayes(f1[1:100], f2[1:100], iter=2);

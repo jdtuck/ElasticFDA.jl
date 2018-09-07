@@ -6,7 +6,15 @@ function exp_map(psi::Vector, v::Vector)
 end
 
 function inv_exp_map(Psi::Vector, psi::Vector)
-    theta = acos(inner_product(Psi,psi))
+    dot = inner_product(Psi,psi)
+    if dot > 1
+        dot = 1
+    end
+    if dot < -1
+        dot = -1
+    end
+    
+    theta = acos(dot)
 
     if (theta < 1e-10)
         exp_inv = zeros(length(psi))

@@ -179,7 +179,7 @@ function elastic_distance(f1::Vector, f2::Vector, timet::Vector,
 
     time1 = collect(LinRange(0,1,length(timet)))
     binsize = mean(diff(time1))
-    psi = sqrt(gradient(gam, binsize))
+    psi = sqrt.(gradient(gam, binsize))
     v = inv_exp_map(ones(length(gam)),psi)
     dp = sqrt(trapz(time1, v.^2))
 
@@ -229,7 +229,7 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
             Ref{Int32}, Ptr{Float64}), q2, q1, n1, M, lam, 0, gam)
     end
 
-    gam = (gam.-gam[1]) ./ (gam[end] - gam[1]);
+    gam = norm_gam(gam);
 
     return gam
 end
@@ -321,7 +321,7 @@ function optimum_reparam(q1::Array{Float64,1}, time1::Array{Float64,1},
             Ref{Int32}, Ptr{Float64}), q2, q1, n1, M1, lam, 0, gam)
     end
 
-    gam = (gam.-gam[1]) ./ (gam[end] - gam[1]);
+    gam = norm_gam(gam);
 
     return gam
 end
@@ -372,7 +372,7 @@ function optimum_reparam(q1::Array{Float64,1}, timet::Array{Float64,1},
                 Ref{Int32}, Ptr{Float64}), qi, q1, n1, M, lam, 0, gam0)
         end
 
-        gam[:, ii] = (gam0.-gam0[1]) ./ (gam0[end] - gam0[1]);
+        gam[:, ii] = norm_gam(gam0);
     end
 
     return gam
@@ -425,7 +425,7 @@ function optimum_reparam(q1::Array{Float64,2}, timet::Array{Float64,1},
                 Ref{Int32}, Ptr{Float64}), q2i, q1i, n1, M, lam, 0, gam0)
         end
 
-        gam[:, ii] = (gam0.-gam0[1]) ./ (gam0[end] - gam0[1]);
+        gam[:, ii] = norm_gam(gam0);
     end
 
     return gam
@@ -502,7 +502,7 @@ function rgam(N, sigma, num)
         vn = norm(v)/sqrt(TT);
         psi = cos(vn)*mu + sin(vn) * v/vn;
         gam[2:end, k] = cumsum(psi.*psi)./TT;
-        gam[:, k] = (gam[:,k] .- gam[1,k]) ./ (gam[end,k] - gam[1,k]);
+        gam[:, k] = norm_gam(gam[:,k]);
     end
 
     return gam
@@ -522,21 +522,20 @@ function random_gamma(gam, num)
 
     U, s, V = svd(K);
     n = 5;
-    TT = size(vec1, 1) + 1;
+    TT = size(vec1, 1);
     vm = mean(vec1, dims=2);
     rgam = zeros(TT, num);
+    timet = collect(LinRange(0,1,TT))
     for k in 1:num
         a = randn(n)
         v = zeros(size(vm,1));
         for i in 1:n
             v = v + a[i] * sqrt(s[i]) * U[:, i];
         end
+        psi = exp_map(mu, v)
 
-        vn = norm(v) / sqrt(TT);
-        psi = cos(vn) .* mu + sin(vn) .* v./vn;
-        tmp = zeros(TT);
-        tmp[2:TT] = cumsum(vec(psi.*psi))/TT;
-        rgam[:, k] = (tmp .- tmp[1]) ./ (tmp[end] - tmp[1]);
+        gam0 = cumtrapz(timet, psi.*psi)
+        rgam[:, k] = norm_gam(gam0);
     end
     return rgam
 end
@@ -552,7 +551,7 @@ function invert_gamma(gam::Vector)
     N = length(gam);
     x = collect(1:N)/N;
     gamI = approx(gam,x,x);
-    gamI = (gamI .- gamI[1]) ./ (gamI[end] - gamI[1]);
+    gamI = norm_gam(gamI);
     return gamI
 end
 
@@ -595,7 +594,7 @@ function sqrt_mean_inverse(gam::Array)
     # Find Direction
     mu = mean(psi, dims=2);
     mu = mu[:]
-    stp = 3
+    stp = .3
     maxiter = 501
     vec1 = zeros(TT, n);
     lvm = zeros(maxiter);
@@ -618,7 +617,7 @@ function sqrt_mean_inverse(gam::Array)
     end
 
     gam_mu = cumtrapz(timet, mu .* mu)
-    gam_mu = (gam_mu .- minimum(gam_mu)) ./ (maximum(gam_mu) - minimum(gam_mu));
+    gam_mu = norm_gam(gam_mu);
     gamI = invert_gamma(gam_mu);
     return gamI
 end
@@ -692,7 +691,7 @@ function sqrt_mean(gam::Array)
     # Find Direction
     mu = mean(psi, dims=2);
     mu = mu[:]
-    stp = 3
+    stp = .3
     maxiter = 501
     vec1 = zeros(TT, n);
     lvm = zeros(maxiter);
@@ -704,7 +703,7 @@ function sqrt_mean(gam::Array)
     vbar = mean(vec1, dims=2)
     lvm[iter] = l2_norm(vbar[:])
 
-    while (lvm[iter]>0.00000001 & iter<maxiter)
+    while (lvm[iter]>0.00000001 && iter<maxiter)
         mu = exp_map(mu, stp*vbar[:])
         iter += 1
         for i in 1:n
@@ -715,7 +714,7 @@ function sqrt_mean(gam::Array)
     end
 
     gam_mu = cumtrapz(timet, mu .* mu)
-    gam_mu = (gam_mu .- minimum(gam_mu)) ./ (maximum(gam_mu) - minimum(gam_mu));
+    gam_mu = norm_gam(gam_mu);
     return mu, gam_mu, psi, vec1
 end
 
@@ -1130,4 +1129,9 @@ function cost_fn(q1,q2,q2L,k,l,i,j,N,lam)
     E = norm(q1[x]-vec)^2/N;
 
     return E
+end
+
+function norm_gam(gam0)
+    gam = (gam0 .- gam0[1]) ./ (gam0[end] - gam0[1])
+    return gam
 end
