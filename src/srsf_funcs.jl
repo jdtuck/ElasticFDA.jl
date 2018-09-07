@@ -584,53 +584,40 @@ Calculate sqrt mean inverse of warping function
 """
 function sqrt_mean_inverse(gam::Array)
     eps1 = eps(Float64);
-    T1, n = size(gam);
-    dt = 1.0/(T1-1);
-    psi = Array{Float64}(undef,(T1-1,n));
+    TT, n = size(gam);
+    timet = collect(LinRange(0,1,TT))
+    binsize = mean(diff(time))
+    psi = Array{Float64}(undef,(TT-1,n));
     for k = 1:n
-        psi[:,k] = sqrt.(diff(gam[:,k]) / dt .+ eps1);
+        psi[:,k] = sqrt.(gradient(gam[:,k], binsize));
     end
 
     # Find Direction
     mnpsi = mean(psi, dims=2);
-    d1 = repeat(mnpsi, 1, n);
-    d = (psi - d1).^2;
-    dqq = sqrt.(sum(d,dims=1));
-    min_ind = argmin(dqq)[2];
-    mu = psi[:, min_ind];
-    maxiter = 20;
-    tt = 1;
+    stp = 3
+    maxiter = 501
+    vec1 = zeros(TT, n);
     lvm = zeros(maxiter);
-    vec1 = zeros(T1-1, n);
-    for itr in 1:maxiter
-        for k in 1:n
-            dot1 = trapz(collect(LinRange(0,1,T1-1)), mu.*psi[:,k]);
-            if dot1 > 1
-                dot1 = 1;
-            elseif dot1 < (-1)
-                dot1 = -1;
-            end
-            leng = acos(dot1);
-            if leng > 0.0001
-                vec1[:, k] = (leng/sin(leng)) * (psi[:,k] - cos(leng) * mu);
-            else
-                vec1[:, k] = zeros(T1-1);
-            end
-        end
-        vm = mean(vec1,dims=2);
-        vm1 = vm.*vm;
-        lvm[itr] = sqrt(sum(vm1) * dt);
-        if lvm[itr] == 0
-            break
-        end
-        mu = cos(tt * lvm[itr]) * mu + (sin(tt * lvm[itr])/lvm[itr]) * vm;
-        if (lvm[itr] < 1e-6) | (itr >= maxiter)
-            break
-        end
+    iter = 1
+
+    for i in 1:n
+        vec1[:,i] = inv_exp_map(mu, psi[:,i])
     end
-    tmp = mu .* mu;
-    gam_mu = zeros(T1)
-    gam_mu[2:end] = cumsum(vec(tmp))./T1;
+    vbar = mean(vec1, dims=2)
+    lvm[iter] = l2_norm(vbar)
+
+    while (lvm[iter]>0.00000001 & iter<maxiter)
+        global iter
+        mu = exp_map(mu, stp*vbar)
+        iter += 1
+        for i in 1:n
+            vec1[:,i] = inv_exp_map(mu, psi[:,i])
+        end
+        vbar = mean(vec1, dims=2)
+        lvm[iter] = l2_norm(vbar)
+    end
+
+    gam_mu = cumtrapz(timet, mu .* mu)
     gam_mu = (gam_mu .- minimum(gam_mu)) ./ (maximum(gam_mu) - minimum(gam_mu));
     gamI = invert_gamma(gam_mu);
     return gamI
