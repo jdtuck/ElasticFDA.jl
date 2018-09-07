@@ -230,9 +230,8 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
     amp_var = trapz(timet, std_fn.^2);
     phase_var = trapz(timet, var_fgam);
 
-    out = Dict("fn" => fn, "qn" => qn, "q0" => q0, "fmean" => fmean,
-               "mqn" => mqn, "gam" => gam, "orig_var" => orig_var,
-               "amp_var" => amp_var, "phase_var" => phase_var);
+    out = warp_data(fn, qn, q0, fmean, mqn, gam, orig_var,
+                    amp_var, phase_var)
     return out
 end
 

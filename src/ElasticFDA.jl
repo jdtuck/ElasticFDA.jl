@@ -93,6 +93,7 @@ function __init__()
 end
 
 ### source files
+include("types.jl")
 include("curve_funcs.jl")
 include("curve_stats.jl")
 include("srsf_funcs.jl")
