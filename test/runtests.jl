@@ -40,10 +40,10 @@ out = srsf_align(f, timet);
 out1 = align_fPCA(f, timet, MaxItr=2);
 
 # test vert_fPCA
-out1 = vert_fPCA(out["qn"],timet,out["qn"]);
+out1 = vert_fPCA(out);
 
 # test horiz_fPCA
-out1 = horiz_fPCA(out["gam"], timet);
+out1 = horiz_fPCA(out);
 
 # test gauss_model
 out1 = gauss_model(out["fn"], timet, out["qn"], out["gam"]);

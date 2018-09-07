@@ -586,14 +586,15 @@ function sqrt_mean_inverse(gam::Array)
     eps1 = eps(Float64);
     TT, n = size(gam);
     timet = collect(LinRange(0,1,TT))
-    binsize = mean(diff(time))
-    psi = Array{Float64}(undef,(TT-1,n));
+    binsize = mean(diff(timet))
+    psi = Array{Float64}(undef,(TT,n));
     for k = 1:n
         psi[:,k] = sqrt.(gradient(gam[:,k], binsize));
     end
 
     # Find Direction
-    mnpsi = mean(psi, dims=2);
+    mu = mean(psi, dims=2);
+    mu = mu[:]
     stp = 3
     maxiter = 501
     vec1 = zeros(TT, n);
@@ -604,17 +605,16 @@ function sqrt_mean_inverse(gam::Array)
         vec1[:,i] = inv_exp_map(mu, psi[:,i])
     end
     vbar = mean(vec1, dims=2)
-    lvm[iter] = l2_norm(vbar)
+    lvm[iter] = l2_norm(vbar[:])
 
-    while (lvm[iter]>0.00000001 & iter<maxiter)
-        global iter
-        mu = exp_map(mu, stp*vbar)
+    while (lvm[iter]>0.00000001 && iter<maxiter)
+        mu = exp_map(mu, stp*vbar[:])
         iter += 1
         for i in 1:n
             vec1[:,i] = inv_exp_map(mu, psi[:,i])
         end
         vbar = mean(vec1, dims=2)
-        lvm[iter] = l2_norm(vbar)
+        lvm[iter] = l2_norm(vbar[:])
     end
 
     gam_mu = cumtrapz(timet, mu .* mu)
@@ -683,14 +683,15 @@ function sqrt_mean(gam::Array)
     eps1 = eps(Float64);
     TT, n = size(gam);
     timet = collect(LinRange(0,1,TT))
-    binsize = mean(diff(time))
-    psi = Array{Float64}(undef,(TT-1,n));
+    binsize = mean(diff(timet))
+    psi = Array{Float64}(undef,(TT,n));
     for k = 1:n
         psi[:,k] = sqrt.(gradient(gam[:,k], binsize));
     end
 
     # Find Direction
-    mnpsi = mean(psi, dims=2);
+    mu = mean(psi, dims=2);
+    mu = mu[:]
     stp = 3
     maxiter = 501
     vec1 = zeros(TT, n);
@@ -701,17 +702,16 @@ function sqrt_mean(gam::Array)
         vec1[:,i] = inv_exp_map(mu, psi[:,i])
     end
     vbar = mean(vec1, dims=2)
-    lvm[iter] = l2_norm(vbar)
+    lvm[iter] = l2_norm(vbar[:])
 
     while (lvm[iter]>0.00000001 & iter<maxiter)
-        global iter
-        mu = exp_map(mu, stp*vbar)
+        mu = exp_map(mu, stp*vbar[:])
         iter += 1
         for i in 1:n
             vec1[:,i] = inv_exp_map(mu, psi[:,i])
         end
         vbar = mean(vec1, dims=2)
-        lvm[iter] = l2_norm(vbar)
+        lvm[iter] = l2_norm(vbar[:])
     end
 
     gam_mu = cumtrapz(timet, mu .* mu)

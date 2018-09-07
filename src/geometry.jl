@@ -23,8 +23,8 @@ function l2_norm(psi::Vector; timet=LinRange(0,1,length(psi)))
     return l2norm
 end
 
-function inner_product(psi1, psi2; timet=LinRange(0,1,length(psi)))
+function inner_product(psi1, psi2; timet=LinRange(0,1,length(psi1)))
     timet = collect(timet)
-    ip <- trapz(timet, psi1.*psi2)
+    ip = trapz(timet, psi1.*psi2)
     return ip
 end
