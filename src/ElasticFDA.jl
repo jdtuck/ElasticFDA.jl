@@ -12,6 +12,8 @@ using Statistics
 using LinearAlgebra
 using Libdl
 
+import Base. summary
+
 export
     smooth_data!,
     smooth_data,
@@ -95,6 +97,7 @@ end
 ### source files
 include("types.jl")
 include("geometry.jl")
+include("summary.jl")
 include("curve_funcs.jl")
 include("curve_stats.jl")
 include("srsf_funcs.jl")

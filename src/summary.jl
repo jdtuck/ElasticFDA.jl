@@ -1,0 +1,13 @@
+function summary(io::IO, x::warp_data)
+    @printf("-------------------------------------\n")
+    @printf("Number of Functions: %d\n", size(x.f,2))
+    @printf("Number of time points: %d\n", size(x.f,1))
+    @printf("-------------------------------------\n")
+    @printf("Alignment with lambda: %f\n", x.lambda)
+    @printf("Method: %s\n", x.method)
+    @printf("Optimization Method: %s\n", x.omethod)
+    @printf("Original Variance: %f\n", x.orig_var)
+    @printf("Amplitude Variance: %f\n", x.amp_var)
+    @printf("Phase Variance: %f\n", x.phase_var)
+    @printf("Number of Iterations: %d\n", length(x.cost))
+end

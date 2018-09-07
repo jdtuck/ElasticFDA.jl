@@ -24,7 +24,7 @@ struct vfpca
     latent::Vector{Float64}
     coef::Array{Float64}
     U::Array{Float64}
-    id::Float64
+    id::Int64
     mqn::Vector{Float64}
     time::Vector{Float64}
 end
