@@ -17,7 +17,7 @@ framework.
                   ("RBFGS")
     :param MaxItr: Maximum number of iterations
 
-    Returns Dict containing
+    Returns warp_data type containing
     :return fn: aligned functions - array of shape (M,N) of N
                 functions with M samples
     :return qn: aligned srsfs - similar structure to fn
@@ -230,8 +230,9 @@ function srsf_align(f, timet; method="mean", smooth=false, sparam=10, lam=0.0,
     amp_var = trapz(timet, std_fn.^2);
     phase_var = trapz(timet, var_fgam);
 
-    out = warp_data(fn, qn, q0, fmean, mqn, gam, orig_var,
-                    amp_var, phase_var)
+    out = warp_data(f0, timet, fn, qn, q0, fmean, mqn, gam,
+                    orig_var, amp_var, phase_var, qun, lam,
+                    method, optim, gamI, false)
     return out
 end
 

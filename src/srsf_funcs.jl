@@ -172,14 +172,16 @@ function elastic_distance(f1::Vector, f2::Vector, timet::Vector,
 
     gam = optimum_reparam(q1, timet, q2, 0.0, method=method);
 
-    q2a = warp_q_gamma(timet, q2, gam);
+    f2a = warp_f_gamma(timet, f2, gam);
+    q2a = f_to_srsf(f2a, timet)
 
-    da = sqrt(sum(trapz(timet, (q1-q2a).^2)));
+    da = sqrt(trapz(timet, (q1-q2a).^2));
 
-    M = length(gam);
-    psi = sqrt.(diff(gam)*(M-1));
-    mu = ones(M-1);
-    dp = real(acos(sum(mu.*psi)/(M-1)));
+    time1 = collect(LinRange(0,1,length(timet)))
+    binsize = mean(diff(time1))
+    psi = sqrt(gradient(gam, binsize))
+    v = inv_exp_map(ones(length(gam)),psi)
+    dp = sqrt(trapz(time1, v.^2)) 
 
     return da, dp
 end
