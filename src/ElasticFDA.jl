@@ -94,6 +94,7 @@ end
 
 ### source files
 include("types.jl")
+incldue("geometry.jl")
 include("curve_funcs.jl")
 include("curve_stats.jl")
 include("srsf_funcs.jl")
