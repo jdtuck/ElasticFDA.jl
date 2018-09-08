@@ -88,10 +88,10 @@ Calculates horizontal functional principal component analysis on aligned data
 function horiz_fPCA(warp_data::fdawarp; no=1)
     gam = warp_data.gam;
     mu, gam_mu, psi, vec1 = sqrt_mean(gam);
-    tau = collect(1:6);
+    tau = collect(1:5);
     m = length(mu);
     n = length(tau);
-    TT = size(vec1,1)+1
+    TT = size(vec1,1)
 
     # TFPCA
     K = Statistics.covm(vec1, mean(vec1,dims=2), 2);
@@ -99,21 +99,20 @@ function horiz_fPCA(warp_data::fdawarp; no=1)
     U, s, V = svd(K);
     vm = mean(vec1, dims=2);
 
-    gam_pca = Array{Float64}(undef, (n, m+1, no));
-    psi_pca = Array{Float64}(undef, (n, m, no));
+    gam_pca = Array{Float64}(undef, (m, n, no));
+    psi_pca = Array{Float64}(undef, (m, n, no));
     for j in 1:no
         for k in tau
             v = (k-3)*sqrt(s[j]).*U[:,j];
             vn = norm(v) / sqrt(TT);
             if vn < 0.0001
-                psi_pca[k, :, j] = mu;
+                psi_pca[:, k, j] = mu;
             else
-                psi_pca[k, :, j] = cos(vn).*mu + sin(vn).*v/vn;
+                psi_pca[:, k, j] = cos(vn).*mu + sin(vn).*v/vn;
             end
 
-            tmp = zeros(TT);
-            tmp[2:TT] = cumsum(psi_pca[k,:,j] .* psi_pca[k,:,j],dims=2);
-            gam_pca[k,:,j] = (tmp .- tmp[1]) ./ (tmp[end] - tmp[1]);
+            gam0 = cumtrapz(collect(LinRange(0,1,TT)), psi_pca[:,k,j].*psi_pca[:,k,j]);
+            gam_pca[:,k,j] = norm_gam(gam0)
         end
     end
 
