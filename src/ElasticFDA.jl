@@ -10,6 +10,7 @@ using Printf
 using Distributed
 using Statistics
 using LinearAlgebra
+using RecipesBase
 using Libdl
 
 import Base. summary

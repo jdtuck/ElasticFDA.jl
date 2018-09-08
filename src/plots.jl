@@ -1,27 +1,64 @@
-function plot_fdawarp(x::fdawarp)
-    M = length(x.time)
+@recipe function f(h::fdawarp)
+    M = length(h.time)
+    x = h.time
 
-    mean_f0 = mean(x.f,dims=2)
-    std_f0 = std(x.f, dims=2)
-    mean_fn = mean(x.fn, dims=2)
-    std_fn = std(x.fn, dims=2)
+    mean_f0 = mean(h.f,dims=2)
+    std_f0 = std(h.f, dims=2)
+    mean_fn = mean(h.fn, dims=2)
+    std_fn = std(h.fn, dims=2)
 
-    plot(x.time,x.f,title="Original Functions",legend=:none)
+    stat0 = [mean_f0, mean_f0+std_f0, mean_f0-std_f0]
+    statn = [mean_fn, mean_fn+std_fn, mean_fn-std_fn]
 
-    plot(x.time,x.fn,title="Warped Functions",legend=:none)
-
-    plot(LinRange(0,1,M),x.gam,title="Warping Functions",legend=:none,
-         aspect_ratio=:equal)
-
-    plot(x.time,[mean_f0, mean_f0+std_f0, mean_f0-std_f0], label=["Mean","Mean + STD","Mean - STD"],
-         title="Original Data: Mean +/- STD")
-
-    plot(x.time,[mean_fn, mean_fn+std_fn, mean_fn-std_fn], label=["Mean","Mean + STD","Mean - STD"],
-         title="Warped Data: Mean +/- STD")
-
-    if x.method=="mean"
-        plot(x.time,x.fmean,title="fmean",legend=:none)
+    if h.method=="mean"
+        type_lbl = "fmean"
     else
-        plot(x.time,x.fmean,title="fmedian",legend=:none)
+        type_lbl = "median"
     end
+
+    # set up the subplots
+    legend := false
+    layout := (2,3)
+
+    @series begin
+        subplot := 1
+        title := "Original Functions"
+        x, h.f
+    end
+
+    @series begin
+        subplot := 2
+        title := "Aligned Functions"
+        x, h.fn
+    end
+
+    @series begin
+        subplot := 3
+        title := "Warping Functions"
+        aspect_ratio := :equal
+        LinRange(0,1,length(x)), h.gam
+    end
+
+    @series begin
+        subplot := 4
+        legend := :bottom
+        title := "Original Data: Mean +/- STD"
+        label := ["Mean","Mean + STD","Mean - STD"]
+        x, stat0
+    end
+
+    @series begin
+        subplot := 5
+        legend := :bottom
+        title := "Warped Data: Mean +/- STD"
+        label := ["Mean","Mean + STD","Mean - STD"]
+        x, statn
+    end
+
+    @series begin
+        subplot := 6
+        title := type_lbl
+        x, h.fmean
+    end
+
 end
