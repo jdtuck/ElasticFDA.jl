@@ -89,7 +89,7 @@ function phi(t)
     idx = t .> 0;
     out = Array{Float64}(undef, size(t));
     if sum(idx) > 0
-        out[idx] = 1.0/(1 .+ exp(-1*t[idx]));
+        out[idx] = 1.0/(1 .+ exp.(-1*t[idx]));
     end
     exp_t = exp.(t[.~idx]);
     out[.~idx] = exp_t ./ (1 .+ exp_t);
