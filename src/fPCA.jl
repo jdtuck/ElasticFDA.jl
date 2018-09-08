@@ -1,20 +1,22 @@
 """
 Calculates vertical functional principal component analysis on aligned data
 
-    vert_fPCA(fn, timet, qn; no=1)
-    :param fn: array of shape (M,N) of N aligned functions with M samples
-    :param timet: vector of size M describing the sample points
-    :param qn: array of shape (M,N) of N aligned SRSF with M samples
+    vert_fPCA(warp_data, qn; no=1)
+    :param warp_data: fdawarp type from srsf_align of aligned data
     :param no: number of components to extract (default = 1)
 
-    Returns Dict containing
+    Returns vfpca type containing
     :return q_pca: srsf principal directions
     :return f_pca: functional principal directions
     :return latent: latent values
     :return coef: scores
     :return U: eigenvectors
+    :return id: point used for f(0)
 """
-function vert_fPCA(fn, timet, qn; no=1)
+function vert_fPCA(warp_data::fdawarp; no=1)
+    qn = warp_data.qn
+    fn = warp_data.fn
+    timet = warp_data.time
     coef = collect(-2:3);
     Nstd = length(coef);
 
@@ -61,8 +63,8 @@ function vert_fPCA(fn, timet, qn; no=1)
         end
     end
 
-    out = Dict("q_pca" => q_pca, "f_pca" => f_pca, "latent" => s,
-               "coef" => c, "U" => U);
+    out = vfpca(q_pca, f_pca, s[1:no], c, U[:,1:no], mididx, mqn[:], timet);
+
     return out
 end
 
@@ -70,26 +72,26 @@ end
 """
 Calculates horizontal functional principal component analysis on aligned data
 
-    horiz_fPCA(gam, timet; no=1)
-    :param gam: array of shape (M,N) of N warping functions with M samples
-    :param timet: vector of size M describing the sample points
+    horiz_fPCA(warp_data; no=1)
+    :param warp_data: fdawarp type from srsf_align of aligned data
     :param no: number of components to extract (default = 1)
 
-    Returns Dict containing
+    Returns hfpca containing
     :return gam_pca: warping principal directions
     :return psi_pca: srsf functional principal directions
     :return latent: latent values
     :return U: eigenvectors
     :return coef: scores
+    :return vec: shooting vectors
     :return gam_mu: mean warping function
-    :return vec1: shooting vectors
 """
-function horiz_fPCA(gam, timet; no=1)
+function horiz_fPCA(warp_data::fdawarp; no=1)
+    gam = warp_data.gam;
     mu, gam_mu, psi, vec1 = sqrt_mean(gam);
-    tau = collect(1:6);
-    TT = length(timet);
-    n = length(tau);
+    tau = collect(1:5);
     m = length(mu);
+    n = length(tau);
+    TT = size(vec1,1)
 
     # TFPCA
     K = Statistics.covm(vec1, mean(vec1,dims=2), 2);
@@ -97,21 +99,20 @@ function horiz_fPCA(gam, timet; no=1)
     U, s, V = svd(K);
     vm = mean(vec1, dims=2);
 
-    gam_pca = Array{Float64}(undef, (n, m+1, no));
-    psi_pca = Array{Float64}(undef, (n, m, no));
+    gam_pca = Array{Float64}(undef, (m, n, no));
+    psi_pca = Array{Float64}(undef, (m, n, no));
     for j in 1:no
         for k in tau
             v = (k-3)*sqrt(s[j]).*U[:,j];
             vn = norm(v) / sqrt(TT);
             if vn < 0.0001
-                psi_pca[k, :, j] = mu;
+                psi_pca[:, k, j] = mu;
             else
-                psi_pca[k, :, j] = cos(vn).*mu + sin(vn).*v/vn;
+                psi_pca[:, k, j] = cos(vn).*mu + sin(vn).*v/vn;
             end
 
-            tmp = zeros(TT);
-            tmp[2:TT] = cumsum(psi_pca[k,:,j] .* psi_pca[k,:,j],dims=2);
-            gam_pca[k,:,j] = (tmp .- tmp[1]) ./ (tmp[end] - tmp[1]);
+            gam0 = cumtrapz(collect(LinRange(0,1,TT)), psi_pca[:,k,j].*psi_pca[:,k,j]);
+            gam_pca[:,k,j] = norm_gam(gam0)
         end
     end
 
@@ -123,7 +124,6 @@ function horiz_fPCA(gam, timet; no=1)
         end
     end
 
-    out = Dict("gam_pca" => gam_pca, "psi_pca" => psi_pca, "latent" => s,
-               "U" => U, "coef" => c, "gam_mu" => gam_mu, "vec1" => vec1);
+    out = hfpca(gam_pca, psi_pca, s[1:no], U[:,1:no], c, vec1, gam_mu)
     return out
 end

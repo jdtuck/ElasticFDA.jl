@@ -1,20 +1,21 @@
 """
 Computes random samples of functions from aligned data using Gaussian model
 
-    gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
-    :param fn: aligned functions (M,N)
-    :param timet: vector (M) describing time
-    :param qn: aligned srvfs (M,N)
-    :param gam: warping functions (M,N)
+    gauss_model(warp_data; n=1, sort_samples=false)
+    :param warp_data: fdawarp type from srsf_align of aligned data
     :param n: number of samples
     :param sort_samples: sort samples
 
-    Returns Dict containing
+    Returns warp_data containing
     :return fs: random aligned functions
     :return gams: random warping functions
     :return ft: random functions
 """
-function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
+function gauss_model(warp_data::fdawarp; n=1, sort_samples=false)
+    fn = warp_data.fn
+    timet = warp_data.time
+    qn = warp_data.qn
+    gam = warp_data.gam
     # Parameters
     eps1 = eps(Float64);
     binsize = mean(diff(timet));
@@ -104,7 +105,12 @@ function gauss_model(fn, timet, qn, gam; n=1, sort_samples=false)
         end
     end
 
-    out = Dict("fs" => fs, "gams" => rgam, "ft" => ft);
+    out = fdawarp(warp_data.f, timet, fn, qn, warp_data.q0, warp_data.fmean,
+                  warp_data.mqn, gam, warp_data.orig_var, warp_data.amp_var,
+                  warp_data.phase_var, warp_data.cost, warp_data.lambda,
+                  warp_data.method, warp_data.omethod, warp_data.gamI, true,
+                  fs, rgam, ft, q_s)
+
     return out
 
 end

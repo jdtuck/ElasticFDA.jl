@@ -10,7 +10,10 @@ using Printf
 using Distributed
 using Statistics
 using LinearAlgebra
+using RecipesBase
 using Libdl
+
+import Base. summary
 
 export
     smooth_data!,
@@ -93,6 +96,10 @@ function __init__()
 end
 
 ### source files
+include("types.jl")
+include("geometry.jl")
+include("summary.jl")
+include("plots.jl")
 include("curve_funcs.jl")
 include("curve_stats.jl")
 include("srsf_funcs.jl")

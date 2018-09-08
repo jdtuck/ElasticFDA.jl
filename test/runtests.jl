@@ -40,13 +40,13 @@ out = srsf_align(f, timet);
 out1 = align_fPCA(f, timet, MaxItr=2);
 
 # test vert_fPCA
-out1 = vert_fPCA(out["qn"],timet,out["qn"]);
+out1 = vert_fPCA(out, no=3);
 
 # test horiz_fPCA
-out1 = horiz_fPCA(out["gam"], timet);
+out1 = horiz_fPCA(out, no=3);
 
 # test gauss_model
-out1 = gauss_model(out["fn"], timet, out["qn"], out["gam"]);
+out1 = gauss_model(out);
 
 # test pair_warping_bayes
 # out1 = pair_warping_bayes(f1[1:100], f2[1:100], iter=2);
