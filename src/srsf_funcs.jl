@@ -127,27 +127,6 @@ function f_to_srsf(f::func)
     return(result)
 end
 
-function f_predictfunction(f::func, at; deriv=0, method="linear")
-    if method=="linear"
-        if (deriv==0)
-            result = approx(f.x, f.y, at)
-        end
-        if (deriv == 1)
-            fmod = approx(f.x, f.y, at)
-            diffy1 = [0, diff(fmod)]
-            diffy2 = [diff(fmod), 0]
-            diffx1 = [0, diff(at)]
-            diffx2 = [diff(at), 0]
-
-            result = (diffy2 + diffy1) / (diffx2 + diffx1)
-        end
-    else
-        error("Method not implemented")
-    end
-
-    return result
-end
-
 """
 Convert square-root slope function (srsf) to f
 

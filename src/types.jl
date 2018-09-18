@@ -52,3 +52,17 @@ struct basis
     x::Vector{Float64}
     matrix::Array{Float64}
 end
+
+struct mcmc_results
+    f2_warped::Vector
+    gamma::Vector
+    g_coef::Array{Float64}
+    psi::Vector
+    sigma1::Vector
+    accept::Vector
+    logl::Vector
+    gamma_mat::Array{Float64}
+    gamma_stats::Array{Float64}
+    xdist::Vector
+    ydist::Vector
+end

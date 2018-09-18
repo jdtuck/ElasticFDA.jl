@@ -114,6 +114,7 @@ include("pair_warping_bayes.jl")
 include("regression.jl")
 include("regression_funcs.jl")
 include("time_warping.jl")
+include("pair_warping_expomap.jl")
 #include("image_funcs.jl")
 #include("image_stats.jl")
 

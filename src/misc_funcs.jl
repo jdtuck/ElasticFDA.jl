@@ -280,3 +280,37 @@ function basis_fourier(f_domain::Vector, numBasis::Int64, fourier_p::Int64)
     out = basis(f_domain,result)
     return out
 end
+
+function f_predictfunction(f::func, at; deriv=0, method="linear")
+    if method=="linear"
+        if (deriv==0)
+            result = approx(f.x, f.y, at)
+        end
+        if (deriv == 1)
+            fmod = approx(f.x, f.y, at)
+            diffy1 = [0, diff(fmod)]
+            diffy2 = [diff(fmod), 0]
+            diffx1 = [0, diff(at)]
+            diffx2 = [diff(at), 0]
+
+            result = (diffy2 + diffy1) / (diffx2 + diffx1)
+        end
+    else
+        error("Method not implemented")
+    end
+
+    out = func(at, result)
+    return out
+end
+
+function f_basistofunction(f_domain, coef, basis; coefconst=0)
+    if (size(basis.matrix,2)<length(coef))
+        error("coefficients exceeds basis functions")
+    end
+
+    y1 = basis.matrix[:,(1:length(coef))] * coef .+ coefconst
+    result = func(basis.x, y1)
+    y = f_predictfunction(result, f_domain)
+
+    return(y)
+end
