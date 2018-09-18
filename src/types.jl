@@ -42,3 +42,13 @@ struct hfpca
     vec::Array{Float64}
     gam_mu::Vector{Float64}
 end
+
+struct func
+    x::Vector{Float64}
+    y::Vector{Float64}
+end
+
+struct basis
+    x::Vector{Float64}
+    matrix::Array{Float64}
+end

@@ -264,3 +264,18 @@ function interp1_flat(x,y,xx)
 
     return yy
 end
+
+function basis_fourier(f_domain::Vector, numBasis::In64, fourier_p::Int64)
+    result = Array{Float64}(undef,length(f_domain),2*numBasis)
+    for i in 1:2*numBasis
+        j = ceil(i/2)
+        if ((i % 2) == 1)
+            result[:,i] = sqrt(2) * sin(2*j*pi*f_domain/fourier_p)
+        end
+        if ((i % 2) == 0)
+            result[:,i] = sqrt(2) * cos(2*j*pi*f_domain/fourier_p)
+        end
+
+        out = basis(f_domain,result)
+        return out
+    end
