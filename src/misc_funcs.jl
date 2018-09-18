@@ -270,10 +270,10 @@ function basis_fourier(f_domain::Vector, numBasis::Int64, fourier_p::Int64)
     for i in 1:2*numBasis
         j = ceil(i/2)
         if ((i % 2) == 1)
-            result[:,i] = sqrt(2) * sin(2*j*pi*f_domain/fourier_p)
+            result[:,i] = sqrt(2) * sin.(2*j*pi*f_domain/fourier_p)
         end
         if ((i % 2) == 0)
-            result[:,i] = sqrt(2) * cos(2*j*pi*f_domain/fourier_p)
+            result[:,i] = sqrt(2) * cos.(2*j*pi*f_domain/fourier_p)
         end
     end
 
@@ -288,12 +288,12 @@ function f_predictfunction(f::func, at; deriv=0, method="linear")
         end
         if (deriv == 1)
             fmod = approx(f.x, f.y, at)
-            diffy1 = [0, diff(fmod)]
-            diffy2 = [diff(fmod), 0]
-            diffx1 = [0, diff(at)]
-            diffx2 = [diff(at), 0]
+            diffy1 = [0; diff(fmod)]
+            diffy2 = [diff(fmod); 0]
+            diffx1 = [0; diff(at)]
+            diffx2 = [diff(at); 0]
 
-            result = (diffy2 + diffy1) / (diffx2 + diffx1)
+            result = (diffy2 + diffy1) ./ (diffx2 + diffx1)
         end
     else
         error("Method not implemented")
@@ -303,14 +303,14 @@ function f_predictfunction(f::func, at; deriv=0, method="linear")
     return out
 end
 
-function f_basistofunction(f_domain, coef, basis; coefconst=0)
-    if (size(basis.matrix,2)<length(coef))
+function f_basistofunction(f_domain, coef, cbasis::basis; coefconst=0)
+    if (size(cbasis.matrix,2)<length(coef))
         error("coefficients exceeds basis functions")
     end
 
-    y1 = basis.matrix[:,(1:length(coef))] * coef .+ coefconst
-    result = func(basis.x, y1)
-    y = f_predictfunction(result, f_domain)
+    y1 = cbasis.matrix[:,(1:length(coef))] * coef .+ coefconst
+    result = func(cbasis.x, y1)
+    y1 = f_predictfunction(result, f_domain)
 
-    return(y)
+    return y1
 end

@@ -18,7 +18,7 @@ Compute pair warping between two functions using Bayesian method
 """
 function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2),
                               alpha0=0.1, beta0=0.1, pbetas=[0.5,0.05,0.005,0.0001],
-                              probs=[0.1,0.1,0.7,0.1],propvar=1,init_coef=zeros(20),
+                              probs=[0.1,0.1,0.7,0.1],propvar=1.0,init_coef=zeros(20),
                               npoints=200,extrainfo=false)
 
     # check inputs
@@ -36,23 +36,24 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
     end
 
     SIG_GAM = 13
-    Mg = length(init.coef)
-    sigma1_ini = 1
+    Mg = length(init_coef)
+    sigma1_ini = 1.0
+    g_coef_ini = init_coef
 
     # normalize time
     timet = collect(LinRange(0,1,length(timet)))
-    f1 = func(x=timet,y=f1)
-    f2 = func(x=timet,y=f2)
+    f1 = func(timet,f1)
+    f2 = func(timet,f2)
 
-    g_basis = basis_fourier(LinRange(0,1,npoints), Mg/2, 1)
+    g_basis = basis_fourier(collect(LinRange(0,1,npoints)), Int(Mg/2), 1)
 
     function propose_g_coef(g_coef_curr)
-        probm = [0, cumsum(probs)]
+        probm = [0; cumsum(probs)]
         z = rand()
         d = MvNormal(propvar./sort(repeat(1:10,2)))
         for i in 1:length(pbetas)
             if (z <= probm[i+1] && z > probm[i])
-                g_coef_new = randn(d)
+                g_coef_new = rand(d)
                 prop = sqrt(1 - pbetas[i] ^ 2) * g_coef_curr + pbetas[i] * g_coef_new
                 ind = i
             end
@@ -68,7 +69,8 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
     sim_domain = collect(LinRange(0,1,npoints))
     valid_index = burnin:iter
 
-    tmp = f_exp1(f_basistofunction(g_basis.x,g_coef_ini,g_basis))
+    g_temp = f_basistofunction(g_basis.x,g_coef_ini,g_basis)
+    tmp = f_exp1(g_temp)
     if (minimum(tmp.y)<0)
         error("Invalid initial value of g")
     end
@@ -78,7 +80,7 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
     sigma1 = Vector{Float64}(undef,iter)
     logl = Vector{Float64}(undef,iter)
     SSE = Vector{Float64}(undef,iter)
-    accept = Vector{Bool}(undef,iter)
+    accept = Vector{Bool}(undef,iter).*false
     accept_betas = Vector{Int64}(undef,iter)
 
     g_coef_curr = g_coef_ini
@@ -86,7 +88,7 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
 
     g = f_basistofunction(g_basis.x, g_coef_curr, g_basis)
     SSE_curr = f_SSEg_pw(g, q1, q2)
-    logl_curr = f_logl_pw(g, sigma1_curr^2, q1, q2, SSE_curr)
+    logl_curr = f_logl_pw(g, sigma1_curr^2, q1, q2, SSEg=SSE_curr)
 
     g_coef[:,1] = g_coef_curr
     sigma1[1] = sigma1_curr
@@ -177,16 +179,16 @@ function f_SSEg_pw(g::func, q1::func, q2::func)
     exp1g_temp = f_predictfunction(f, obs_domain)
     pt = zeros(length(obs_domain))
     for i in 2:length(pt)
-        tmp = func(obs.domain[1:i],exp1g_temp.y[1:i])
+        tmp = func(obs_domain[1:i],exp1g_temp.y[1:i])
         pt[i] = f_L2norm(tmp)^2
     end
     temp = f_predictfunction(q2,pt)
-    vec = (q1.y - temp.y * exp1g_temp.y).^2
+    vec1 = (q1.y - temp.y .* exp1g_temp.y).^2
 
-    return sum(vec)
+    return sum(vec1)
 end
 
-function f_logl_pw(g::func, q1::func, q2::func, var1; SSEg=0)
+function f_logl_pw(g::func, var1, q1::func, q2::func; SSEg=0.0)
     if (SSEg == 0)
         SSEg = f_SSEg_pw(g, q1, q2)
     end

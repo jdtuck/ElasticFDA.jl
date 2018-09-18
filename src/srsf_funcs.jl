@@ -122,8 +122,8 @@ function f_to_srsf(f::Array, timet=0, smooth=false)
 end
 
 function f_to_srsf(f::func)
-    d = f_predictfunction(f, at=f.x, deriv=1)
-    result = func(f.x, sign(d) .* sqrt(abs(d)))
+    d = f_predictfunction(f, f.x, deriv=1)
+    result = func(f.x, sign.(d.y) .* sqrt.(abs.(d.y)))
     return(result)
 end
 
