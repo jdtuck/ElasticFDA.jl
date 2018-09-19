@@ -1,4 +1,4 @@
-using JLD2
+using JLD2, Distributions, ProgressMeter, Interpolations, Plots
 @load "test/simu_data.jld2"
 include("src/types.jl")
 include("src/misc_funcs.jl")

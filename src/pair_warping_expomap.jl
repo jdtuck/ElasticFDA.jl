@@ -51,6 +51,8 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
         probm = [0; cumsum(probs)]
         z = rand()
         d = MvNormal(propvar./sort(repeat(1:10,2)))
+        ind = 0
+        prop = g_coef_curr
         for i in 1:length(pbetas)
             if (z <= probm[i+1] && z > probm[i])
                 g_coef_new = rand(d)
@@ -67,7 +69,7 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
 
     obs_domain = q1.x
     sim_domain = collect(LinRange(0,1,npoints))
-    valid_index = burnin:iter
+    valid_index = Int(burnin):iter
 
     g_temp = f_basistofunction(g_basis.x,g_coef_ini,g_basis)
     tmp = f_exp1(g_temp)
@@ -96,9 +98,9 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
     logl[1] = logl_curr
     accept[1] = true
 
-    for m in 2:iter
+    @showprogress 1 "Computing MCMC..." for m in 2:iter
         # update g
-        g_coef_curr, SSE_curr, logl_curr, accept = f_updateg_pw(g_coef_curr, g_basis,
+        g_coef_curr, SSE_curr, logl_curr, accepti = f_updateg_pw(g_coef_curr, g_basis,
                                                                 sigma1_curr^2, q1, q2,
                                                                 SSE_curr, propose_g_coef)
 
@@ -108,14 +110,14 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
         d = InverseGamma(newshape, newscale)
         sigma1_curr = rand(d)
         g = f_basistofunction(g_basis.x, g_coef_curr, g_basis)
-        logl_curr = f_logl_pw(g, sigma1_curr^2, q1, q2, SSE_curr)
+        logl_curr = f_logl_pw(g, sigma1_curr^2, q1, q2, SSEg=SSE_curr)
 
         g_coef[:,m] = g_coef_curr
         sigma1[m] = sigma1_curr
         SSE[m] = SSE_curr
         if (extrainfo)
             logl[m] = logl_curr
-            accept[m] = accept
+            accept[m] = accepti
         end
     end
 
@@ -135,19 +137,20 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
     result_posterior_psi = approx(sim_domain, result_posterior_psi_simDomain.y, q1.x)
 
     # transform to γ
-    result_posterior_gamma = f_phiinv(result_posterior_psi)
+    psi_tmp = func(obs_domain, result_posterior_psi)
+    result_posterior_gamma = f_phiinv(psi_tmp)
     gam0 = result_posterior_gamma.y
-    result_posterior_gamma.y = norm_gam(gam0)
+    result_posterior_gamma = func(obs_domain,norm_gam(gam0))
 
     # warped f_2
-    f2_warped = warp_f_gamma(result_posterior_gamma.x, f2, result_posterior_gamma.y)
+    f2_warped = warp_f_gamma(result_posterior_gamma.x, f2.y, result_posterior_gamma.y)
 
     Dx = []
-    Dy = [];
-    gamma_mat = [];
-    gamma_stats = [];
+    Dy = []
+    gamma_mat = []
+    gamma_stats = []
     if (extrainfo)
-        gamma_mat = zeros(size(pw_sim_est_psi_matrix))
+        gamma_mat = zeros(length(obs_domain),size(pw_sim_est_psi_matrix,2))
         Dx = Vector{Float64}(undef, size(pw_sim_est_psi_matrix,2))
         Dy = Vector{Float64}(undef, size(pw_sim_est_psi_matrix,2))
         one_v = ones(size(pw_sim_est_psi_matrix,1))
@@ -166,7 +169,7 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
     end
 
     # return object
-    out = mcmc_results(f2_warped, result_posterior_gamma.y, g_coef, result_posterior_psi.y,
+    out = mcmc_results(f2_warped, result_posterior_gamma.y, g_coef, result_posterior_psi,
                        sigma1, accept, logl, gamma_mat, gamma_stats, Dx, Dy)
 
     return out
@@ -198,9 +201,9 @@ function f_logl_pw(g::func, var1, q1::func, q2::func; SSEg=0.0)
 end
 
 function f_updateg_pw(g_coef_curr, g_basis, var1_curr, q1::func, q2::func,
-                      SSEg_curr, propose_g_coef::Function)
+                      SSE_curr, propose_g_coef::Function)
 
-    g_coef_prop = propose_g_coef(g_coef_curr)
+    g_coef_prop, ind = propose_g_coef(g_coef_curr)
 
     g_curr = f_basistofunction(g_basis.x, g_coef_curr, g_basis)
     if (SSE_curr == 0)
@@ -210,8 +213,8 @@ function f_updateg_pw(g_coef_curr, g_basis, var1_curr, q1::func, q2::func,
     g_prop = f_basistofunction(g_basis.x, g_coef_prop, g_basis)
     SSE_prop = f_SSEg_pw(g_prop, q1, q2)
 
-    logl_curr = f_logl_pw(g_curr, var1_curr, q1, q2, SSE_curr)
-    logl_prop = f_logl_pw(g_prop, var1_curr, q1, q2, SSE_prop)
+    logl_curr = f_logl_pw(g_curr, var1_curr, q1, q2, SSEg=SSE_curr)
+    logl_prop = f_logl_pw(g_prop, var1_curr, q1, q2, SSEg=SSE_prop)
 
     ratio = min(1, exp(logl_prop-logl_curr))
     u = rand()

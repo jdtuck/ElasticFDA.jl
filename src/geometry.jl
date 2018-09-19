@@ -57,8 +57,8 @@ end
 
 function f_psimean(x, y; e1=0.001, e2=0.3)
     rmy = mean(y,dims=2)
-    tmp = func(x, rmy)
-    result = rmy / f_L2norm(tmp)
+    tmp = func(x, rmy[:])
+    result = rmy[:] / f_L2norm(tmp)
     out = func(x, result)
     return out
 end

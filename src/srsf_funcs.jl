@@ -450,7 +450,7 @@ function warp_q_gamma(time::Vector, q::Vector, gam::Vector)
     gam_dev = gradient(gam, 1/(M-1));
     tmp = interpolate((time,), q, Gridded(Linear()))
     xout = (time[end] - time[1]) .* gam .+ time[1];
-    q_temp = tmp[xout] .* sqrt.(gam_dev);
+    q_temp = tmp(xout) .* sqrt.(gam_dev);
 
     return q_temp
 end
@@ -468,7 +468,7 @@ function warp_f_gamma(time::Vector, f::Vector, gam::Vector)
     M = length(gam);
     tmp = interpolate((time,), f, Gridded(Linear()))
     xout = (time[end] - time[1]) .* gam .+ time[1];
-    f_temp = tmp[xout];
+    f_temp = tmp(xout);
 
     return f_temp
 end
