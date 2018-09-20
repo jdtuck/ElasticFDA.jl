@@ -488,18 +488,19 @@ function rgam(N, sigma, num)
     TT = N-1;
     timet = LinRange(0,1,TT);
     mu = sqrt.(ones(N-1)*TT/(N-1));
-    omega = (2*pi)/TT;
+    omega = 2*pi
+    d = Normal(0,sigma)
     for k in 1:num
-        alpha_i = randn(1)*sigma;
+        alpha_i = rand(d)
         v = alpha_i .* ones(TT);
         cnt = 1;
-        for l in 2:10
-            alpha_i = randn(1)*sigma;
+        for l in 2:3
+            alpha_i = rand(d)
             if (mod(l,2) != 0)
-                v = v+alpha_i.*sqrt(2).*cos.(cnt*omega*timet);
+                v += alpha_i.*sqrt(2).*cos.(cnt*omega*timet);
                 cnt += 1;
             elseif (mod(l,2) == 0)
-                v = v+alpha_i.*sqrt(2).*sin.(cnt*omega*timet);
+                v += alpha_i.*sqrt(2).*sin.(cnt*omega*timet);
             end
         end
 
