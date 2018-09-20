@@ -17,3 +17,5 @@ propvar=1.0
 init_coef=zeros(20)
 npoints=200
 extrainfo=false
+
+out = pair_warping_expomap(f1,f2,timet,extrainfo=true)

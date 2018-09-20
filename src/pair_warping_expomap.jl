@@ -183,8 +183,8 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
     end
 
     # return object
-    out = mcmc_results(f2_warped, result_posterior_gamma.y, g_coef, result_posterior_psi,
-                       sigma1, accept, logl, gamma_mat, gamma_stats, Dx, Dy)
+    out = mcmc_results(f2_warped, result_posterior_gamma.y, g_coef[:,valid_index], result_posterior_psi,
+                       sigma1[valid_index], accept[valid_index], logl[valid_index], gamma_mat, gamma_stats, Dx, Dy)
 
     return out
 end
