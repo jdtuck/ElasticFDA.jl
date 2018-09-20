@@ -31,7 +31,7 @@ Compute pair warping between two functions using Bayesian method
     :return ydist: amplitude distance of posterior warping functions
 """
 function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2),
-                              alpha0=0.1, beta0=0.1, pbetas=[0.5,0.05,0.005,0.0001],
+                              alpha0=0.1, beta0=0.1, pbetas=[0.8,0.1,0.005,0.0001],
                               probs=[0.1,0.1,0.7,0.1],propvar=1.0,init_coef=zeros(20),
                               npoints=200,extrainfo=false)
 
@@ -123,9 +123,9 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
         newshape = length(q1.x) / 2 + alpha0
         newscale = 1 / 2 * SSE_curr + beta0
         d = InverseGamma(newshape, newscale)
-        sigma1_curr = rand(d)
-        g = f_basistofunction(g_basis.x, g_coef_curr, g_basis)
-        logl_curr = f_logl_pw(g, sigma1_curr^2, q1, q2, SSEg=SSE_curr)
+        sigma1_curr = sqrt(rand(d))
+        g1 = f_basistofunction(g_basis.x, g_coef_curr, g_basis)
+        logl_curr = f_logl_pw(g1, sigma1_curr^2, q1, q2, SSEg=SSE_curr)
 
         g_coef[:,m] = g_coef_curr
         sigma1[m] = sigma1_curr
@@ -170,8 +170,8 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
         Dy = Vector{Float64}(undef, size(pw_sim_est_psi_matrix,2))
         one_v = ones(size(pw_sim_est_psi_matrix,1))
         for i = 1:size(pw_sim_est_psi_matrix,2)
-            tmp = approx(sim_domain, pw_sim_est_psi_matrix, q1.x)
-            tmp = func(q1.x,tmp)
+            tmp = approx(sim_domain, pw_sim_est_psi_matrix[:,i], obs_domain)
+            tmp = func(obs_domain,tmp)
             gam0 = f_phiinv(tmp)
             gamma_mat[:,i] = norm_gam(gam0.y)
 
@@ -219,13 +219,19 @@ function f_updateg_pw(g_coef_curr, g_basis, var1_curr, q1::func, q2::func,
                       SSE_curr, propose_g_coef::Function)
 
     g_coef_prop, ind = propose_g_coef(g_coef_curr)
+    g_prop = f_basistofunction(g_basis.x, g_coef_prop, g_basis)
+    tmp = f_exp1(g_prop)
+    while (minimum(tmp.y)<0)
+        g_coef_prop, ind = propose_g_coef(g_coef_curr)
+        g_prop = f_basistofunction(g_basis.x, g_coef_prop, g_basis)
+        tmp = f_exp1(g_prop)
+    end
 
     g_curr = f_basistofunction(g_basis.x, g_coef_curr, g_basis)
     if (SSE_curr == 0)
         SSE_curr = f_SSEg_pw(g_curr, q1, q2)
     end
 
-    g_prop = f_basistofunction(g_basis.x, g_coef_prop, g_basis)
     SSE_prop = f_SSEg_pw(g_prop, q1, q2)
 
     logl_curr = f_logl_pw(g_curr, var1_curr, q1, q2, SSEg=SSE_curr)

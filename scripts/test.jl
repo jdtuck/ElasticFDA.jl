@@ -18,4 +18,8 @@ init_coef=zeros(20)
 npoints=200
 extrainfo=false
 
-out = pair_warping_expomap(f1,f2,timet,extrainfo=true)
+using JLD2, ElasticFDA, Plots
+@load "test/simu_data.jld2"
+f1 = f[:,1]
+f2 = f[:,21]
+out = pair_warping_expomap(f1,f2,timet,propvar=1,extrainfo=true)
