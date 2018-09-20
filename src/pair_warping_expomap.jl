@@ -53,18 +53,19 @@ function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2)
     Mg = length(init_coef)
     sigma1_ini = 1.0
     g_coef_ini = init_coef
+    nbasis = Int(Mg/2)
 
     # normalize time
     timet = collect(LinRange(0,1,length(timet)))
     f1 = func(timet,f1)
     f2 = func(timet,f2)
 
-    g_basis = basis_fourier(collect(LinRange(0,1,npoints)), Int(Mg/2), 1)
+    g_basis = basis_fourier(collect(LinRange(0,1,npoints)), nbasis, 1)
 
     function propose_g_coef(g_coef_curr)
         probm = [0; cumsum(probs)]
         z = rand()
-        d = MvNormal(propvar./sort(repeat(1:10,2)))
+        d = MvNormal(propvar./sort(repeat(1:nbasis,2)))
         ind = 0
         prop = g_coef_curr
         for i in 1:length(pbetas)
