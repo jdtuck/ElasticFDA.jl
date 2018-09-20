@@ -1,20 +1,34 @@
 """
 Compute pair warping between two functions using Bayesian method
 
-    pair_warping_expomap(f1, f2, timet; iter=15000, times=5, powera=1)
-    :param f1, f2: vectors describing functions
-    :param iter: number of iterations
-    :param times: MCMC parameter
-    :param powera: MCMC parameter
+    pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2),
+                         alpha0=0.1, beta0=0.1, pbetas=[0.5,0.05,0.005,0.0001],
+                         probs=[0.1,0.1,0.7,0.1],propvar=1.0,
+                         init_coef=zeros(20),npoints=200,extrainfo=false)
 
-    Returns Dict containing
-    :return f1:
-    :return f2_q: srsf registration
-    :return gam_q: warping function
-    :return f2a: registered f2
-    :return gam: warping function
-    :return dist_collect: distance
-    :return best_match: best match
+    :param f1, f2: vectors describing functions
+    :param timet: vector describing timing
+    :param iter: number of MCMC iterations
+    :param burnin: number of MCMC burnin iterations
+    :param alpha0, beta0: IG parameters for prior of sigma1
+    :param pbetas: mixture ratios for pCN
+    :param probs: mixcture probabilities for zpCN
+    :param propvar: variance of proposal distribution
+    :param init_coef: initial g coefficients
+    :param npoits: number of sample points to use during alignment
+    :param extrainfo: T/F whether additional information is returned (accept, logl, gamma_mat, gamma_stats, xdist, ydist)
+
+    Returns mcmc struct containing
+    :return f2_warped: warped f2
+    :return gamma: warping function
+    :return g_coef: g_coeficients
+    :return sigma1: variance samples
+    :return accept: accept samples
+    :return logl: log-likelihood
+    :return gamma_mat: posterior warping function samples
+    :return gamma_stats: posterior warping function samples 95% credible intervals
+    :return xdist: phase distance of posterior warping functions
+    :return ydist: amplitude distance of posterior warping functions
 """
 function pair_warping_expomap(f1, f2, timet; iter=20000, burnin=min(5000,iter/2),
                               alpha0=0.1, beta0=0.1, pbetas=[0.5,0.05,0.005,0.0001],
