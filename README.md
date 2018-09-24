@@ -75,3 +75,5 @@ Vision (ECCV), September, 2014
 
 Cheng, W., Dryden, I. L., & Huang, X. (2016). Bayesian registration of functions
 and curves. Bayesian Analysis, 11(2), 447–475.
+
+Y. Lu, R. Herbei and S. Kurtek (2017). "Bayesian Registration of Functions with a Gaussian Process Prior." Journal of Computational and Graphical Statistics: in press: 1-34

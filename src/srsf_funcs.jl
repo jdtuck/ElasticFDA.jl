@@ -122,30 +122,9 @@ function f_to_srsf(f::Array, timet=0, smooth=false)
 end
 
 function f_to_srsf(f::func)
-    d = f_predictfunction(f, at=f.x, deriv=1)
-    result = func(f.x, sign(d) .* sqrt(abs(d)))
+    d = f_predictfunction(f, f.x, deriv=1)
+    result = func(f.x, sign.(d.y) .* sqrt.(abs.(d.y)))
     return(result)
-end
-
-function f_predictfunction(f::func, at; deriv=0, method="linear")
-    if method=="linear"
-        if (deriv==0)
-            result = approx(f.x, f.y, at)
-        end
-        if (deriv == 1)
-            fmod = approx(f.x, f.y, at)
-            diffy1 = [0, diff(fmod)]
-            diffy2 = [diff(fmod), 0]
-            diffx1 = [0, diff(at)]
-            diffx2 = [diff(at), 0]
-
-            result = (diffy2 + diffy1) / (diffx2 + diffx1)
-        end
-    else
-        error("Method not implemented")
-    end
-
-    return result
 end
 
 """
@@ -471,7 +450,7 @@ function warp_q_gamma(time::Vector, q::Vector, gam::Vector)
     gam_dev = gradient(gam, 1/(M-1));
     tmp = interpolate((time,), q, Gridded(Linear()))
     xout = (time[end] - time[1]) .* gam .+ time[1];
-    q_temp = tmp[xout] .* sqrt.(gam_dev);
+    q_temp = tmp(xout) .* sqrt.(gam_dev);
 
     return q_temp
 end
@@ -489,7 +468,7 @@ function warp_f_gamma(time::Vector, f::Vector, gam::Vector)
     M = length(gam);
     tmp = interpolate((time,), f, Gridded(Linear()))
     xout = (time[end] - time[1]) .* gam .+ time[1];
-    f_temp = tmp[xout];
+    f_temp = tmp(xout);
 
     return f_temp
 end
@@ -509,18 +488,19 @@ function rgam(N, sigma, num)
     TT = N-1;
     timet = LinRange(0,1,TT);
     mu = sqrt.(ones(N-1)*TT/(N-1));
-    omega = (2*pi)/TT;
+    omega = 2*pi
+    d = Normal(0,sigma)
     for k in 1:num
-        alpha_i = randn(1)*sigma;
+        alpha_i = rand(d)
         v = alpha_i .* ones(TT);
         cnt = 1;
-        for l in 2:10
-            alpha_i = randn(1)*sigma;
+        for l in 2:3
+            alpha_i = rand(d)
             if (mod(l,2) != 0)
-                v = v+alpha_i.*sqrt(2).*cos.(cnt*omega*timet);
+                v += alpha_i.*sqrt(2).*cos.(cnt*omega*timet);
                 cnt += 1;
             elseif (mod(l,2) == 0)
-                v = v+alpha_i.*sqrt(2).*sin.(cnt*omega*timet);
+                v += alpha_i.*sqrt(2).*sin.(cnt*omega*timet);
             end
         end
 
