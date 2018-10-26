@@ -20,9 +20,9 @@ else
 		LDFLAGS = -shared # linking flags
 		LIBS = -lmkl_rt -lpthread
 	else
-		CFLAGS =  -fPIC -std=c++11 -O3 -g  # C flags
+		CFLAGS =  -fPIC -std=c++11 -O3 -g  -L./destdir/lib # C flags
 		LDFLAGS = -shared # linking flags
-		LIBS = -lopenblas
+		LIBS = -lopenblas64_
 	endif
 endif
 
