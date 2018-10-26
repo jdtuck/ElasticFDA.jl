@@ -22,7 +22,7 @@ else
 	else
 		CFLAGS =  -fPIC -std=c++11 -O3 -g  # C flags
 		LDFLAGS = -shared # linking flags
-		LIBS = -lblas -llapack
+		LIBS = -lopenblas
 	endif
 endif
 
