@@ -39,6 +39,9 @@ all: $(TARGET)
 clean:
 	rm -f $(OBJECTS) $(TARGET)
 
+install:
+	cp $(TARGET) ../
+
 src/%.o: src/%.cpp
 	$(CXX) $(CFLAGS) $(INC) -c -o $@ $<
 

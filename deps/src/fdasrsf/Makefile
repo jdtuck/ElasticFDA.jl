@@ -23,5 +23,8 @@ all: $(TARGET)
 clean:
 	rm -f $(OBJECTS) $(TARGET)
 
+install:
+	cp $(TARGET) ../
+
 $(TARGET) : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
