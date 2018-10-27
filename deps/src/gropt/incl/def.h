@@ -394,7 +394,7 @@ extern void dgees_(
         } nullptr = {};
     #endif // end of __GNUC__
 #else
-#   error "Unknown compiler"
+    #define M_PI 3.14159265358979323846264338327950288
 #endif
 
 #include <map>
