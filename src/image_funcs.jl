@@ -126,8 +126,7 @@ function compgrad2D(f::Array)
         dfdv = zeros(n,t,d);
     end
 
-    @cpp ccall((:findgrad2D, libfdaqmap), Void, (Ptr{Float64}, Ptr{Float64},
-               Ptr{Float64}, Int32, Int32, Int32), dfdu, dfdv, f, n, t, d)
+    @cxx findgrad2D(dfdu, dfdv, f, n, t, d)
 
     return dfdu, dfdv
 end
