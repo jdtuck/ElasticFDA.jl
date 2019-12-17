@@ -1,14 +1,14 @@
 .PHONY : clean
 
 ERR = $(shell which icpc>/dev/null; echo $$?)
-ifeq "$(ERR)" "0"
-    CXX = icpc
-	CFLAGS =  -fPIC -O3 -g # C flags
-	LDFLAGS = -shared # linking flags
-else
+#ifeq "$(ERR)" "0"
+#    CXX = icpc
+#	CFLAGS =  -fPIC -O3 -g # C flags
+#	LDFLAGS = -shared # linking flags
+#else
 	CFLAGS =  -fPIC -std=c++11 -O3 -g  # C flags
 	LDFLAGS = -shared # linking flags
-endif
+#endif
 
 LIB=fdaqmap
 SUFFIX=so
