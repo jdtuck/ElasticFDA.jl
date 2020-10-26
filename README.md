@@ -1,7 +1,7 @@
 # ElasticFDA
 *Julia library for elastic functional data analysis*
 
-[![Build Status](https://travis-ci.org/jdtuck/ElasticFDA.jl.svg?branch=master)](https://travis-ci.org/jdtuck/ElasticFDA.jl)
+[![Build Status](https://travis-ci.com/jdtuck/ElasticFDA.jl.svg?branch=master)](https://travis-ci.com/jdtuck/ElasticFDA.jl)
 [![Build status](https://img.shields.io/appveyor/ci/jdtuck/elasticfda-jl.svg?style=flat-square&label=windows)](https://ci.appveyor.com/project/jdtuck/elasticfda-jl/branch/master)
 [![Coverage Status](http://img.shields.io/coveralls/jdtuck/ElasticFDA.jl.svg?style=flat-square)](https://coveralls.io/r/jdtuck/ElasticFDA.jl?branch=master)
 
